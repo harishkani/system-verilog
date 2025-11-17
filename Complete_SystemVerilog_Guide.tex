@@ -1092,65 +1092,2736 @@ Write a module that demonstrates the difference:
 % The document continues with more sections...
 
 \newpage
-\section{Note on Document Length}
+% ============================================================================
+\section{Control Flow Statements}
 
-This is the beginning of a comprehensive SystemVerilog guide. The complete document would continue with:
+\subsection{If-Else Statements}
 
-\textbf{Remaining Beginner Topics (Sections 5-10):}
-\begin{itemize}
-  \item Combinational Logic Design
-  \item Sequential Logic Design
-  \item Modules and Hierarchy
-  \item Testbenches and Simulation
-  \item Control Flow (if, case, loops)
-  \item Basic Arrays
-\end{itemize}
+\begin{lstlisting}[caption={If-Else Statements}]
+module if_else_example;
+  int temperature = 75;
+  string weather_status;
 
-\textbf{Intermediate Topics (Sections 11-20):}
-\begin{itemize}
-  \item Advanced Data Types (struct, enum, union, typedef)
-  \item Arrays (dynamic, associative, queues)
-  \item Interfaces and Modports
-  \item Packages and Import
-  \item Generate Blocks
-  \item Parameters
-  \item Functions and Tasks (detailed)
-  \item Clocking Blocks
-  \item Classes and OOP Basics
-  \item Inheritance and Polymorphism
-\end{itemize}
+  initial begin
+    // Simple if
+    if (temperature > 80)
+      $display("It's hot!");
 
-\textbf{Advanced Topics (Sections 21-30):}
-\begin{itemize}
-  \item Randomization and Constraints
-  \item Functional Coverage and Covergroups
-  \item Assertions (SVA)
-  \item Inter-process Communication
-  \item Virtual Interfaces
-  \item Factory Pattern
-  \item UVM Basics
-  \item Complete Verification Projects
-  \item Performance and Optimization
-  \item Industry Best Practices
-\end{itemize}
+    // If-else
+    if (temperature > 80)
+      $display("It's hot!");
+    else
+      $display("It's not hot");
 
-The complete document would be approximately \textbf{8000-10000 lines} with all 100+ exercises, solutions, waveforms, and cheat sheets.
+    // If-else-if ladder
+    if (temperature < 32)
+      weather_status = "Freezing";
+    else if (temperature < 50)
+      weather_status = "Cold";
+    else if (temperature < 70)
+      weather_status = "Cool";
+    else if (temperature < 85)
+      weather_status = "Warm";
+    else
+      weather_status = "Hot";
 
-Would you like me to:
+    $display("Temperature: %0d°F - %s", temperature, weather_status);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Case Statements}
+
+\begin{lstlisting}[caption={Case Statement Examples}]
+module case_example;
+  logic [2:0] opcode;
+  string operation;
+
+  initial begin
+    opcode = 3'b010;
+
+    // Standard case
+    case (opcode)
+      3'b000: operation = "ADD";
+      3'b001: operation = "SUB";
+      3'b010: operation = "MUL";
+      3'b011: operation = "DIV";
+      3'b100: operation = "AND";
+      3'b101: operation = "OR";
+      3'b110: operation = "XOR";
+      3'b111: operation = "NOT";
+      default: operation = "INVALID";
+    endcase
+
+    $display("Opcode %b = %s", opcode, operation);
+
+    // Case with multiple matches
+    logic [1:0] priority;
+    case (opcode[2:1])
+      2'b00: priority = 2'b00;  // Low
+      2'b01: priority = 2'b01;  // Medium
+      2'b10, 2'b11: priority = 2'b10;  // High (multiple matches)
+    endcase
+
+    $display("Priority: %b", priority);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{CaseX and CaseZ}
+
+\begin{lstlisting}[caption={CaseX and CaseZ for Don't Care}]
+module casex_casez;
+  logic [3:0] instruction;
+
+  initial begin
+    instruction = 4'b1010;
+
+    // casez: treats Z as don't care
+    casez (instruction)
+      4'b1???: $display("Starts with 1");
+      4'b01??: $display("Starts with 01");
+      4'b001?: $display("Starts with 001");
+      default: $display("Something else");
+    endcase
+
+    // casex: treats both X and Z as don't care
+    instruction = 4'b10XX;
+    casex (instruction)
+      4'b1000: $display("Exact: 1000");
+      4'b10XX: $display("Matches 10XX pattern");
+      default: $display("No match");
+    endcase
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Unique and Priority Case}
+
+SystemVerilog adds \texttt{unique} and \texttt{priority} keywords for better simulation and synthesis:
+
+\begin{lstlisting}[caption={Unique and Priority Case}]
+module unique_priority_case;
+  logic [2:0] sel;
+
+  initial begin
+    sel = 3'b010;
+
+    // unique case - simulator checks that only ONE branch matches
+    unique case (sel)
+      3'b001: $display("Branch 1");
+      3'b010: $display("Branch 2");
+      3'b100: $display("Branch 3");
+      default: $display("Default");
+    endcase
+
+    // priority case - simulator checks in order, first match wins
+    priority case (sel)
+      3'b001: $display("Priority 1");
+      3'b010: $display("Priority 2");
+      3'b011: $display("Priority 3");  // Won't match if sel=010
+      default: $display("Default");
+    endcase
+
+    // unique if - exactly one condition must be true
+    unique if (sel == 3'b001)
+      $display("Condition 1");
+    else if (sel == 3'b010)
+      $display("Condition 2");
+    else if (sel == 3'b100)
+      $display("Condition 3");
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{For Loops}
+
+\begin{lstlisting}[caption={For Loop Examples}]
+module for_loop_example;
+  initial begin
+    // Basic for loop
+    for (int i = 0; i < 10; i++) begin
+      $display("i = %0d", i);
+    end
+
+    // Nested loops
+    for (int row = 0; row < 3; row++) begin
+      for (int col = 0; col < 3; col++) begin
+        $display("Position [%0d][%0d]", row, col);
+      end
+    end
+
+    // Loop with step
+    for (int i = 0; i < 20; i += 2) begin
+      $display("Even: %0d", i);
+    end
+
+    // Reverse loop
+    for (int i = 10; i >= 0; i--) begin
+      $display("Countdown: %0d", i);
+    end
+
+    // Array initialization
+    int array[10];
+    for (int i = 0; i < 10; i++) begin
+      array[i] = i * i;
+    end
+    $display("Array: %p", array);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{While and Do-While Loops}
+
+\begin{lstlisting}[caption={While and Do-While Loops}]
+module while_loops;
+  initial begin
+    // While loop
+    int count = 0;
+    while (count < 5) begin
+      $display("While: count = %0d", count);
+      count++;
+    end
+
+    // Do-while loop (executes at least once)
+    count = 0;
+    do begin
+      $display("Do-while: count = %0d", count);
+      count++;
+    end while (count < 5);
+
+    // While loop with condition check
+    int value = 1;
+    while (value < 1000) begin
+      $display("Value: %0d", value);
+      value = value * 2;
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Repeat and Forever Loops}
+
+\begin{lstlisting}[caption={Repeat and Forever Loops}]
+module repeat_forever;
+  logic clk = 0;
+
+  initial begin
+    // Repeat loop - fixed iterations
+    repeat (5) begin
+      #10 clk = ~clk;
+      $display("[%0t] Clock toggled", $time);
+    end
+
+    // Repeat with expression
+    int num_cycles = 3;
+    repeat (num_cycles) begin
+      $display("Iteration");
+    end
+  end
+
+  // Forever loop - infinite loop (use with caution!)
+  initial begin
+    int counter = 0;
+    forever begin
+      #10;
+      counter++;
+      $display("[%0t] Counter: %0d", $time, counter);
+      if (counter >= 10) break;  // Must have exit condition!
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Break and Continue}
+
+\begin{lstlisting}[caption={Break and Continue}]
+module break_continue;
+  initial begin
+    // Break - exit loop immediately
+    $display("=== Break Example ===");
+    for (int i = 0; i < 10; i++) begin
+      if (i == 5) break;
+      $display("i = %0d", i);
+    end
+    $display("Loop exited at i=5\n");
+
+    // Continue - skip rest of iteration
+    $display("=== Continue Example ===");
+    for (int i = 0; i < 10; i++) begin
+      if (i % 2 == 0) continue;  // Skip even numbers
+      $display("Odd: %0d", i);
+    end
+
+    // Break in nested loops
+    $display("\n=== Nested Break ===");
+    for (int i = 0; i < 5; i++) begin
+      for (int j = 0; j < 5; j++) begin
+        if (j == 3) break;  // Only breaks inner loop
+        $display("[%0d][%0d]", i, j);
+      end
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\begin{cheatbox}
+\textbf{Control Flow Cheat Sheet}
+
+\textbf{If Statement:}
+\begin{lstlisting}
+if (condition)
+  statement;
+else if (condition2)
+  statement;
+else
+  statement;
+\end{lstlisting}
+
+\textbf{Case Statement:}
+\begin{lstlisting}
+case (expression)
+  value1: statement;
+  value2, value3: statement;  // Multiple values
+  default: statement;
+endcase
+\end{lstlisting}
+
+\textbf{Loops:}
+\begin{lstlisting}
+for (int i=0; i<N; i++) { }
+while (condition) { }
+do { } while (condition);
+repeat (N) { }
+forever { }  // Must have break!
+\end{lstlisting}
+
+\textbf{Loop Control:}
+\begin{lstlisting}
+break;     // Exit loop
+continue;  // Skip to next iteration
+\end{lstlisting}
+\end{cheatbox}
+
+\begin{exercisebox}
+\textbf{Exercise 11: FizzBuzz}
+
+Classic programming challenge:
 \begin{enumerate}
-  \item Continue building the complete document section by section?
-  \item Focus on specific topics you need most?
-  \item Create this as multiple smaller documents (one per topic)?
+  \item Print numbers 1 to 100
+  \item For multiples of 3, print "Fizz"
+  \item For multiples of 5, print "Buzz"
+  \item For multiples of both 3 and 5, print "FizzBuzz"
 \end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 12: Prime Number Checker}
+
+Write a module with a function \texttt{is\_prime(int n)} that:
+\begin{enumerate}
+  \item Returns 1 if n is prime, 0 otherwise
+  \item Test numbers 1-50
+  \item Display all prime numbers found
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 13: Pattern Printer}
+
+Create a module that prints this pattern:
+\begin{verbatim}
+*
+**
+***
+****
+*****
+\end{verbatim}
+Then print it in reverse. Use nested for loops.
+\end{exercisebox}
+
+\newpage
+% ============================================================================
+\section{Combinational Logic Design}
+
+\subsection{Understanding Combinational Logic}
+
+Combinational logic output depends ONLY on current inputs, with no memory of past states.
+
+\textbf{Key Characteristics:}
+\begin{itemize}
+  \item No clock required
+  \item No storage elements (flip-flops)
+  \item Implemented using gates (AND, OR, NOT, etc.)
+  \item Use \texttt{always\_comb} or \texttt{assign}
+\end{itemize}
+
+\subsection{Continuous Assignment (assign)}
+
+\begin{lstlisting}[caption={Continuous Assignment}]
+module gates_with_assign;
+  logic a, b;
+  logic and_out, or_out, xor_out, not_out;
+
+  // Continuous assignments - always active
+  assign and_out = a & b;
+  assign or_out = a | b;
+  assign xor_out = a ^ b;
+  assign not_out = ~a;
+
+  initial begin
+    $display("a b | AND OR XOR NOT");
+    $display("----|----------------");
+    for (int i = 0; i < 4; i++) begin
+      {a, b} = i;
+      #1;  // Allow time for assignment
+      $display("%b %b |  %b  %b   %b   %b",
+               a, b, and_out, or_out, xor_out, not_out);
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Always\_comb for Combinational Logic}
+
+\begin{lstlisting}[caption={Always\_comb Block}]
+module mux_2to1;
+  logic a, b, sel;
+  logic out;
+
+  // Combinational logic using always_comb
+  always_comb begin
+    if (sel)
+      out = b;
+    else
+      out = a;
+  end
+
+  // Equivalent using conditional operator
+  assign out_alt = sel ? b : a;
+
+  initial begin
+    $display("sel a b | out");
+    $display("--------|----");
+    for (int i = 0; i < 8; i++) begin
+      {sel, a, b} = i;
+      #1;
+      $display(" %b  %b %b |  %b", sel, a, b, out);
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Multiplexers (MUX)}
+
+\begin{lstlisting}[caption={4-to-1 Multiplexer}]
+module mux_4to1 (
+  input  logic [3:0] data_in,  // 4 data inputs
+  input  logic [1:0] sel,      // 2-bit select
+  output logic       data_out
+);
+
+  // Method 1: Using case
+  always_comb begin
+    case (sel)
+      2'b00: data_out = data_in[0];
+      2'b01: data_out = data_in[1];
+      2'b10: data_out = data_in[2];
+      2'b11: data_out = data_in[3];
+    endcase
+  end
+
+  // Method 2: Using if-else (commented)
+  /*
+  always_comb begin
+    if (sel == 2'b00)      data_out = data_in[0];
+    else if (sel == 2'b01) data_out = data_in[1];
+    else if (sel == 2'b10) data_out = data_in[2];
+    else                   data_out = data_in[3];
+  end
+  */
+
+  // Method 3: Direct indexing (most concise)
+  // assign data_out = data_in[sel];
+
+endmodule
+
+// Testbench
+module mux_4to1_tb;
+  logic [3:0] data_in;
+  logic [1:0] sel;
+  logic data_out;
+
+  mux_4to1 dut (.*);
+
+  initial begin
+    data_in = 4'b1010;
+    $display("Testing 4:1 MUX with data_in = %b", data_in);
+    $display("sel | out");
+    $display("----|----");
+
+    for (int i = 0; i < 4; i++) begin
+      sel = i;
+      #1;
+      $display(" %b |  %b", sel, data_out);
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Decoders}
+
+\begin{lstlisting}[caption={2-to-4 Decoder}]
+module decoder_2to4 (
+  input  logic [1:0] in,
+  input  logic       enable,
+  output logic [3:0] out
+);
+
+  always_comb begin
+    if (enable) begin
+      case (in)
+        2'b00: out = 4'b0001;
+        2'b01: out = 4'b0010;
+        2'b10: out = 4'b0100;
+        2'b11: out = 4'b1000;
+      endcase
+    end else begin
+      out = 4'b0000;
+    end
+  end
+
+endmodule
+
+// Testbench
+module decoder_2to4_tb;
+  logic [1:0] in;
+  logic enable;
+  logic [3:0] out;
+
+  decoder_2to4 dut (.*);
+
+  initial begin
+    $display("Decoder 2:4 Truth Table");
+    $display("en in | out ");
+    $display("------|-----");
+
+    enable = 1;
+    for (int i = 0; i < 4; i++) begin
+      in = i;
+      #1;
+      $display(" %b %b | %b", enable, in, out);
+    end
+
+    $display("\nWith enable=0:");
+    enable = 0;
+    in = 2'b11;
+    #1;
+    $display(" %b %b | %b", enable, in, out);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Encoders}
+
+\begin{lstlisting}[caption={4-to-2 Priority Encoder}]
+module priority_encoder_4to2 (
+  input  logic [3:0] in,
+  output logic [1:0] out,
+  output logic       valid
+);
+
+  always_comb begin
+    // Priority encoding (highest bit wins)
+    if (in[3]) begin
+      out = 2'b11;
+      valid = 1'b1;
+    end else if (in[2]) begin
+      out = 2'b10;
+      valid = 1'b1;
+    end else if (in[1]) begin
+      out = 2'b01;
+      valid = 1'b1;
+    end else if (in[0]) begin
+      out = 2'b00;
+      valid = 1'b1;
+    end else begin
+      out = 2'b00;
+      valid = 1'b0;  // No input active
+    end
+  end
+
+endmodule
+\end{lstlisting}
+
+\subsection{Adders}
+
+\begin{lstlisting}[caption={Half Adder and Full Adder}]
+// Half Adder
+module half_adder (
+  input  logic a, b,
+  output logic sum, carry
+);
+  assign sum = a ^ b;
+  assign carry = a & b;
+endmodule
+
+// Full Adder
+module full_adder (
+  input  logic a, b, cin,
+  output logic sum, cout
+);
+  assign sum = a ^ b ^ cin;
+  assign cout = (a & b) | (b & cin) | (a & cin);
+endmodule
+
+// 4-bit Ripple Carry Adder
+module ripple_carry_adder_4bit (
+  input  logic [3:0] a, b,
+  input  logic       cin,
+  output logic [3:0] sum,
+  output logic       cout
+);
+  logic [3:1] carry;  // Internal carries
+
+  full_adder fa0 (.a(a[0]), .b(b[0]), .cin(cin),      .sum(sum[0]), .cout(carry[1]));
+  full_adder fa1 (.a(a[1]), .b(b[1]), .cin(carry[1]), .sum(sum[1]), .cout(carry[2]));
+  full_adder fa2 (.a(a[2]), .b(b[2]), .cin(carry[2]), .sum(sum[2]), .cout(carry[3]));
+  full_adder fa3 (.a(a[3]), .b(b[3]), .cin(carry[3]), .sum(sum[3]), .cout(cout));
+
+endmodule
+
+// Simple adder using + operator
+module simple_adder #(parameter WIDTH = 8) (
+  input  logic [WIDTH-1:0] a, b,
+  output logic [WIDTH-1:0] sum,
+  output logic             carry
+);
+  assign {carry, sum} = a + b;
+endmodule
+\end{lstlisting}
+
+\subsection{ALU (Arithmetic Logic Unit)}
+
+\begin{lstlisting}[caption={Simple 8-bit ALU}]
+module alu_8bit (
+  input  logic [7:0]  a, b,
+  input  logic [2:0]  opcode,
+  output logic [7:0]  result,
+  output logic        zero, carry, overflow
+);
+
+  logic [8:0] temp_result;  // Extra bit for carry
+
+  always_comb begin
+    case (opcode)
+      3'b000: temp_result = a + b;           // ADD
+      3'b001: temp_result = a - b;           // SUB
+      3'b010: temp_result = {1'b0, a & b};   // AND
+      3'b011: temp_result = {1'b0, a | b};   // OR
+      3'b100: temp_result = {1'b0, a ^ b};   // XOR
+      3'b101: temp_result = {1'b0, ~a};      // NOT
+      3'b110: temp_result = {1'b0, a << 1};  // Shift left
+      3'b111: temp_result = {1'b0, a >> 1};  // Shift right
+    endcase
+
+    result = temp_result[7:0];
+    carry = temp_result[8];
+    zero = (result == 8'b0);
+
+    // Overflow for signed addition/subtraction
+    overflow = (opcode == 3'b000 || opcode == 3'b001) &&
+               (a[7] == b[7]) && (result[7] != a[7]);
+  end
+
+endmodule
+
+// Testbench
+module alu_8bit_tb;
+  logic [7:0] a, b, result;
+  logic [2:0] opcode;
+  logic zero, carry, overflow;
+
+  alu_8bit dut (.*);
+
+  initial begin
+    $display("Testing ALU:");
+    $display("opcode | a    | b    | result | flags");
+    $display("-------|------|------|--------|------");
+
+    a = 8'd15; b = 8'd10;
+
+    for (int op = 0; op < 8; op++) begin
+      opcode = op;
+      #1;
+      $display("  %b   | %3d  | %3d  |  %3d   | Z=%b C=%b V=%b",
+               opcode, a, b, result, zero, carry, overflow);
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\begin{cheatbox}
+\textbf{Combinational Logic Cheat Sheet}
+
+\textbf{Use for Combinational Logic:}
+\begin{lstlisting}
+// Method 1: Continuous assignment
+assign out = a & b;
+
+// Method 2: always_comb
+always_comb begin
+  out = a & b;
+end
+\end{lstlisting}
+
+\textbf{Common Pitfalls:}
+\begin{itemize}
+  \item ❌ Don't use \texttt{always\_ff} for combinational logic
+  \item ❌ Don't forget default case in case statements (causes latches)
+  \item ❌ Don't assign same signal in multiple always blocks
+  \item ✅ Always use blocking assignments (=) in \texttt{always\_comb}
+  \item ✅ Ensure all outputs are assigned in all paths
+\end{itemize}
+\end{cheatbox}
+
+\begin{exercisebox}
+\textbf{Exercise 14: 8-to-1 Multiplexer}
+
+Design an 8-to-1 multiplexer:
+\begin{enumerate}
+  \item 8 data inputs (8-bit each)
+  \item 3-bit select signal
+  \item 8-bit output
+  \item Create testbench to verify all selections
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 15: 7-Segment Decoder}
+
+Create a BCD to 7-segment display decoder:
+\begin{enumerate}
+  \item Input: 4-bit BCD (0-9)
+  \item Output: 7-bit segments (a-g)
+  \item Display format for digit 8: all segments on
+  \item Create truth table and implement
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 16: Comparator}
+
+Design a 4-bit magnitude comparator:
+\begin{enumerate}
+  \item Two 4-bit inputs: A and B
+  \item Three outputs: A\_greater, A\_equal, A\_less
+  \item Test with various input combinations
+\end{enumerate}
+\end{exercisebox}
+
+% ============================================================================
+\section{Sequential Logic Design}
+
+\subsection{Understanding Sequential vs Combinational}
+
+\textbf{Combinational Logic:}
+\begin{itemize}
+  \item Output depends ONLY on current inputs
+  \item No memory of past states
+  \item Examples: MUX, decoder, adder, ALU
+\end{itemize}
+
+\textbf{Sequential Logic:}
+\begin{itemize}
+  \item Output depends on current inputs AND past states
+  \item Has memory elements (flip-flops, latches)
+  \item Driven by clock signals
+  \item Examples: counters, shift registers, FSMs
+\end{itemize}
+
+\subsection{D Flip-Flop Basics}
+
+The D flip-flop is the fundamental building block of sequential logic:
+
+\begin{lstlisting}[caption={Simple D Flip-Flop}]
+module d_flipflop (
+  input  logic clk,
+  input  logic d,
+  output logic q
+);
+  always_ff @(posedge clk) begin
+    q <= d;  // Non-blocking assignment for sequential logic
+  end
+endmodule
+\end{lstlisting}
+
+\textbf{Key Points:}
+\begin{itemize}
+  \item \texttt{always\_ff} - Indicates sequential (flip-flop) logic
+  \item \texttt{@(posedge clk)} - Triggered on rising edge of clock
+  \item \texttt{<=} - Non-blocking assignment (essential for sequential)
+\end{itemize}
+
+\textbf{Timing Diagram (Text):}
+\begin{verbatim}
+Time:  0    1    2    3    4    5    6    7    8
+       |    |    |    |    |    |    |    |    |
+clk:   _|‾‾|__|‾‾|__|‾‾|__|‾‾|__|‾‾|__|‾‾|__|‾‾|_
+d:     ____|‾‾‾‾‾‾‾‾|___________|‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+q:     ________|‾‾‾‾‾‾‾‾|___________|‾‾‾‾‾‾‾‾‾‾
+                ^           ^           ^
+            Captured    Captured    Captured
+\end{verbatim}
+
+\subsection{D Flip-Flop with Reset}
+
+\begin{lstlisting}[caption={D Flip-Flop with Asynchronous Reset}]
+module d_ff_async_reset (
+  input  logic clk,
+  input  logic rst_n,  // Active-low reset
+  input  logic d,
+  output logic q
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      q <= 1'b0;  // Reset takes priority
+    else
+      q <= d;
+  end
+endmodule
+\end{lstlisting}
+
+\begin{lstlisting}[caption={D Flip-Flop with Synchronous Reset}]
+module d_ff_sync_reset (
+  input  logic clk,
+  input  logic rst,
+  input  logic d,
+  output logic q
+);
+  always_ff @(posedge clk) begin
+    if (rst)
+      q <= 1'b0;  // Reset synchronized to clock
+    else
+      q <= d;
+  end
+endmodule
+\end{lstlisting}
+
+\begin{coloredbox}{warningcolor}{Warning - Reset Strategy}
+\textbf{Asynchronous Reset:}
+\begin{itemize}
+  \item Resets immediately when asserted
+  \item Can cause metastability issues
+  \item Use for critical resets
+  \item Syntax: \texttt{@(posedge clk or negedge rst\_n)}
+\end{itemize}
+
+\textbf{Synchronous Reset:}
+\begin{itemize}
+  \item Resets only on clock edge
+  \item More predictable timing
+  \item Preferred for most designs
+  \item Syntax: reset check inside \texttt{@(posedge clk)}
+\end{itemize}
+\end{coloredbox}
+
+\subsection{Registers (Multi-bit Storage)}
+
+\begin{lstlisting}[caption={8-bit Register with Load Enable}]
+module register_8bit (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       load,      // Load enable
+  input  logic [7:0] d,
+  output logic [7:0] q
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      q <= 8'b0;
+    else if (load)
+      q <= d;
+    // else: q retains its value (implied)
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Counters}
+
+\subsubsection{Binary Counter}
+
+\begin{lstlisting}[caption={4-bit Binary Up Counter}]
+module binary_counter_4bit (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       enable,
+  output logic [3:0] count
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      count <= 4'b0;
+    else if (enable)
+      count <= count + 1;  // Wraps around at 15->0
+  end
+endmodule
+\end{lstlisting}
+
+\subsubsection{Up/Down Counter}
+
+\begin{lstlisting}[caption={8-bit Up/Down Counter with Load}]
+module updown_counter (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       enable,
+  input  logic       up_down,   // 1=up, 0=down
+  input  logic       load,
+  input  logic [7:0] load_value,
+  output logic [7:0] count,
+  output logic       overflow,
+  output logic       underflow
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      count     <= 8'b0;
+      overflow  <= 1'b0;
+      underflow <= 1'b0;
+    end else if (load) begin
+      count     <= load_value;
+      overflow  <= 1'b0;
+      underflow <= 1'b0;
+    end else if (enable) begin
+      if (up_down) begin
+        count    <= count + 1;
+        overflow <= (count == 8'hFF);
+      end else begin
+        count     <= count - 1;
+        underflow <= (count == 8'h00);
+      end
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsubsection{Gray Code Counter}
+
+Gray code changes only 1 bit between consecutive values, useful for clock domain crossing.
+
+\begin{lstlisting}[caption={4-bit Gray Code Counter}]
+module gray_counter_4bit (
+  input  logic       clk,
+  input  logic       rst_n,
+  output logic [3:0] gray_count
+);
+  logic [3:0] binary_count;
+
+  // Binary counter
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      binary_count <= 4'b0;
+    else
+      binary_count <= binary_count + 1;
+  end
+
+  // Binary to Gray conversion
+  assign gray_count = binary_count ^ (binary_count >> 1);
+endmodule
+
+// Conversion table:
+// Binary | Gray
+//  0000  | 0000
+//  0001  | 0001
+//  0010  | 0011  <- Only 1 bit changes
+//  0011  | 0010  <- Only 1 bit changes
+//  0100  | 0110
+//  0101  | 0111
+//  0110  | 0101
+//  0111  | 0100
+\end{lstlisting}
+
+\subsubsection{Ring Counter}
+
+\begin{lstlisting}[caption={4-bit Ring Counter}]
+module ring_counter_4bit (
+  input  logic       clk,
+  input  logic       rst_n,
+  output logic [3:0] ring
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      ring <= 4'b0001;  // Initialize with single 1
+    else
+      ring <= {ring[2:0], ring[3]};  // Rotate left
+  end
+endmodule
+
+// Sequence: 0001 -> 0010 -> 0100 -> 1000 -> 0001 -> ...
+\end{lstlisting}
+
+\subsubsection{Johnson Counter}
+
+\begin{lstlisting}[caption={4-bit Johnson Counter}]
+module johnson_counter_4bit (
+  input  logic       clk,
+  input  logic       rst_n,
+  output logic [3:0] johnson
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      johnson <= 4'b0000;
+    else
+      johnson <= {johnson[2:0], ~johnson[3]};  // Rotate with inversion
+  end
+endmodule
+
+// Sequence: 0000 -> 0001 -> 0011 -> 0111 -> 1111 ->
+//           1110 -> 1100 -> 1000 -> 0000 -> ...
+\end{lstlisting}
+
+\subsection{Shift Registers}
+
+\subsubsection{Serial-In Serial-Out (SISO)}
+
+\begin{lstlisting}[caption={8-bit SISO Shift Register}]
+module siso_shift_register (
+  input  logic clk,
+  input  logic rst_n,
+  input  logic serial_in,
+  output logic serial_out
+);
+  logic [7:0] shift_reg;
+
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      shift_reg <= 8'b0;
+    else
+      shift_reg <= {shift_reg[6:0], serial_in};  // Shift left
+  end
+
+  assign serial_out = shift_reg[7];  // MSB output
+endmodule
+\end{lstlisting}
+
+\subsubsection{Serial-In Parallel-Out (SIPO)}
+
+\begin{lstlisting}[caption={8-bit SIPO Shift Register}]
+module sipo_shift_register (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       serial_in,
+  output logic [7:0] parallel_out
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      parallel_out <= 8'b0;
+    else
+      parallel_out <= {parallel_out[6:0], serial_in};
+  end
+endmodule
+\end{lstlisting}
+
+\subsubsection{Parallel-In Serial-Out (PISO)}
+
+\begin{lstlisting}[caption={8-bit PISO Shift Register}]
+module piso_shift_register (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       load,         // Load parallel data
+  input  logic       shift_enable,
+  input  logic [7:0] parallel_in,
+  output logic       serial_out
+);
+  logic [7:0] shift_reg;
+
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      shift_reg <= 8'b0;
+    else if (load)
+      shift_reg <= parallel_in;    // Load parallel
+    else if (shift_enable)
+      shift_reg <= {shift_reg[6:0], 1'b0};  // Shift left
+  end
+
+  assign serial_out = shift_reg[7];
+endmodule
+\end{lstlisting}
+
+\subsubsection{Parallel-In Parallel-Out (PIPO)}
+
+\begin{lstlisting}[caption={8-bit PIPO Register}]
+module pipo_register (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       load,
+  input  logic [7:0] parallel_in,
+  output logic [7:0] parallel_out
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      parallel_out <= 8'b0;
+    else if (load)
+      parallel_out <= parallel_in;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Finite State Machines (FSM)}
+
+FSMs are the heart of sequential control logic. There are two types:
+
+\textbf{Moore Machine:} Output depends only on current state
+\textbf{Mealy Machine:} Output depends on current state AND inputs
+
+\subsubsection{Moore FSM Example - Sequence Detector}
+
+Detect sequence "1011" in serial input:
+
+\begin{lstlisting}[caption={Moore FSM - Sequence Detector for "1011"}]
+module sequence_detector_moore (
+  input  logic clk,
+  input  logic rst_n,
+  input  logic serial_in,
+  output logic detected
+);
+  // State encoding
+  typedef enum logic [2:0] {
+    IDLE   = 3'b000,
+    GOT_1  = 3'b001,
+    GOT_10 = 3'b010,
+    GOT_101= 3'b011,
+    FOUND  = 3'b100
+  } state_t;
+
+  state_t current_state, next_state;
+
+  // State register
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      current_state <= IDLE;
+    else
+      current_state <= next_state;
+  end
+
+  // Next state logic
+  always_comb begin
+    next_state = current_state;  // Default: stay in current state
+
+    case (current_state)
+      IDLE: begin
+        if (serial_in)
+          next_state = GOT_1;
+      end
+
+      GOT_1: begin
+        if (!serial_in)
+          next_state = GOT_10;
+        // else stay in GOT_1 (consecutive 1s)
+      end
+
+      GOT_10: begin
+        if (serial_in)
+          next_state = GOT_101;
+        else
+          next_state = IDLE;
+      end
+
+      GOT_101: begin
+        if (serial_in)
+          next_state = FOUND;
+        else
+          next_state = GOT_10;
+      end
+
+      FOUND: begin
+        next_state = IDLE;  // Reset after detection
+      end
+
+      default: next_state = IDLE;
+    endcase
+  end
+
+  // Output logic (Moore: depends only on state)
+  assign detected = (current_state == FOUND);
+endmodule
+\end{lstlisting}
+
+\textbf{State Diagram:}
+\begin{verbatim}
+         1              0              1              1
+  IDLE ----> GOT_1 ----> GOT_10 ----> GOT_101 ----> FOUND
+   ^          |  ^         |            |            |
+   |          |  |         |            |            |
+   |          0  +----1----+            +-----0------+
+   |             (stay)
+   +----------------------------------------------------+
+                        (return to IDLE)
+\end{verbatim}
+
+\subsubsection{Mealy FSM Example - Serial Adder}
+
+\begin{lstlisting}[caption={Mealy FSM - Serial Binary Adder}]
+module serial_adder_mealy (
+  input  logic clk,
+  input  logic rst_n,
+  input  logic a,      // Serial input A
+  input  logic b,      // Serial input B
+  output logic sum,    // Serial sum output
+  output logic carry_out
+);
+  typedef enum logic {
+    NO_CARRY = 1'b0,
+    HAS_CARRY = 1'b1
+  } state_t;
+
+  state_t current_state, next_state;
+
+  // State register
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      current_state <= NO_CARRY;
+    else
+      current_state <= next_state;
+  end
+
+  // Next state and output logic (Mealy: combined)
+  always_comb begin
+    case (current_state)
+      NO_CARRY: begin
+        case ({a, b})
+          2'b00: begin sum = 0; next_state = NO_CARRY; end
+          2'b01: begin sum = 1; next_state = NO_CARRY; end
+          2'b10: begin sum = 1; next_state = NO_CARRY; end
+          2'b11: begin sum = 0; next_state = HAS_CARRY; end
+        endcase
+      end
+
+      HAS_CARRY: begin
+        case ({a, b})
+          2'b00: begin sum = 1; next_state = NO_CARRY; end
+          2'b01: begin sum = 0; next_state = HAS_CARRY; end
+          2'b10: begin sum = 0; next_state = HAS_CARRY; end
+          2'b11: begin sum = 1; next_state = HAS_CARRY; end
+        endcase
+      end
+    endcase
+  end
+
+  assign carry_out = (current_state == HAS_CARRY);
+endmodule
+\end{lstlisting}
+
+\subsubsection{FSM Design Best Practices}
+
+\begin{coloredbox}{tipcolor}{Tip - FSM Coding Style}
+\textbf{Three Always Block Style (Recommended):}
+\begin{enumerate}
+  \item \texttt{always\_ff}: State register (sequential)
+  \item \texttt{always\_comb}: Next state logic (combinational)
+  \item \texttt{always\_comb} or \texttt{assign}: Output logic
+\end{enumerate}
+
+\textbf{Advantages:}
+\begin{itemize}
+  \item Clear separation of concerns
+  \item Easy to debug and maintain
+  \item Synthesis-friendly
+  \item Avoids latches
+\end{itemize}
+
+\textbf{State Encoding:}
+\begin{itemize}
+  \item Use \texttt{typedef enum} for readable code
+  \item Let synthesizer choose encoding (usually one-hot or binary)
+  \item Specify encoding if needed: \texttt{\{*\} fsm\_encoding = "one\_hot"}
+\end{itemize}
+\end{coloredbox}
+
+\subsection{Complete Example - Traffic Light Controller}
+
+\begin{lstlisting}[caption={Traffic Light Controller FSM}]
+module traffic_light_controller (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       pedestrian_button,
+  output logic [2:0] north_south_light,  // [R, Y, G]
+  output logic [2:0] east_west_light,
+  output logic       walk_sign
+);
+  // Light encoding
+  localparam RED    = 3'b100;
+  localparam YELLOW = 3'b010;
+  localparam GREEN  = 3'b001;
+
+  // States
+  typedef enum logic [2:0] {
+    NS_GREEN  = 3'b000,
+    NS_YELLOW = 3'b001,
+    EW_GREEN  = 3'b010,
+    EW_YELLOW = 3'b011,
+    PED_CROSS = 3'b100
+  } state_t;
+
+  state_t current_state, next_state;
+  logic [7:0] timer;
+
+  // Timer durations (in clock cycles)
+  localparam NS_GREEN_TIME  = 100;  // 10 seconds at 10Hz clock
+  localparam NS_YELLOW_TIME = 30;
+  localparam EW_GREEN_TIME  = 80;
+  localparam EW_YELLOW_TIME = 30;
+  localparam PED_CROSS_TIME = 50;
+
+  // State register
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      current_state <= NS_GREEN;
+    else
+      current_state <= next_state;
+  end
+
+  // Timer
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      timer <= 8'b0;
+    else if (current_state != next_state)
+      timer <= 8'b0;  // Reset timer on state change
+    else
+      timer <= timer + 1;
+  end
+
+  // Next state logic
+  always_comb begin
+    next_state = current_state;  // Default
+
+    case (current_state)
+      NS_GREEN: begin
+        if (timer >= NS_GREEN_TIME)
+          next_state = NS_YELLOW;
+      end
+
+      NS_YELLOW: begin
+        if (timer >= NS_YELLOW_TIME)
+          next_state = pedestrian_button ? PED_CROSS : EW_GREEN;
+      end
+
+      EW_GREEN: begin
+        if (timer >= EW_GREEN_TIME)
+          next_state = EW_YELLOW;
+      end
+
+      EW_YELLOW: begin
+        if (timer >= EW_YELLOW_TIME)
+          next_state = NS_GREEN;
+      end
+
+      PED_CROSS: begin
+        if (timer >= PED_CROSS_TIME)
+          next_state = EW_GREEN;
+      end
+
+      default: next_state = NS_GREEN;
+    endcase
+  end
+
+  // Output logic
+  always_comb begin
+    // Default all lights red
+    north_south_light = RED;
+    east_west_light   = RED;
+    walk_sign         = 1'b0;
+
+    case (current_state)
+      NS_GREEN: begin
+        north_south_light = GREEN;
+        east_west_light   = RED;
+      end
+
+      NS_YELLOW: begin
+        north_south_light = YELLOW;
+        east_west_light   = RED;
+      end
+
+      EW_GREEN: begin
+        north_south_light = RED;
+        east_west_light   = GREEN;
+      end
+
+      EW_YELLOW: begin
+        north_south_light = RED;
+        east_west_light   = YELLOW;
+      end
+
+      PED_CROSS: begin
+        north_south_light = RED;
+        east_west_light   = RED;
+        walk_sign         = 1'b1;
+      end
+    endcase
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Sequential Logic Cheat Sheet}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Component} & \textbf{Always Block} & \textbf{Assignment} \\
+\hline
+D Flip-Flop & \texttt{always\_ff @(posedge clk)} & \texttt{<=} (non-blocking) \\
+Register & \texttt{always\_ff @(posedge clk)} & \texttt{<=} \\
+Counter & \texttt{always\_ff @(posedge clk)} & \texttt{<=} \\
+Shift Register & \texttt{always\_ff @(posedge clk)} & \texttt{<=} \\
+FSM State Reg & \texttt{always\_ff @(posedge clk)} & \texttt{<=} \\
+FSM Next State & \texttt{always\_comb} & \texttt{=} (blocking) \\
+FSM Output & \texttt{always\_comb} or \texttt{assign} & \texttt{=} or continuous \\
+\hline
+\end{tabular}
+\caption{Sequential Logic Quick Reference}
+\end{table}
+
+\begin{coloredbox}{warningcolor}{Critical Rules for Sequential Logic}
+\begin{enumerate}
+  \item ALWAYS use \texttt{<=} (non-blocking) in \texttt{always\_ff}
+  \item ALWAYS use \texttt{=} (blocking) in \texttt{always\_comb}
+  \item NEVER mix blocking and non-blocking in same block
+  \item Include reset in all sequential logic
+  \item Use \texttt{always\_ff} for flip-flops (not plain \texttt{always})
+  \item Make sure all outputs are assigned in all branches (avoid latches)
+\end{enumerate}
+\end{coloredbox}
+
+\subsection{Exercises - Sequential Logic}
+
+\begin{exercisebox}
+\textbf{Exercise 17: Modulo-N Counter}
+
+Create a parameterized modulo-N counter:
+\begin{enumerate}
+  \item Parameter: N (count from 0 to N-1, then wrap)
+  \item Input: clk, rst\_n, enable
+  \item Output: count (sized appropriately for N)
+  \item Output: terminal\_count (1 when count = N-1)
+  \item Test with N = 10, 16, 100
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 18: Bidirectional Shift Register}
+
+Design an 8-bit shift register with:
+\begin{enumerate}
+  \item Mode select: 00=hold, 01=shift left, 10=shift right, 11=parallel load
+  \item Serial input left and right
+  \item Parallel input and output
+  \item Test all modes with different data patterns
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 19: FSM - Vending Machine}
+
+Design a simple vending machine controller:
+\begin{enumerate}
+  \item Item cost: 15 cents
+  \item Accepts: 5 cent (nickel), 10 cent (dime)
+  \item Inputs: nickel\_in, dime\_in, clk, rst\_n
+  \item Outputs: dispense\_item, return\_change (5 cents)
+  \item States: IDLE, FIVE\_CENTS, TEN\_CENTS, FIFTEEN\_CENTS
+  \item Draw state diagram and implement
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 20: Debounce Circuit}
+
+Create a button debouncer:
+\begin{enumerate}
+  \item Input: noisy\_button (from mechanical switch)
+  \item Output: clean\_button (debounced signal)
+  \item Algorithm: Sample button every N clocks, output changes only if stable for M samples
+  \item Parameters: N (sample period), M (stability count)
+  \item Test with simulated noisy input
+\end{enumerate}
+\end{exercisebox}
+
+% ============================================================================
+\section{Modules and Hierarchy}
+
+\subsection{What is a Module?}
+
+A module is the fundamental building block in SystemVerilog. Think of it as:
+\begin{itemize}
+  \item A container for logic
+  \item A reusable component
+  \item A level of hierarchy in your design
+  \item Similar to a function/class in software, but describes hardware
+\end{itemize}
+
+\subsection{Basic Module Structure}
+
+\begin{lstlisting}[caption={Module Structure}]
+module module_name (
+  // Port declarations
+  input  logic signal_in,
+  output logic signal_out
+);
+  // Internal signals
+  logic internal_signal;
+
+  // Logic implementation
+  assign signal_out = signal_in & internal_signal;
+
+endmodule
+\end{lstlisting}
+
+\textbf{Key Parts:}
+\begin{enumerate}
+  \item \texttt{module} keyword + name
+  \item Port list (inputs, outputs, inouts)
+  \item Internal declarations
+  \item Logic implementation
+  \item \texttt{endmodule} keyword
+\end{enumerate}
+
+\subsection{Port Directions}
+
+\begin{lstlisting}[caption={Port Direction Types}]
+module port_examples (
+  input  logic       a,           // Input only
+  output logic       b,           // Output only
+  inout  logic       c,           // Bidirectional (tri-state)
+  output logic [7:0] d,           // Multi-bit output
+  input  logic [3:0] e,           // Multi-bit input
+  ref    int         counter      // Reference (for tasks/functions)
+);
+  // Module logic here
+endmodule
+\end{lstlisting}
+
+\textbf{Port Types:}
+\begin{itemize}
+  \item \texttt{input} - Data flows into the module
+  \item \texttt{output} - Data flows out of the module
+  \item \texttt{inout} - Bidirectional (used for tri-state buses)
+  \item \texttt{ref} - Pass by reference (advanced, for verification)
+\end{itemize}
+
+\subsection{Module Instantiation}
+
+Creating an instance of a module inside another module:
+
+\begin{lstlisting}[caption={Module Instantiation - Named Port Connection}]
+// Define a simple AND gate module
+module and_gate (
+  input  logic a,
+  input  logic b,
+  output logic y
+);
+  assign y = a & b;
+endmodule
+
+// Use the AND gate in a larger module
+module top_module (
+  input  logic in1,
+  input  logic in2,
+  output logic out1
+);
+  // Instantiate and_gate
+  // Syntax: module_name instance_name (port connections);
+  and_gate u_and_gate (
+    .a(in1),      // Connect in1 to port 'a'
+    .b(in2),      // Connect in2 to port 'b'
+    .y(out1)      // Connect out1 to port 'y'
+  );
+endmodule
+\end{lstlisting}
+
+\begin{coloredbox}{tipcolor}{Tip - Port Connection Styles}
+\textbf{Named Connection (Recommended):}
+\begin{lstlisting}
+and_gate u_and (.a(in1), .b(in2), .y(out1));
+\end{lstlisting}
+\textbf{Advantages:} Clear, less error-prone, order doesn't matter
+
+\textbf{Positional Connection:}
+\begin{lstlisting}
+and_gate u_and (in1, in2, out1);  // Order must match module definition
+\end{lstlisting}
+\textbf{Disadvantages:} Easy to make mistakes, hard to maintain
+\end{coloredbox}
+
+\subsection{Hierarchical Design Example}
+
+\begin{lstlisting}[caption={Building Hierarchy - Half Adder to Full Adder}]
+// Half Adder - Basic building block
+module half_adder (
+  input  logic a,
+  input  logic b,
+  output logic sum,
+  output logic carry
+);
+  assign sum   = a ^ b;
+  assign carry = a & b;
+endmodule
+
+// Full Adder - Built from two half adders
+module full_adder (
+  input  logic a,
+  input  logic b,
+  input  logic cin,     // Carry in
+  output logic sum,
+  output logic cout     // Carry out
+);
+  logic sum1, carry1, carry2;
+
+  // First half adder: add a and b
+  half_adder ha1 (
+    .a(a),
+    .b(b),
+    .sum(sum1),
+    .carry(carry1)
+  );
+
+  // Second half adder: add sum1 and carry in
+  half_adder ha2 (
+    .a(sum1),
+    .b(cin),
+    .sum(sum),
+    .carry(carry2)
+  );
+
+  // Final carry is OR of two carries
+  assign cout = carry1 | carry2;
+endmodule
+
+// 4-bit Ripple Carry Adder - Built from four full adders
+module adder_4bit (
+  input  logic [3:0] a,
+  input  logic [3:0] b,
+  input  logic       cin,
+  output logic [3:0] sum,
+  output logic       cout
+);
+  logic [3:1] carry;  // Internal carry signals
+
+  // Bit 0
+  full_adder fa0 (.a(a[0]), .b(b[0]), .cin(cin),     .sum(sum[0]), .cout(carry[1]));
+  // Bit 1
+  full_adder fa1 (.a(a[1]), .b(b[1]), .cin(carry[1]), .sum(sum[1]), .cout(carry[2]));
+  // Bit 2
+  full_adder fa2 (.a(a[2]), .b(b[2]), .cin(carry[2]), .sum(sum[2]), .cout(carry[3]));
+  // Bit 3
+  full_adder fa3 (.a(a[3]), .b(b[3]), .cin(carry[3]), .sum(sum[3]), .cout(cout));
+endmodule
+\end{lstlisting}
+
+\textbf{Hierarchy Visualization:}
+\begin{verbatim}
+adder_4bit
+  |
+  +-- full_adder (fa0)
+  |     |
+  |     +-- half_adder (ha1)
+  |     +-- half_adder (ha2)
+  |
+  +-- full_adder (fa1)
+  |     +-- half_adder (ha1)
+  |     +-- half_adder (ha2)
+  |
+  +-- full_adder (fa2)
+  |     +-- half_adder (ha1)
+  |     +-- half_adder (ha2)
+  |
+  +-- full_adder (fa3)
+        +-- half_adder (ha1)
+        +-- half_adder (ha2)
+\end{verbatim}
+
+\subsection{Multiple Instances}
+
+You can create multiple instances of the same module:
+
+\begin{lstlisting}[caption={Multiple Instances}]
+module four_and_gates (
+  input  logic [3:0] a,
+  input  logic [3:0] b,
+  output logic [3:0] y
+);
+  // Create 4 separate AND gate instances
+  and_gate u_and0 (.a(a[0]), .b(b[0]), .y(y[0]));
+  and_gate u_and1 (.a(a[1]), .b(b[1]), .y(y[1]));
+  and_gate u_and2 (.a(a[2]), .b(b[2]), .y(y[2]));
+  and_gate u_and3 (.a(a[3]), .b(b[3]), .y(y[3]));
+endmodule
+\end{lstlisting}
+
+\subsection{Parameters and Parameterized Modules}
+
+Parameters make modules reusable with different configurations:
+
+\begin{lstlisting}[caption={Parameterized Module}]
+module parameterized_adder #(
+  parameter WIDTH = 8  // Default width is 8 bits
+)(
+  input  logic [WIDTH-1:0] a,
+  input  logic [WIDTH-1:0] b,
+  input  logic             cin,
+  output logic [WIDTH-1:0] sum,
+  output logic             cout
+);
+  logic [WIDTH:0] temp_sum;
+
+  assign temp_sum = a + b + cin;
+  assign sum      = temp_sum[WIDTH-1:0];
+  assign cout     = temp_sum[WIDTH];
+endmodule
+
+// Using the parameterized module
+module top (
+  input  logic [15:0] data_a,
+  input  logic [15:0] data_b,
+  input  logic [7:0]  byte_a,
+  input  logic [7:0]  byte_b,
+  output logic [15:0] result_16,
+  output logic [7:0]  result_8
+);
+  logic cout_16, cout_8;
+
+  // 16-bit adder instance
+  parameterized_adder #(.WIDTH(16)) u_adder_16 (
+    .a(data_a),
+    .b(data_b),
+    .cin(1'b0),
+    .sum(result_16),
+    .cout(cout_16)
+  );
+
+  // 8-bit adder instance
+  parameterized_adder #(.WIDTH(8)) u_adder_8 (
+    .a(byte_a),
+    .b(byte_b),
+    .cin(1'b0),
+    .sum(result_8),
+    .cout(cout_8)
+  );
+endmodule
+\end{lstlisting}
+
+\subsection{Local Parameters}
+
+\texttt{localparam} defines constants that cannot be overridden:
+
+\begin{lstlisting}[caption={localparam vs parameter}]
+module state_machine #(
+  parameter NUM_STATES = 4  // Can be overridden during instantiation
+)(
+  input  logic clk,
+  output logic [1:0] state
+);
+  // localparam cannot be changed from outside
+  localparam IDLE  = 2'b00;
+  localparam RUN   = 2'b01;
+  localparam PAUSE = 2'b10;
+  localparam DONE  = 2'b11;
+
+  // ... state machine logic ...
+endmodule
+\end{lstlisting}
+
+\subsection{Generate Blocks}
+
+Generate blocks allow you to create multiple instances programmatically:
+
+\begin{lstlisting}[caption={Generate Block for Multiple Instances}]
+module parallel_and_gates #(
+  parameter NUM_GATES = 8
+)(
+  input  logic [NUM_GATES-1:0] a,
+  input  logic [NUM_GATES-1:0] b,
+  output logic [NUM_GATES-1:0] y
+);
+  // Generate NUM_GATES instances of AND gates
+  genvar i;
+  generate
+    for (i = 0; i < NUM_GATES; i++) begin : gen_and_gates
+      and_gate u_and (
+        .a(a[i]),
+        .b(b[i]),
+        .y(y[i])
+      );
+    end
+  endgenerate
+endmodule
+\end{lstlisting}
+
+\subsection{Conditional Generate}
+
+Generate blocks based on parameters:
+
+\begin{lstlisting}[caption={Conditional Generate}]
+module configurable_adder #(
+  parameter WIDTH = 8,
+  parameter USE_FAST_ADDER = 1  // 1 = fast, 0 = small
+)(
+  input  logic [WIDTH-1:0] a, b,
+  output logic [WIDTH-1:0] sum
+);
+  generate
+    if (USE_FAST_ADDER) begin : fast_impl
+      // Fast but larger implementation
+      assign sum = a + b;  // Uses carry lookahead
+    end else begin : small_impl
+      // Slower but smaller implementation
+      logic [WIDTH-1:0] temp_sum;
+      always_comb begin
+        temp_sum = '0;
+        for (int i = 0; i < WIDTH; i++) begin
+          temp_sum[i] = a[i] ^ b[i];  // Ripple carry
+        end
+      end
+      assign sum = temp_sum;
+    end
+  endgenerate
+endmodule
+\end{lstlisting}
+
+\subsection{Complete Example - Parameterized Register File}
+
+\begin{lstlisting}[caption={Parameterized Register File}]
+module register_file #(
+  parameter DATA_WIDTH = 32,
+  parameter NUM_REGS   = 16,
+  parameter ADDR_WIDTH = $clog2(NUM_REGS)  // Calculate address width
+)(
+  input  logic                     clk,
+  input  logic                     rst_n,
+  // Write port
+  input  logic                     wr_en,
+  input  logic [ADDR_WIDTH-1:0]    wr_addr,
+  input  logic [DATA_WIDTH-1:0]    wr_data,
+  // Read port 1
+  input  logic [ADDR_WIDTH-1:0]    rd_addr1,
+  output logic [DATA_WIDTH-1:0]    rd_data1,
+  // Read port 2
+  input  logic [ADDR_WIDTH-1:0]    rd_addr2,
+  output logic [DATA_WIDTH-1:0]    rd_data2
+);
+  // Register array
+  logic [DATA_WIDTH-1:0] registers [NUM_REGS];
+
+  // Write logic
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      for (int i = 0; i < NUM_REGS; i++) begin
+        registers[i] <= '0;
+      end
+    end else if (wr_en) begin
+      registers[wr_addr] <= wr_data;
+    end
+  end
+
+  // Read logic (combinational, dual-port)
+  assign rd_data1 = registers[rd_addr1];
+  assign rd_data2 = registers[rd_addr2];
+endmodule
+
+// Testbench
+module tb_register_file;
+  localparam DATA_WIDTH = 8;
+  localparam NUM_REGS = 4;
+  localparam ADDR_WIDTH = $clog2(NUM_REGS);
+
+  logic                    clk;
+  logic                    rst_n;
+  logic                    wr_en;
+  logic [ADDR_WIDTH-1:0]   wr_addr;
+  logic [DATA_WIDTH-1:0]   wr_data;
+  logic [ADDR_WIDTH-1:0]   rd_addr1, rd_addr2;
+  logic [DATA_WIDTH-1:0]   rd_data1, rd_data2;
+
+  // Instantiate register file
+  register_file #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .NUM_REGS(NUM_REGS)
+  ) dut (
+    .clk(clk),
+    .rst_n(rst_n),
+    .wr_en(wr_en),
+    .wr_addr(wr_addr),
+    .wr_data(wr_data),
+    .rd_addr1(rd_addr1),
+    .rd_data1(rd_data1),
+    .rd_addr2(rd_addr2),
+    .rd_data2(rd_data2)
+  );
+
+  // Clock generation
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk;
+  end
+
+  // Test sequence
+  initial begin
+    // Reset
+    rst_n = 0;
+    wr_en = 0;
+    #20 rst_n = 1;
+
+    // Write to register 0
+    @(posedge clk);
+    wr_en = 1;
+    wr_addr = 0;
+    wr_data = 8'hAA;
+
+    // Write to register 1
+    @(posedge clk);
+    wr_addr = 1;
+    wr_data = 8'hBB;
+
+    // Write to register 2
+    @(posedge clk);
+    wr_addr = 2;
+    wr_data = 8'hCC;
+
+    // Stop writing
+    @(posedge clk);
+    wr_en = 0;
+
+    // Read from registers
+    @(posedge clk);
+    rd_addr1 = 0;
+    rd_addr2 = 1;
+    #1 $display("Read addr 0: %h, Read addr 1: %h", rd_data1, rd_data2);
+
+    @(posedge clk);
+    rd_addr1 = 2;
+    rd_addr2 = 0;
+    #1 $display("Read addr 2: %h, Read addr 0: %h", rd_data1, rd_data2);
+
+    #50 $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Module Design Best Practices}
+
+\begin{coloredbox}{tipcolor}{Best Practices for Modules}
+\begin{enumerate}
+  \item \textbf{One module per file:} Name file same as module (e.g., \texttt{adder.sv})
+  \item \textbf{Use named port connections:} Clearer and less error-prone
+  \item \textbf{Use parameters:} Make modules reusable and configurable
+  \item \textbf{Clear naming:} Use descriptive names for modules, signals, instances
+  \item \textbf{Consistent reset:} Use same reset polarity throughout design
+  \item \textbf{Separate combinational and sequential:} Use \texttt{always\_comb} and \texttt{always\_ff}
+  \item \textbf{Document parameters:} Add comments explaining parameter meanings
+  \item \textbf{Avoid deep nesting:} Keep hierarchy manageable (3-5 levels max)
+\end{enumerate}
+\end{coloredbox}
+
+\begin{coloredbox}{warningcolor}{Common Mistakes to Avoid}
+\begin{enumerate}
+  \item \textbf{Connecting wrong port sizes:} Always match bit widths
+  \item \textbf{Leaving ports unconnected:} Can cause X's or Z's to propagate
+  \item \textbf{Circular dependencies:} Module A instantiates B, B instantiates A
+  \item \textbf{Missing instance names:} Always name your instances uniquely
+  \item \textbf{Positional connections:} Error-prone for large port lists
+\end{enumerate}
+\end{coloredbox}
+
+\subsection{Modules and Hierarchy Cheat Sheet}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Concept} & \textbf{Syntax} \\
+\hline
+Module declaration & \texttt{module name (ports); ... endmodule} \\
+Input port & \texttt{input logic [7:0] data\_in} \\
+Output port & \texttt{output logic [7:0] data\_out} \\
+Parameter & \texttt{parameter WIDTH = 8} \\
+Local parameter & \texttt{localparam STATE = 2'b00} \\
+Named instantiation & \texttt{module\_name inst (.port(signal))} \\
+Parameter override & \texttt{module\_name \#(.PARAM(value)) inst (...)} \\
+Generate for loop & \texttt{generate for (i=0; i<N; i++) ...} \\
+Generate if & \texttt{generate if (COND) ... else ...} \\
+Calc parameter & \texttt{parameter ADDR\_W = \$clog2(SIZE)} \\
+\hline
+\end{tabular}
+\caption{Modules and Hierarchy Quick Reference}
+\end{table}
+
+\subsection{Exercises - Modules and Hierarchy}
+
+\begin{exercisebox}
+\textbf{Exercise 21: Parameterized Multiplexer}
+
+Create a parameterized N:1 multiplexer:
+\begin{enumerate}
+  \item Parameters: DATA\_WIDTH, NUM\_INPUTS
+  \item Automatically calculate select width: \texttt{\$clog2(NUM\_INPUTS)}
+  \item Input: data array, select signal
+  \item Output: selected data
+  \item Test with 4:1 (8-bit) and 8:1 (16-bit) configurations
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 22: Hierarchical Counter System}
+
+Build a hierarchical counting system:
+\begin{enumerate}
+  \item Bottom level: 4-bit counter module
+  \item Middle level: Decade counter (0-9) using 4-bit counter
+  \item Top level: Minutes and seconds counter (00:00 to 59:59)
+  \item Use parameters for counter limits
+  \item Include enable and reset signals
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 23: Configurable FIFO}
+
+Design a parameterized FIFO (First-In-First-Out) buffer:
+\begin{enumerate}
+  \item Parameters: DATA\_WIDTH, DEPTH
+  \item Inputs: clk, rst\_n, wr\_en, rd\_en, wr\_data
+  \item Outputs: rd\_data, full, empty, count
+  \item Use generate blocks if helpful
+  \item Test with different configurations
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 24: Module Hierarchy Diagram}
+
+For the following code, draw the complete hierarchy diagram:
+\begin{lstlisting}
+module top;
+  module_a u_a (...);
+  module_b u_b1 (...);
+  module_b u_b2 (...);
+endmodule
+
+module module_a;
+  module_c u_c1 (...);
+  module_c u_c2 (...);
+endmodule
+
+module module_b;
+  module_c u_c (...);
+  module_d u_d (...);
+endmodule
+\end{lstlisting}
+
+Show all instances and their relationships.
+\end{exercisebox}
+
+% ============================================================================
+\section{Testbenches and Simulation}
+
+\subsection{What is a Testbench?}
+
+A testbench is a SystemVerilog module that:
+\begin{itemize}
+  \item Tests your design (the Device Under Test - DUT)
+  \item Generates input stimulus (test patterns)
+  \item Checks output responses
+  \item Reports pass/fail results
+  \item Does NOT synthesize to hardware (simulation only)
+\end{itemize}
+
+\textbf{Testbench vs Design Module:}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Feature} & \textbf{Design Module} & \textbf{Testbench} \\
+\hline
+Purpose & Describes hardware & Tests hardware \\
+Synthesizable & Yes & No \\
+Has ports & Yes & No (top level) \\
+Contains DUT & No & Yes (instantiates design) \\
+Uses delays & Rarely & Yes (for stimulus) \\
+Uses \$display & No & Yes (for messages) \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Basic Testbench Structure}
+
+\begin{lstlisting}[caption={Basic Testbench Template}]
+module tb_module_name;
+  // 1. Declare signals to connect to DUT
+  logic signal1;
+  logic signal2;
+  logic result;
+
+  // 2. Instantiate the DUT (Device Under Test)
+  module_name dut (
+    .input_port(signal1),
+    .input_port2(signal2),
+    .output_port(result)
+  );
+
+  // 3. Generate stimulus
+  initial begin
+    // Initialize signals
+    signal1 = 0;
+    signal2 = 0;
+    #10;  // Wait 10 time units
+
+    // Apply test patterns
+    signal1 = 1;
+    signal2 = 0;
+    #10;
+
+    // Check results
+    if (result !== expected_value)
+      $display("ERROR: Test failed!");
+
+    // End simulation
+    $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Complete Testbench Example}
+
+\begin{lstlisting}[caption={Full Adder Testbench}]
+// Design: Full Adder
+module full_adder (
+  input  logic a, b, cin,
+  output logic sum, cout
+);
+  assign sum  = a ^ b ^ cin;
+  assign cout = (a & b) | (b & cin) | (a & cin);
+endmodule
+
+// Testbench
+module tb_full_adder;
+  // Signals
+  logic a, b, cin;
+  logic sum, cout;
+  int errors = 0;
+
+  // DUT instantiation
+  full_adder dut (
+    .a(a),
+    .b(b),
+    .cin(cin),
+    .sum(sum),
+    .cout(cout)
+  );
+
+  // Test procedure
+  initial begin
+    $display("======================================");
+    $display("    Full Adder Testbench");
+    $display("======================================");
+    $display("Time\t a b cin | sum cout");
+    $display("--------------------------------------");
+
+    // Test all 8 input combinations
+    {a, b, cin} = 3'b000; #10;
+    $display("%0t\t %b %b  %b  |  %b   %b", $time, a, b, cin, sum, cout);
+    if (sum !== 0 || cout !== 0) errors++;
+
+    {a, b, cin} = 3'b001; #10;
+    $display("%0t\t %b %b  %b  |  %b   %b", $time, a, b, cin, sum, cout);
+    if (sum !== 1 || cout !== 0) errors++;
+
+    {a, b, cin} = 3'b010; #10;
+    $display("%0t\t %b %b  %b  |  %b   %b", $time, a, b, cin, sum, cout);
+    if (sum !== 1 || cout !== 0) errors++;
+
+    {a, b, cin} = 3'b011; #10;
+    $display("%0t\t %b %b  %b  |  %b   %b", $time, a, b, cin, sum, cout);
+    if (sum !== 0 || cout !== 1) errors++;
+
+    {a, b, cin} = 3'b100; #10;
+    $display("%0t\t %b %b  %b  |  %b   %b", $time, a, b, cin, sum, cout);
+    if (sum !== 1 || cout !== 0) errors++;
+
+    {a, b, cin} = 3'b101; #10;
+    $display("%0t\t %b %b  %b  |  %b   %b", $time, a, b, cin, sum, cout);
+    if (sum !== 0 || cout !== 1) errors++;
+
+    {a, b, cin} = 3'b110; #10;
+    $display("%0t\t %b %b  %b  |  %b   %b", $time, a, b, cin, sum, cout);
+    if (sum !== 0 || cout !== 1) errors++;
+
+    {a, b, cin} = 3'b111; #10;
+    $display("%0t\t %b %b  %b  |  %b   %b", $time, a, b, cin, sum, cout);
+    if (sum !== 1 || cout !== 1) errors++;
+
+    // Report results
+    $display("======================================");
+    if (errors == 0)
+      $display("*** TEST PASSED ***");
+    else
+      $display("*** TEST FAILED: %0d errors ***", errors);
+    $display("======================================");
+
+    $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Clock Generation}
+
+Most digital designs need a clock. Here are common patterns:
+
+\begin{lstlisting}[caption={Clock Generation Methods}]
+module tb_with_clock;
+  logic clk;
+
+  // Method 1: Forever loop (most common)
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk;  // Toggle every 5ns (100MHz)
+  end
+
+  // Method 2: Always block
+  always #5 clk = ~clk;  // Same as above
+
+  // Method 3: Multiple clocks
+  logic clk_fast, clk_slow;
+  initial begin
+    clk_fast = 0;
+    clk_slow = 0;
+    fork
+      forever #5  clk_fast = ~clk_fast;  // 100MHz
+      forever #50 clk_slow = ~clk_slow;  // 10MHz
+    join
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Timing Control}
+
+\begin{lstlisting}[caption={Timing Control in Testbenches}]
+module tb_timing;
+  logic clk, data, reset;
+
+  // Clock
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk;
+  end
+
+  // Stimulus
+  initial begin
+    // Delay-based timing
+    #10 reset = 1;   // At time 10
+    #20 reset = 0;   // At time 30
+    #50 data = 1;    // At time 80
+
+    // Event-based timing
+    @(posedge clk);  // Wait for rising edge of clk
+    data = 0;
+
+    @(negedge clk);  // Wait for falling edge
+    data = 1;
+
+    // Wait for specific number of clock cycles
+    repeat (10) @(posedge clk);
+    data = 0;
+
+    // Wait for condition
+    wait (reset == 0);
+    data = 1;
+
+    #100 $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{System Tasks for Testbenches}
+
+\begin{lstlisting}[caption={Common System Tasks}]
+module tb_system_tasks;
+  initial begin
+    // Display messages
+    $display("Simple message");
+    $display("Value = %d", 42);           // Decimal
+    $display("Value = %h", 8'hAB);        // Hexadecimal
+    $display("Value = %b", 4'b1010);      // Binary
+    $display("Time = %0t", $time);        // Current simulation time
+
+    // Monitor signals (prints on change)
+    $monitor("Time=%0t a=%b b=%b", $time, signal_a, signal_b);
+
+    // Write to console without newline
+    $write("Part 1 ");
+    $write("Part 2\n");
+
+    // Time functions
+    $display("Current time: %0t", $time);
+
+    // Control simulation
+    $stop;    // Pause simulation (interactive)
+    $finish;  // End simulation
+
+    // File operations
+    integer file_handle;
+    file_handle = $fopen("output.txt", "w");
+    $fwrite(file_handle, "Data: %d\n", 123);
+    $fclose(file_handle);
+
+    // Random numbers
+    int rand_val;
+    rand_val = $random;        // Random 32-bit signed
+    rand_val = $urandom;       // Random 32-bit unsigned
+    rand_val = $urandom_range(10, 20);  // Random in range [10,20]
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Self-Checking Testbenches}
+
+\begin{lstlisting}[caption={Self-Checking Testbench with Assertions}]
+module tb_self_checking;
+  logic [3:0] a, b, sum;
+  logic cout;
+  int test_count = 0;
+  int pass_count = 0;
+
+  // DUT
+  adder_4bit dut (.a(a), .b(b), .cin(1'b0), .sum(sum), .cout(cout));
+
+  // Check task
+  task automatic check_result(
+    input logic [3:0] exp_sum,
+    input logic       exp_cout,
+    input string      test_name
+  );
+    test_count++;
+    if (sum === exp_sum && cout === exp_cout) begin
+      $display("[PASS] %s: sum=%h cout=%b", test_name, sum, cout);
+      pass_count++;
+    end else begin
+      $display("[FAIL] %s: Expected sum=%h cout=%b, Got sum=%h cout=%b",
+               test_name, exp_sum, exp_cout, sum, cout);
+    end
+  endtask
+
+  initial begin
+    // Test 1: 0 + 0
+    a = 4'h0; b = 4'h0; #10;
+    check_result(4'h0, 1'b0, "0 + 0");
+
+    // Test 2: 5 + 3
+    a = 4'h5; b = 4'h3; #10;
+    check_result(4'h8, 1'b0, "5 + 3");
+
+    // Test 3: 15 + 1 (overflow)
+    a = 4'hF; b = 4'h1; #10;
+    check_result(4'h0, 1'b1, "15 + 1");
+
+    // Test 4: 8 + 8
+    a = 4'h8; b = 4'h8; #10;
+    check_result(4'h0, 1'b1, "8 + 8");
+
+    // Summary
+    $display("\n========================================");
+    $display("Tests: %0d, Passed: %0d, Failed: %0d",
+             test_count, pass_count, test_count - pass_count);
+    if (pass_count == test_count)
+      $display("*** ALL TESTS PASSED ***");
+    else
+      $display("*** SOME TESTS FAILED ***");
+    $display("========================================");
+
+    $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Using Tasks and Functions in Testbenches}
+
+\begin{lstlisting}[caption={Tasks and Functions for Cleaner Testbenches}]
+module tb_with_tasks;
+  logic clk, rst_n;
+  logic [7:0] data_in, data_out;
+  logic wr_en, rd_en;
+
+  // Clock generation
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk;
+  end
+
+  // DUT instantiation
+  // ... (DUT code here) ...
+
+  // Task: Reset the DUT
+  task reset_dut();
+    rst_n = 0;
+    wr_en = 0;
+    rd_en = 0;
+    data_in = 8'h00;
+    repeat (5) @(posedge clk);
+    rst_n = 1;
+    @(posedge clk);
+  endtask
+
+  // Task: Write data
+  task write_data(input logic [7:0] data);
+    @(posedge clk);
+    wr_en = 1;
+    data_in = data;
+    @(posedge clk);
+    wr_en = 0;
+  endtask
+
+  // Task: Read data and check
+  task read_and_check(input logic [7:0] expected);
+    @(posedge clk);
+    rd_en = 1;
+    @(posedge clk);
+    rd_en = 0;
+    if (data_out !== expected)
+      $display("[FAIL] Expected %h, got %h", expected, data_out);
+    else
+      $display("[PASS] Read %h correctly", data_out);
+  endtask
+
+  // Main test sequence
+  initial begin
+    reset_dut();
+
+    $display("Writing test data...");
+    write_data(8'hAA);
+    write_data(8'hBB);
+    write_data(8'hCC);
+
+    $display("Reading and checking...");
+    read_and_check(8'hAA);
+    read_and_check(8'hBB);
+    read_and_check(8'hCC);
+
+    #100 $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Generating Random Stimulus}
+
+\begin{lstlisting}[caption={Random Test Pattern Generation}]
+module tb_random_testing;
+  logic [7:0] a, b, sum;
+  logic cout;
+  int num_tests = 1000;
+
+  // DUT
+  adder_8bit dut (.a(a), .b(b), .cin(1'b0), .sum(sum), .cout(cout));
+
+  // Random testing
+  initial begin
+    automatic logic [8:0] expected;
+
+    $display("Running %0d random tests...", num_tests);
+
+    for (int i = 0; i < num_tests; i++) begin
+      // Generate random inputs
+      a = $urandom_range(0, 255);
+      b = $urandom_range(0, 255);
+      #10;
+
+      // Calculate expected result
+      expected = a + b;
+
+      // Check
+      if ({cout, sum} !== expected) begin
+        $display("[FAIL] Test %0d: %0d + %0d = %0d, expected %0d",
+                 i, a, b, {cout, sum}, expected);
+        $finish;
+      end
+
+      if (i % 100 == 0)
+        $display("  Completed %0d tests...", i);
+    end
+
+    $display("*** ALL %0d RANDOM TESTS PASSED ***", num_tests);
+    $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Waveform Dumping (VCD)}
+
+\begin{lstlisting}[caption={Generating Waveform Files}]
+module tb_with_waveforms;
+  logic clk, reset;
+  logic [7:0] data;
+
+  // DUT
+  // ... instantiation ...
+
+  initial begin
+    // Create VCD (Value Change Dump) file for waveform viewing
+    $dumpfile("waveform.vcd");
+    $dumpvars(0, tb_with_waveforms);  // Dump all variables in this module
+
+    // Or dump specific signals
+    // $dumpvars(1, clk, reset, data);
+
+    // Run simulation
+    reset = 1;
+    #100 reset = 0;
+    #1000;
+
+    $finish;
+  end
+
+  // Clock
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk;
+  end
+endmodule
+// View waveform.vcd with GTKWave or other waveform viewer
+\end{lstlisting}
+
+\subsection{Complete Example - Counter Testbench}
+
+\begin{lstlisting}[caption={Comprehensive Counter Testbench}]
+// Design: 8-bit counter
+module counter_8bit (
+  input  logic       clk,
+  input  logic       rst_n,
+  input  logic       enable,
+  input  logic       load,
+  input  logic [7:0] load_value,
+  output logic [7:0] count
+);
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      count <= 8'h00;
+    else if (load)
+      count <= load_value;
+    else if (enable)
+      count <= count + 1;
+  end
+endmodule
+
+// Testbench
+module tb_counter_8bit;
+  // Signals
+  logic       clk;
+  logic       rst_n;
+  logic       enable;
+  logic       load;
+  logic [7:0] load_value;
+  logic [7:0] count;
+
+  // DUT instantiation
+  counter_8bit dut (.*);  // Implicit port connection (all names match)
+
+  // Clock generation: 10ns period (100 MHz)
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk;
+  end
+
+  // Task: Reset
+  task reset_counter();
+    rst_n = 0;
+    enable = 0;
+    load = 0;
+    load_value = 8'h00;
+    repeat (3) @(posedge clk);
+    rst_n = 1;
+    @(posedge clk);
+    $display("[%0t] Reset complete", $time);
+  endtask
+
+  // Task: Check counter value
+  task check_count(input logic [7:0] expected, input string msg);
+    if (count !== expected)
+      $display("[%0t] FAIL: %s - Expected %0d, got %0d", $time, msg, expected, count);
+    else
+      $display("[%0t] PASS: %s - Count = %0d", $time, msg, count);
+  endtask
+
+  // Main test
+  initial begin
+    $display("========================================");
+    $display("  Counter 8-bit Testbench");
+    $display("========================================\n");
+
+    // VCD dump
+    $dumpfile("counter.vcd");
+    $dumpvars(0, tb_counter_8bit);
+
+    // Test 1: Reset
+    $display("Test 1: Reset");
+    reset_counter();
+    check_count(8'h00, "After reset");
+
+    // Test 2: Count up
+    $display("\nTest 2: Count up");
+    enable = 1;
+    repeat (10) begin
+      @(posedge clk);
+      #1;  // Small delay for signal to settle
+    end
+    check_count(8'd10, "After 10 counts");
+
+    // Test 3: Disable counting
+    $display("\nTest 3: Disable counting");
+    enable = 0;
+    repeat (5) @(posedge clk);
+    check_count(8'd10, "Count should not change");
+
+    // Test 4: Load value
+    $display("\nTest 4: Load value");
+    load = 1;
+    load_value = 8'hF0;
+    @(posedge clk);
+    load = 0;
+    @(posedge clk);
+    #1;
+    check_count(8'hF0, "After load");
+
+    // Test 5: Overflow
+    $display("\nTest 5: Overflow");
+    load = 1;
+    load_value = 8'hFD;
+    @(posedge clk);
+    load = 0;
+    enable = 1;
+    repeat (3) @(posedge clk);
+    #1;
+    check_count(8'h00, "After overflow");
+
+    // End
+    $display("\n========================================");
+    $display("  All tests complete");
+    $display("========================================");
+    #50 $finish;
+  end
+
+  // Monitor (prints on every change)
+  initial begin
+    $monitor("[%0t] count=%0d enable=%b load=%b", $time, count, enable, load);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Testbench Best Practices}
+
+\begin{coloredbox}{tipcolor}{Best Practices for Testbenches}
+\begin{enumerate}
+  \item \textbf{Use meaningful names:} Clear signal and task names
+  \item \textbf{Organize with tasks:} Break complex tests into reusable tasks
+  \item \textbf{Self-checking:} Automate pass/fail checking
+  \item \textbf{Use \$display wisely:} Clear messages for debugging
+  \item \textbf{Test corner cases:} Minimum, maximum, overflow, underflow
+  \item \textbf{Random testing:} Complement directed tests with random stimulus
+  \item \textbf{Waveform dumps:} Essential for debugging
+  \item \textbf{Timing control:} Use @(posedge clk) for synchronous designs
+  \item \textbf{Code coverage:} Ensure all code paths are tested
+  \item \textbf{Document tests:} Comment what each test verifies
+\end{enumerate}
+\end{coloredbox}
+
+\subsection{Testbench Cheat Sheet}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Task} & \textbf{Syntax} \\
+\hline
+Display message & \texttt{\$display("msg \%d", var);} \\
+Monitor signals & \texttt{\$monitor("sig=\%b", sig);} \\
+Current time & \texttt{\$time} \\
+End simulation & \texttt{\$finish;} \\
+Delay & \texttt{\#10;} (10 time units) \\
+Wait for edge & \texttt{@(posedge clk);} \\
+Wait N cycles & \texttt{repeat(N) @(posedge clk);} \\
+Clock generation & \texttt{forever \#5 clk = \textasciitilde clk;} \\
+Random integer & \texttt{\$urandom\_range(min, max)} \\
+Waveform dump & \texttt{\$dumpfile("file.vcd");} \\
+Dump variables & \texttt{\$dumpvars(0, module);} \\
+File write & \texttt{\$fwrite(handle, "data");} \\
+\hline
+\end{tabular}
+\caption{Testbench Quick Reference}
+\end{table}
+
+\subsection{Exercises - Testbenches}
+
+\begin{exercisebox}
+\textbf{Exercise 25: MUX Testbench}
+
+Create a comprehensive testbench for a 4:1 multiplexer:
+\begin{enumerate}
+  \item Test all 4 input selections
+  \item Use tasks for applying stimulus
+  \item Implement self-checking with expected values
+  \item Generate VCD waveform file
+  \item Print pass/fail summary
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 26: Shift Register Testbench}
+
+Write a testbench for an 8-bit shift register:
+\begin{enumerate}
+  \item Generate clock (10ns period)
+  \item Shift in a known pattern (e.g., 10101010)
+  \item Verify parallel output matches expected after 8 clocks
+  \item Test reset functionality
+  \item Use \$monitor to track shift register contents
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 27: FSM Testbench}
+
+Create testbench for the sequence detector FSM from Section 7:
+\begin{enumerate}
+  \item Test sequence "1011" detection
+  \item Test that "1001" does NOT trigger detection
+  \item Test overlapping sequences
+  \item Create task to apply bit sequence
+  \item Verify state transitions with assertions
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 28: Random ALU Testing}
+
+Develop random testbench for 8-bit ALU:
+\begin{enumerate}
+  \item Generate 500 random test cases
+  \item For each operation, calculate expected result
+  \item Compare DUT output with expected
+  \item Track and report error count
+  \item Use functions to calculate expected results
+\end{enumerate}
+\end{exercisebox}
+
+% Continue with Section 10 (final beginner section)
 
 \vfill
 \begin{center}
 \rule{0.5\textwidth}{0.4pt}\\
 \Large\textbf{Complete SystemVerilog Guide}\\
 \normalsize
-Version 1.0 - Beginner Section\\
+Version 1.3 - Sections 1-9 Complete\\
 \vspace{0.3cm}
-\textit{Document in Progress}\\
+\textit{Beginner Level: 90\% Complete}\\
 \textit{Last Updated: \today}\\
 \end{center}
 
