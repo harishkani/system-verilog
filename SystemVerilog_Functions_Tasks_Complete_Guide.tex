@@ -5,6 +5,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[margin=1in]{geometry}
 \usepackage{listings}
+\usepackage{upquote}
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{graphicx}
@@ -84,6 +85,9 @@
   xrightmargin=5pt,
   aboveskip=10pt,
   belowskip=10pt,
+  upquote=true,
+  keepspaces=true,
+  columns=flexible
 }
 
 % Custom boxes
@@ -317,10 +321,10 @@ Usage in Expressions & Can be used in expressions & Cannot be used in expression
 \begin{tipbox}
 \textbf{Quick Decision Guide:}
 \begin{itemize}
-  \item Need to return a value and use in expression? → Use Function
-  \item Need timing control or delays? → Use Task
-  \item Pure computation without side effects? → Use Function
-  \item Multiple outputs needed? → Use Task or Function with output/ref
+  \item Need to return a value and use in expression? $\rightarrow$ Use Function
+  \item Need timing control or delays? $\rightarrow$ Use Task
+  \item Pure computation without side effects? $\rightarrow$ Use Function
+  \item Multiple outputs needed? $\rightarrow$ Use Task or Function with output/ref
 \end{itemize}
 \end{tipbox}
 
@@ -377,7 +381,7 @@ Test it with values: 10 - 3, 100 - 50, 7 - 12.
 \textbf{Exercise 2: Create a multiply function}
 
 Write a function called \texttt{multiply} that takes two integers and returns their product.
-Test it with values: 6 × 7, 12 × 12, -5 × 3.
+Test it with values: 6 $\times$ 7, 12 $\times$ 12, -5 $\times$ 3.
 \end{exercisebox}
 
 \subsection{Function Return Types}
@@ -428,9 +432,9 @@ Write two functions:
   \item \texttt{fahrenheit\_to\_celsius(real f)} - converts F to C
   \item \texttt{celsius\_to\_kelvin(real c)} - converts C to Kelvin
 \end{enumerate}
-Formula: C = (F - 32) × 5/9, K = C + 273.15
+Formula: C = (F - 32) $\times$ 5/9, K = C + 273.15
 
-Test with: 32°F, 98.6°F, 212°F
+Test with: 32$^\circ$F, 98.6$^\circ$F, 212$^\circ$F
 \end{exercisebox}
 
 \subsection{Void Functions}
