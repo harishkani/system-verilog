@@ -3409,8 +3409,3271 @@ Create a complete verification environment:
 You've mastered dynamic data structures, interfaces, packages,\\
 and object-oriented programming in SystemVerilog.\\
 \vspace{0.5cm}
-\textit{Continue to Advanced Level (Sections 21-30) for:}\\
-\textit{UVM, Advanced Assertions, Design Patterns, and More!}\\
+\textit{Advancing to Expert Level - Sections 21-30...}\\
+\end{center}
+
+\newpage
+% ============================================================================
+% ADVANCED LEVEL - SECTIONS 21-30
+% ============================================================================
+
+\part{Advanced Level (Sections 21-30)}
+
+\textit{Master professional verification techniques, UVM methodology, assertions, and industry best practices. This section represents expert-level SystemVerilog knowledge required for senior verification engineer positions.}
+
+% ============================================================================
+\section{SystemVerilog Assertions (SVA)}
+
+\subsection{Introduction to Assertions}
+
+SystemVerilog Assertions provide a powerful mechanism for specifying and verifying temporal behavior and protocol compliance. Assertions are essential for:
+\begin{itemize}
+  \item Protocol verification (AXI, APB, AHB, etc.)
+  \item Interface checking
+  \item Temporal property verification
+  \item Functional coverage
+  \item Formal verification
+\end{itemize}
+
+\begin{lstlisting}[caption={Immediate vs Concurrent Assertions}]
+module assertion_basics(
+    input logic clk,
+    input logic rst_n,
+    input logic req,
+    input logic ack,
+    input logic [7:0] data
+);
+
+    // Immediate assertion (procedural, executes like regular code)
+    always @(posedge clk) begin
+        if (req && rst_n) begin
+            assert (data != 8'h00)
+                else $error("Data cannot be zero when req is high");
+
+            // With custom message
+            assert (data < 8'hFF)
+                else $error("[%0t] Data %h exceeds maximum", $time, data);
+        end
+    end
+
+    // Concurrent assertion (declarative, continuously checked)
+    property req_ack_handshake;
+        @(posedge clk) disable iff (!rst_n)
+        req |-> ##[1:3] ack;  // ack must follow req within 1-3 cycles
+    endproperty
+
+    assert property (req_ack_handshake)
+        else $error("[%0t] Request not acknowledged within 3 cycles", $time);
+
+    // Assertion with success and failure actions
+    assert property (req_ack_handshake)
+        $display("[%0t] Handshake completed successfully", $time);
+        else $error("[%0t] Handshake failed", $time);
+
+    // Assume for formal verification
+    assume property (@(posedge clk) disable iff (!rst_n) req |-> data != 0);
+
+    // Cover to track interesting events
+    cover property (@(posedge clk) disable iff (!rst_n) req ##1 ack);
+
+endmodule
+\end{lstlisting}
+
+\subsection{Sequence Operators and Temporal Logic}
+
+SVA provides rich temporal operators for describing complex timing relationships:
+
+\begin{lstlisting}[caption={Comprehensive Sequence Operators}]
+module sva_sequences(
+    input logic clk,
+    input logic rst_n,
+    input logic start,
+    input logic busy,
+    input logic done,
+    input logic valid,
+    input logic ready,
+    input logic [3:0] state
+);
+
+    // ========== Delay Operators ==========
+
+    // Fixed delay: ## operator
+    property fixed_delay;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> ##3 done;  // done exactly 3 cycles after start
+    endproperty
+
+    // Range delay
+    property delay_range;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> ##[1:5] done;  // done between 1 and 5 cycles
+    endproperty
+
+    // Unbounded delay
+    property unbounded_delay;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> ##[1:$] done;  // done eventually (at least 1 cycle)
+    endproperty
+
+    // ========== Repetition Operators ==========
+
+    // Consecutive repetition [*n]
+    property consecutive_repetition;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> busy[*3] ##1 done;  // busy for exactly 3 cycles, then done
+    endproperty
+
+    // Range repetition
+    property range_repetition;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> busy[*1:5] ##1 done;  // busy for 1 to 5 cycles
+    endproperty
+
+    // Zero or more repetition
+    property zero_or_more;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> busy[*0:$] ##1 done;  // busy for any number of cycles
+    endproperty
+
+    // Non-consecutive repetition [=n]
+    property non_consecutive_rep;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> busy[=3] ##1 done;
+        // busy is high 3 times (not necessarily consecutive), then done next cycle
+    endproperty
+
+    // Goto repetition [->n]
+    property goto_rep;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> busy[->3] ##1 done;
+        // On 3rd occurrence of busy, done must be high next cycle
+    endproperty
+
+    // ========== Sequence Composition ==========
+
+    // throughout operator (value must hold throughout sequence)
+    property throughout_example;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> (busy throughout (##[1:10] done));
+        // busy must remain high until done occurs (1-10 cycles)
+    endproperty
+
+    // within operator
+    property within_example;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> ((valid && ready) within (##[1:5] done));
+        // valid&&ready must occur before done (within 1-5 cycles of start)
+    endproperty
+
+    // intersect operator
+    sequence seq1;
+        valid ##[1:3] ready;
+    endsequence
+
+    sequence seq2;
+        ##2 done;
+    endsequence
+
+    property intersect_example;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> (seq1 intersect seq2);
+        // Both sequences must complete at the same time
+    endproperty
+
+    // and operator for sequences
+    property sequence_and;
+        @(posedge clk) disable iff (!rst_n)
+        (start ##1 busy) and (valid ##1 ready);
+    endproperty
+
+    // or operator for sequences
+    property sequence_or;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> (busy ##1 done) or (valid ##1 ready);
+    endproperty
+
+    // first_match - stops at first match
+    property first_match_example;
+        @(posedge clk) disable iff (!rst_n)
+        start |-> first_match(busy[*1:$] ##1 done);
+    endproperty
+
+    // Instantiate some assertions
+    assert property (fixed_delay);
+    assert property (consecutive_repetition);
+    assert property (throughout_example);
+    assert property (goto_rep);
+
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 48: FIFO Assertions with SVA}
+
+Create comprehensive SVA assertions for a FIFO interface:
+\begin{itemize}
+  \item Assert read when empty produces error
+  \item Assert write when full produces error
+  \item Assert full and empty are mutually exclusive
+  \item Assert count increments on write and decrements on read
+  \item Assert data stability when valid
+  \item Add coverage for corner cases (full, empty, simultaneous read/write)
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Real-World Protocol Assertions: AXI4}
+
+\begin{lstlisting}[caption={Comprehensive AXI4-Lite Protocol Assertions}, basicstyle=\ttfamily\footnotesize]
+module axi4_lite_assertions(
+    input logic aclk,
+    input logic aresetn,
+    // Write address channel
+    input logic [31:0] awaddr,
+    input logic [2:0]  awprot,
+    input logic        awvalid,
+    input logic        awready,
+    // Write data channel
+    input logic [31:0] wdata,
+    input logic [3:0]  wstrb,
+    input logic        wvalid,
+    input logic        wready,
+    // Write response channel
+    input logic [1:0]  bresp,
+    input logic        bvalid,
+    input logic        bready,
+    // Read address channel
+    input logic [31:0] araddr,
+    input logic [2:0]  arprot,
+    input logic        arvalid,
+    input logic        arready,
+    // Read data channel
+    input logic [31:0] rdata,
+    input logic [1:0]  rresp,
+    input logic        rvalid,
+    input logic        rready
+);
+
+    // ========== Handshake Protocol ==========
+
+    // Once valid asserted, must remain until ready (Write Address)
+    property awvalid_until_awready;
+        @(posedge aclk) disable iff (!aresetn)
+        (awvalid && !awready) |=> awvalid;
+    endproperty
+    aw_stable: assert property (awvalid_until_awready)
+        else $error("AWVALID deasserted before AWREADY");
+
+    // Address must be stable when valid and not ready
+    property awaddr_stable;
+        @(posedge aclk) disable iff (!aresetn)
+        (awvalid && !awready) |=> $stable(awaddr) && $stable(awprot);
+    endproperty
+    aw_addr_stable: assert property (awaddr_stable)
+        else $error("AWADDR/AWPROT changed while AWVALID high");
+
+    // Similar for write data channel
+    property wvalid_until_wready;
+        @(posedge aclk) disable iff (!aresetn)
+        (wvalid && !wready) |=> wvalid;
+    endproperty
+    w_stable: assert property (wvalid_until_wready);
+
+    property wdata_stable;
+        @(posedge aclk) disable iff (!aresetn)
+        (wvalid && !wready) |=> ($stable(wdata) && $stable(wstrb));
+    endproperty
+    w_data_stable: assert property (wdata_stable);
+
+    // Response channel
+    property bvalid_until_bready;
+        @(posedge aclk) disable iff (!aresetn)
+        (bvalid && !bready) |=> bvalid;
+    endproperty
+    b_stable: assert property (bvalid_until_bready);
+
+    property bresp_stable;
+        @(posedge aclk) disable iff (!aresetn)
+        (bvalid && !bready) |=> $stable(bresp);
+    endproperty
+    b_resp_stable: assert property (bresp_stable);
+
+    // ========== Transaction Ordering ==========
+
+    // Write response must follow write data completion
+    property write_response_after_data;
+        @(posedge aclk) disable iff (!aresetn)
+        (wvalid && wready) |-> ##[0:16] bvalid;
+    endproperty
+    wr_resp_timing: assert property (write_response_after_data)
+        else $error("Write response timeout");
+
+    // Write address before or with write data
+    sequence write_addr_accepted;
+        awvalid && awready;
+    endsequence
+
+    sequence write_data_accepted;
+        wvalid && wready;
+    endsequence
+
+    property addr_before_data;
+        @(posedge aclk) disable iff (!aresetn)
+        write_data_accepted |->
+            $past(write_addr_accepted, 1) or write_addr_accepted;
+    endproperty
+    wr_addr_first: assert property (addr_before_data)
+        else $error("Write data before address");
+
+    // ========== Value Checks ==========
+
+    // No X/Z on control signals when valid
+    property no_x_awvalid;
+        @(posedge aclk) disable iff (!aresetn)
+        !$isunknown(awvalid);
+    endproperty
+    awvalid_no_x: assert property (no_x_awvalid)
+        else $fatal("X/Z on AWVALID");
+
+    property no_x_on_addr_when_valid;
+        @(posedge aclk) disable iff (!aresetn)
+        awvalid |-> !$isunknown(awaddr);
+    endproperty
+    awaddr_no_x: assert property (no_x_on_addr_when_valid);
+
+    // ========== Coverage ==========
+
+    // Cover interesting scenarios
+    cover_aw_w_same_cycle: cover property (
+        @(posedge aclk) disable iff (!aresetn)
+        (awvalid && awready && wvalid && wready)
+    );
+
+    cover_max_aw_delay: cover property (
+        @(posedge aclk) disable iff (!aresetn)
+        (awvalid && !awready) ##15 (awvalid && awready)
+    );
+
+    cover_back_to_back_writes: cover property (
+        @(posedge aclk) disable iff (!aresetn)
+        (wvalid && wready) ##1 (wvalid && wready)
+    );
+
+    // ========== Read Channel Assertions ==========
+
+    property arvalid_until_arready;
+        @(posedge aclk) disable iff (!aresetn)
+        (arvalid && !arready) |=> arvalid;
+    endproperty
+    ar_stable: assert property (arvalid_until_arready);
+
+    property rvalid_until_rready;
+        @(posedge aclk) disable iff (!aresetn)
+        (rvalid && !rready) |=> rvalid;
+    endproperty
+    r_stable: assert property (rvalid_until_rready);
+
+    // Read data must follow read address
+    property read_data_after_addr;
+        @(posedge aclk) disable iff (!aresetn)
+        (arvalid && arready) |-> ##[1:16] rvalid;
+    endproperty
+    rd_data_timing: assert property (read_data_after_addr)
+        else $error("Read data timeout");
+
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 49: I2C Protocol Assertions}
+
+Implement comprehensive SVA assertions for I2C:
+\begin{itemize}
+  \item START condition: SDA falls while SCL high
+  \item STOP condition: SDA rises while SCL high
+  \item Data stability: SDA stable when SCL high
+  \item ACK timing: SDA low on 9th clock after address/data
+  \item No bus contention detection
+  \item Clock stretching support verification
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Assertion Methodology and Best Practices}
+
+\begin{lstlisting}[caption={Binding Assertions to Design}]
+// Design module
+module fifo #(parameter DEPTH = 16, WIDTH = 8)(
+    input  logic             clk,
+    input  logic             rst_n,
+    input  logic             wr_en,
+    input  logic             rd_en,
+    input  logic [WIDTH-1:0] wr_data,
+    output logic [WIDTH-1:0] rd_data,
+    output logic             full,
+    output logic             empty,
+    output logic [$clog2(DEPTH):0] count
+);
+    // FIFO implementation...
+endmodule
+
+// Assertions in separate module
+module fifo_sva #(parameter DEPTH = 16, WIDTH = 8)(
+    input logic             clk,
+    input logic             rst_n,
+    input logic             wr_en,
+    input logic             rd_en,
+    input logic [WIDTH-1:0] wr_data,
+    input logic [WIDTH-1:0] rd_data,
+    input logic             full,
+    input logic             empty,
+    input logic [$clog2(DEPTH):0] count
+);
+
+    // Mutex: full and empty cannot both be true
+    property full_empty_mutex;
+        @(posedge clk) disable iff (!rst_n)
+        !(full && empty);
+    endproperty
+    a_mutex: assert property (full_empty_mutex)
+        else $fatal("FIFO full and empty simultaneously");
+
+    // Count range
+    property count_in_range;
+        @(posedge clk) disable iff (!rst_n)
+        count <= DEPTH;
+    endproperty
+    a_count_range: assert property (count_in_range);
+
+    // Full means count == DEPTH
+    property full_means_max_count;
+        @(posedge clk) disable iff (!rst_n)
+        full |-> (count == DEPTH);
+    endproperty
+    a_full_count: assert property (full_means_max_count);
+
+    // Empty means count == 0
+    property empty_means_zero_count;
+        @(posedge clk) disable iff (!rst_n)
+        empty |-> (count == 0);
+    endproperty
+    a_empty_count: assert property (empty_means_zero_count);
+
+    // Write increments count (if not full and no read)
+    property write_increments;
+        @(posedge clk) disable iff (!rst_n)
+        (wr_en && !full && !rd_en) |=> (count == $past(count) + 1);
+    endproperty
+    a_wr_inc: assert property (write_increments);
+
+    // Read decrements count
+    property read_decrements;
+        @(posedge clk) disable iff (!rst_n)
+        (rd_en && !empty && !wr_en) |=> (count == $past(count) - 1);
+    endproperty
+    a_rd_dec: assert property (read_decrements);
+
+    // Simultaneous read/write keeps count stable
+    property simul_rd_wr;
+        @(posedge clk) disable iff (!rst_n)
+        (wr_en && rd_en && !full && !empty) |=> (count == $past(count));
+    endproperty
+    a_simul: assert property (simul_rd_wr);
+
+    // Data stability when writing
+    property wr_data_stable;
+        @(posedge clk) disable iff (!rst_n)
+        (wr_en && !full) |-> !$isunknown(wr_data);
+    endproperty
+    a_wr_stable: assert property (wr_data_stable);
+
+    // Coverage
+    c_full: cover property (@(posedge clk) disable iff (!rst_n) full);
+    c_empty: cover property (@(posedge clk) disable iff (!rst_n) empty);
+    c_half_full: cover property (
+        @(posedge clk) disable iff (!rst_n) (count == DEPTH/2)
+    );
+    c_back_to_back_wr: cover property (
+        @(posedge clk) disable iff (!rst_n) (wr_en && !full) ##1 (wr_en && !full)
+    );
+
+endmodule
+
+// Top level with bind
+module fifo_top;
+    logic clk, rst_n;
+    // ... other signals ...
+
+    fifo #(.DEPTH(16), .WIDTH(8)) dut (.*);
+
+    // Bind assertions
+    bind fifo fifo_sva #(.DEPTH(DEPTH), .WIDTH(WIDTH))
+        sva_inst (.*);
+
+endmodule
+\end{lstlisting}
+
+\subsection{Quiz: SystemVerilog Assertions}
+
+\begin{quizbox}
+\textbf{Quiz 16: SVA Mastery}
+
+\begin{enumerate}
+  \item What's the difference between |-> and |=> operators?
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What does [*3] mean in a sequence? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What's the difference between [=3] and [->3]?
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item When should you use assume vs assert? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What does throughout operator ensure? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item |-> is overlapping (checks same cycle); |=> is non-overlapping (checks next cycle)
+  \item Signal is true for exactly 3 consecutive cycles
+  \item [=3] means 3 occurrences (not necessarily consecutive); [->3] means on 3rd occurrence
+  \item Use assert to verify DUT behavior; assume to constrain inputs in formal verification
+  \item A signal/condition remains true throughout the entire sequence duration
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Advanced Randomization and Constraints}
+
+\subsection{Constraint Layering and Modes}
+
+Advanced constrained random verification requires sophisticated control over constraint activation:
+
+\begin{lstlisting}[caption={Multi-Mode Constraint Architecture}]
+class ConfigurableTransaction;
+    rand bit [31:0] address;
+    rand bit [31:0] data;
+    rand bit [7:0]  burst_len;
+    rand bit        is_write;
+    rand bit [3:0]  id;
+
+    // Test modes
+    typedef enum {
+        NORMAL_MODE,
+        STRESS_MODE,
+        CORNER_CASE_MODE,
+        DEBUG_MODE
+    } test_mode_t;
+
+    test_mode_t current_mode = NORMAL_MODE;
+
+    // Always-active base constraints
+    constraint base_constraints {
+        burst_len inside {[1:16]};
+        address[1:0] == 2'b00;  // Word aligned
+        id < 8;
+    }
+
+    // Mode-specific constraints
+    constraint normal_mode_c {
+        if (current_mode == NORMAL_MODE) {
+            address inside {[32'h0000_0000:32'h0000_FFFF]};
+            burst_len inside {[1:4]};
+            is_write dist {1 := 60, 0 := 40};
+        }
+    }
+
+    constraint stress_mode_c {
+        if (current_mode == STRESS_MODE) {
+            burst_len == 16;  // Max burst
+            address[31:20] == 12'hFFF;  // High memory
+            is_write dist {1 := 90, 0 := 10};  // Mostly writes
+        }
+    }
+
+    constraint corner_case_c {
+        if (current_mode == CORNER_CASE_MODE) {
+            address inside {
+                32'h0000_0000,  // Start of memory
+                32'h0000_FFFC,  // End of low memory
+                32'hFFFF_0000,  // Start of high memory
+                32'hFFFF_FFFC   // End of memory
+            };
+            burst_len inside {1, 16};  // Min or max
+        }
+    }
+
+    constraint debug_mode_c {
+        if (current_mode == DEBUG_MODE) {
+            address == 32'h1000;  // Fixed address
+            burst_len == 1;       // Single transfer
+        }
+    }
+
+    function void set_mode(test_mode_t mode);
+        current_mode = mode;
+        $display("Mode changed to: %s", mode.name());
+    endfunction
+
+    function void display(string prefix = "");
+        $display("%s [%s] %s: Addr=0x%h Data=0x%h Len=%0d ID=%0d",
+                 prefix, current_mode.name(),
+                 is_write ? "WR" : "RD",
+                 address, data, burst_len, id);
+    endfunction
+endclass
+
+module constraint_modes_example;
+    initial begin
+        ConfigurableTransaction trans = new();
+
+        $display("\n=== NORMAL MODE ===");
+        trans.set_mode(ConfigurableTransaction::NORMAL_MODE);
+        repeat(5) begin
+            assert(trans.randomize());
+            trans.display();
+        end
+
+        $display("\n=== STRESS MODE ===");
+        trans.set_mode(ConfigurableTransaction::STRESS_MODE);
+        repeat(5) begin
+            assert(trans.randomize());
+            trans.display();
+        end
+
+        $display("\n=== CORNER CASE MODE ===");
+        trans.set_mode(ConfigurableTransaction::CORNER_CASE_MODE);
+        repeat(5) begin
+            assert(trans.randomize());
+            trans.display();
+        end
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Advanced Inline Constraints and Constraint Override}
+
+\begin{lstlisting}[caption={Dynamic Constraint Control}]
+class FlexiblePacket;
+    rand bit [15:0] length;
+    rand bit [7:0]  data[];
+    rand bit [3:0]  priority;
+    rand bit        error_inject;
+
+    constraint length_c {
+        length inside {[64:512]};
+        length % 64 == 0;  // Cache line aligned
+    }
+
+    constraint data_size_c {
+        data.size() == length;
+    }
+
+    constraint priority_c {
+        priority dist {
+            [0:3]   := 70,   // Low priority: 70%
+            [4:7]   := 20,   // Medium: 20%
+            [8:15]  := 10    // High: 10%
+        };
+    }
+
+    constraint error_c {
+        error_inject dist {0 := 95, 1 := 5};  // 5% error rate
+    }
+
+    function void display();
+        $display("Len=%0d Pri=%0d Err=%0b DataSize=%0d",
+                 length, priority, error_inject, data.size());
+    endfunction
+endclass
+
+module inline_constraint_demo;
+    initial begin
+        FlexiblePacket pkt = new();
+
+        $display("=== Standard Randomization ===");
+        repeat(3) begin
+            assert(pkt.randomize());
+            pkt.display();
+        end
+
+        $display("\n=== With Inline Constraints ===");
+        // Override with inline constraints
+        assert(pkt.randomize() with {
+            length == 256;
+            priority == 15;  // Highest priority
+            error_inject == 1;
+        });
+        pkt.display();
+
+        $display("\n=== Inline Constraint on Array ===");
+        assert(pkt.randomize() with {
+            length == 128;
+            foreach(data[i]) {
+                if (i < 10)
+                    data[i] == i;  // First 10 = sequential
+                else
+                    data[i] inside {[100:200]};
+            }
+        });
+        $display("First 10 elements: %p", pkt.data[0:9]);
+
+        $display("\n=== Disable Constraint ===");
+        pkt.length_c.constraint_mode(0);  // Disable
+        assert(pkt.randomize() with {
+            length == 1000;  // Would violate length_c if enabled
+        });
+        pkt.display();
+        pkt.length_c.constraint_mode(1);  // Re-enable
+
+        $display("\n=== Randomize Specific Variables ===");
+        pkt.length = 192;
+        pkt.priority = 10;
+        // Randomize only data array
+        assert(pkt.randomize(data));
+        pkt.display();
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Solve-Before and Constraint Ordering}
+
+\begin{lstlisting}[caption={Constraint Solving Order Control}]
+class ConstraintOrderPacket;
+    rand bit [7:0] packet_type;
+    rand bit [15:0] length;
+    rand bit [7:0] header_len;
+    rand bit [7:0] payload_len;
+
+    // Ensure packet_type is solved first
+    // Then length depends on type
+    // Then header and payload are divided from length
+    constraint solve_order {
+        solve packet_type before length;
+        solve length before header_len, payload_len;
+    }
+
+    constraint type_c {
+        packet_type inside {[0:3]};
+    }
+
+    constraint length_from_type {
+        if (packet_type == 0)      length == 64;
+        else if (packet_type == 1) length == 128;
+        else if (packet_type == 2) length == 256;
+        else                       length == 512;
+    }
+
+    constraint split_length {
+        header_len + payload_len == length;
+        header_len inside {[20:60]};
+    }
+
+    function void display();
+        $display("Type=%0d Len=%0d Hdr=%0d Payload=%0d (Sum=%0d)",
+                 packet_type, length, header_len, payload_len,
+                 header_len + payload_len);
+    endfunction
+endclass
+
+// Example with cyclic dependency resolution
+class CyclicDependency;
+    rand bit [7:0] a, b, c;
+
+    constraint circular {
+        a < b;
+        b < c;
+        c < a + 50;  // Creates dependency cycle
+    }
+
+    // Break cycle with solve-before
+    constraint solve_cycle {
+        solve a before b;
+        solve b before c;
+    }
+endclass
+
+module constraint_order_example;
+    initial begin
+        ConstraintOrderPacket pkt = new();
+
+        $display("=== Constraint Ordering Demo ===");
+        repeat(10) begin
+            assert(pkt.randomize());
+            pkt.display();
+        end
+
+        $display("\n=== Cyclic Dependency Resolution ===");
+        CyclicDependency cyc = new();
+        repeat(5) begin
+            assert(cyc.randomize());
+            $display("a=%0d b=%0d c=%0d", cyc.a, cyc.b, cyc.c);
+        end
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Random Stability with rand\_mode}
+
+\begin{lstlisting}[caption={Selective Randomization Control}]
+class SelectiveRandom;
+    rand bit [31:0] address;
+    rand bit [31:0] data;
+    rand bit [7:0]  burst_len;
+    rand bit        is_write;
+
+    constraint addr_c {
+        address inside {[32'h1000:32'h1FFF]};
+    }
+
+    function void display();
+        $display("Addr=0x%h Data=0x%h Len=%0d %s",
+                 address, data, burst_len, is_write ? "WR" : "RD");
+    endfunction
+endclass
+
+module rand_mode_example;
+    initial begin
+        SelectiveRandom obj = new();
+
+        $display("=== Full Randomization ===");
+        repeat(3) begin
+            assert(obj.randomize());
+            obj.display();
+        end
+
+        $display("\n=== Keep address constant, randomize rest ===");
+        obj.address = 32'h1234;
+        obj.rand_mode(0);  // Disable randomization for all
+        obj.address.rand_mode(0);  // Keep address
+        obj.data.rand_mode(1);     // Randomize data
+        obj.burst_len.rand_mode(1);
+        obj.is_write.rand_mode(1);
+
+        // Actually, better way:
+        obj.rand_mode(1);  // Re-enable all
+        obj.address.rand_mode(0);  // Disable just address
+
+        repeat(3) begin
+            assert(obj.randomize());
+            obj.display();  // Address stays 0x1234
+        end
+
+        $display("\n=== Randomize only data ===");
+        obj.rand_mode(0);  // Disable all
+        obj.data.rand_mode(1);  // Enable only data
+        repeat(3) begin
+            assert(obj.randomize());
+            obj.display();
+        end
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 50: Advanced Transaction Generator}
+
+Create a sophisticated transaction generator with:
+\begin{itemize}
+  \item Multiple operation modes (normal, stress, corner, debug)
+  \item Constraint layering based on mode
+  \item Solve-before to establish dependencies
+  \item Inline constraints for special test cases
+  \item Pre/post randomize for statistics and validation
+  \item Generate 1000 transactions and verify distributions
+  \item Support for selective randomization (fixed address, random data)
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Quiz: Advanced Randomization}
+
+\begin{quizbox}
+\textbf{Quiz 17: Advanced Constraints}
+
+\begin{enumerate}
+  \item How do you temporarily disable a constraint? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What does solve X before Y do? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item When is pre\_randomize() called? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item How do you randomize only specific variables? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What's the advantage of constraint modes? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{constraint\_name.constraint\_mode(0)}; re-enable with (1)
+  \item Forces constraint solver to determine X's value before solving for Y; breaks cyclic dependencies
+  \item Before randomize() is called; used to set up conditions that affect constraints
+  \item \texttt{randomize(var1, var2)} or use rand\_mode() to disable others
+  \item Allows switching between different constraint sets without modifying class
+\end{enumerate}
+\end{quizbox}
+
+%============================================================================
+\section{Design Patterns in SystemVerilog}
+%============================================================================
+
+Design patterns are reusable solutions to common problems in software design. In SystemVerilog verification, several patterns have emerged as best practices for building scalable, maintainable testbenches.
+
+%----------------------------------------------------------------------------
+\subsection{The Singleton Pattern}
+%----------------------------------------------------------------------------
+
+The Singleton pattern ensures that only one instance of a class exists throughout the simulation. This is commonly used for configuration databases, message handlers, and global resources.
+
+\begin{lstlisting}
+class Config;
+    static local Config m_instance = null;
+
+    // Configuration parameters
+    int num_transactions = 100;
+    bit enable_coverage = 1;
+    string test_name = "default_test";
+
+    // Private constructor prevents direct instantiation
+    local function new();
+    endfunction
+
+    // Static method to get the singleton instance
+    static function Config get();
+        if (m_instance == null) begin
+            m_instance = new();
+            $display("Config singleton created");
+        end
+        return m_instance;
+    endfunction
+
+    // Configuration methods
+    function void set_num_transactions(int n);
+        num_transactions = n;
+        $display("Set num_transactions = %0d", n);
+    endfunction
+
+    function void print_config();
+        $display("=== Configuration ===");
+        $display("Test Name: %s", test_name);
+        $display("Num Transactions: %0d", num_transactions);
+        $display("Coverage Enabled: %0d", enable_coverage);
+    endfunction
+endclass
+
+// Usage example
+module test_singleton;
+    initial begin
+        Config cfg1, cfg2;
+
+        // Get singleton instances
+        cfg1 = Config::get();
+        cfg2 = Config::get();
+
+        // Both references point to the same object
+        cfg1.set_num_transactions(500);
+        cfg2.print_config();  // Shows 500, proving same instance
+
+        if (cfg1 == cfg2)
+            $display("SUCCESS: cfg1 and cfg2 are the same instance");
+    end
+endmodule
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{The Factory Pattern}
+%----------------------------------------------------------------------------
+
+The Factory pattern provides an interface for creating objects without specifying their exact class. This is essential for creating different transaction types based on test configuration.
+
+\begin{lstlisting}
+// Base transaction class
+virtual class BaseTransaction;
+    rand bit [31:0] addr;
+    rand bit [31:0] data;
+    typedef enum {READ, WRITE, BURST} trans_type_t;
+    rand trans_type_t trans_type;
+
+    pure virtual function void display();
+    pure virtual function BaseTransaction clone();
+endclass
+
+// Read transaction
+class ReadTransaction extends BaseTransaction;
+    rand bit [3:0] burst_len;
+
+    constraint read_c { trans_type == READ; }
+
+    virtual function void display();
+        $display("READ: addr=0x%0h, burst_len=%0d", addr, burst_len);
+    endfunction
+
+    virtual function BaseTransaction clone();
+        ReadTransaction rt = new();
+        rt.addr = this.addr;
+        rt.burst_len = this.burst_len;
+        return rt;
+    endfunction
+endclass
+
+// Write transaction
+class WriteTransaction extends BaseTransaction;
+    rand bit [7:0] byte_enable;
+
+    constraint write_c { trans_type == WRITE; }
+
+    virtual function void display();
+        $display("WRITE: addr=0x%0h, data=0x%0h, be=0x%0h",
+                 addr, data, byte_enable);
+    endfunction
+
+    virtual function BaseTransaction clone();
+        WriteTransaction wt = new();
+        wt.addr = this.addr;
+        wt.data = this.data;
+        wt.byte_enable = this.byte_enable;
+        return wt;
+    endfunction
+endclass
+
+// Burst transaction
+class BurstTransaction extends BaseTransaction;
+    rand bit [31:0] data_queue[$];
+    rand int burst_length;
+
+    constraint burst_c {
+        trans_type == BURST;
+        burst_length inside {[4:16]};
+        data_queue.size() == burst_length;
+    }
+
+    virtual function void display();
+        $display("BURST: addr=0x%0h, length=%0d", addr, burst_length);
+        foreach(data_queue[i])
+            $display("  [%0d]: 0x%0h", i, data_queue[i]);
+    endfunction
+
+    virtual function BaseTransaction clone();
+        BurstTransaction bt = new();
+        bt.addr = this.addr;
+        bt.burst_length = this.burst_length;
+        bt.data_queue = this.data_queue;
+        return bt;
+    endfunction
+endclass
+
+// Transaction Factory
+class TransactionFactory;
+    typedef enum {READ_TYPE, WRITE_TYPE, BURST_TYPE} factory_type_t;
+
+    // Factory method
+    static function BaseTransaction create(factory_type_t t_type);
+        case (t_type)
+            READ_TYPE:  return new ReadTransaction();
+            WRITE_TYPE: return new WriteTransaction();
+            BURST_TYPE: return new BurstTransaction();
+            default: begin
+                $error("Unknown transaction type");
+                return null;
+            end
+        endcase
+    endfunction
+
+    // Random factory method
+    static function BaseTransaction create_random();
+        factory_type_t t = factory_type_t'($urandom_range(0, 2));
+        return create(t);
+    endfunction
+endclass
+
+// Usage example
+module test_factory;
+    initial begin
+        BaseTransaction trans;
+
+        // Create specific transaction types
+        trans = TransactionFactory::create(TransactionFactory::READ_TYPE);
+        assert(trans.randomize());
+        trans.display();
+
+        trans = TransactionFactory::create(TransactionFactory::WRITE_TYPE);
+        assert(trans.randomize());
+        trans.display();
+
+        // Create random transactions
+        repeat(5) begin
+            trans = TransactionFactory::create_random();
+            assert(trans.randomize());
+            trans.display();
+        end
+    end
+endmodule
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{The Observer Pattern}
+%----------------------------------------------------------------------------
+
+The Observer pattern defines a one-to-many dependency where multiple observers are notified when a subject changes state. This is useful for event notification in verification environments.
+
+\begin{lstlisting}
+// Observer interface
+virtual class Observer;
+    pure virtual task update(string event_name, int event_data);
+endclass
+
+// Subject (Observable)
+class EventBroadcaster;
+    local Observer observers[$];
+
+    // Subscribe an observer
+    function void attach(Observer obs);
+        observers.push_back(obs);
+        $display("Observer attached, total: %0d", observers.size());
+    endfunction
+
+    // Unsubscribe an observer
+    function void detach(Observer obs);
+        int index[$];
+        index = observers.find_index with (item == obs);
+        if (index.size() > 0)
+            observers.delete(index[0]);
+    endfunction
+
+    // Notify all observers
+    task notify(string event_name, int event_data);
+        $display("Broadcasting event: %s (data=%0d)", event_name, event_data);
+        foreach(observers[i]) begin
+            fork
+                automatic int idx = i;
+                observers[idx].update(event_name, event_data);
+            join_none
+        end
+        wait fork;  // Wait for all notifications to complete
+    endtask
+endclass
+
+// Concrete Observer: Coverage Collector
+class CoverageCollector extends Observer;
+    string name;
+    int events_received = 0;
+
+    function new(string n);
+        name = n;
+    endfunction
+
+    virtual task update(string event_name, int event_data);
+        events_received++;
+        $display("[%s] Received event: %s, data=%0d (total: %0d)",
+                 name, event_name, event_data, events_received);
+        #1ns;  // Simulate processing time
+    endtask
+endclass
+
+// Concrete Observer: Scoreboard
+class Scoreboard extends Observer;
+    int total_score = 0;
+
+    virtual task update(string event_name, int event_data);
+        total_score += event_data;
+        $display("[Scoreboard] Event: %s, Score: %0d, Total: %0d",
+                 event_name, event_data, total_score);
+        #2ns;  // Simulate processing time
+    endtask
+endclass
+
+// Concrete Observer: Logger
+class Logger extends Observer;
+    int log_count = 0;
+
+    virtual task update(string event_name, int event_data);
+        log_count++;
+        $display("[Logger-%0d] %s: 0x%0h", log_count, event_name, event_data);
+    endtask
+endclass
+
+// Usage example
+module test_observer;
+    initial begin
+        EventBroadcaster broadcaster;
+        CoverageCollector cov1, cov2;
+        Scoreboard sb;
+        Logger log;
+
+        broadcaster = new();
+        cov1 = new("Coverage1");
+        cov2 = new("Coverage2");
+        sb = new();
+        log = new();
+
+        // Subscribe observers
+        broadcaster.attach(cov1);
+        broadcaster.attach(cov2);
+        broadcaster.attach(sb);
+        broadcaster.attach(log);
+
+        // Trigger events
+        broadcaster.notify("TRANSACTION_START", 100);
+        #10ns;
+        broadcaster.notify("TRANSACTION_COMPLETE", 200);
+        #10ns;
+
+        // Detach one observer and trigger again
+        broadcaster.detach(cov2);
+        broadcaster.notify("ERROR_DETECTED", 42);
+        #10ns;
+    end
+endmodule
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{The Strategy Pattern}
+%----------------------------------------------------------------------------
+
+The Strategy pattern defines a family of algorithms and makes them interchangeable. In verification, this is used to switch between different protocol implementations or stimulus generation strategies.
+
+\begin{lstlisting}
+// Strategy interface
+virtual class TransferStrategy;
+    pure virtual task execute(bit [31:0] addr, bit [31:0] data);
+    pure virtual function string get_name();
+endclass
+
+// Concrete Strategy: AXI Transfer
+class AXIStrategy extends TransferStrategy;
+    virtual task execute(bit [31:0] addr, bit [31:0] data);
+        $display("[AXI] Starting transfer");
+        $display("  AWADDR = 0x%0h", addr);
+        $display("  AWVALID = 1");
+        #10ns;
+        $display("  AWREADY = 1");
+        $display("  WDATA = 0x%0h", data);
+        $display("  WVALID = 1");
+        #10ns;
+        $display("  WREADY = 1");
+        $display("  BRESP = 2'b00 (OKAY)");
+        $display("[AXI] Transfer complete");
+    endtask
+
+    virtual function string get_name();
+        return "AXI4";
+    endfunction
+endclass
+
+// Concrete Strategy: APB Transfer
+class APBStrategy extends TransferStrategy;
+    virtual task execute(bit [31:0] addr, bit [31:0] data);
+        $display("[APB] Starting transfer");
+        $display("  PADDR = 0x%0h", addr);
+        $display("  PSEL = 1, PENABLE = 0");
+        #10ns;
+        $display("  PENABLE = 1");
+        $display("  PWDATA = 0x%0h", data);
+        #10ns;
+        $display("  PREADY = 1");
+        $display("[APB] Transfer complete");
+    endtask
+
+    virtual function string get_name();
+        return "APB";
+    endfunction
+endclass
+
+// Concrete Strategy: Avalon Transfer
+class AvalonStrategy extends TransferStrategy;
+    virtual task execute(bit [31:0] addr, bit [31:0] data);
+        $display("[Avalon] Starting transfer");
+        $display("  address = 0x%0h", addr);
+        $display("  writedata = 0x%0h", data);
+        $display("  write = 1");
+        #20ns;  // Wait for waitrequest
+        $display("  waitrequest = 0");
+        $display("[Avalon] Transfer complete");
+    endtask
+
+    virtual function string get_name();
+        return "Avalon-MM";
+    endfunction
+endclass
+
+// Context class that uses a strategy
+class ProtocolDriver;
+    TransferStrategy strategy;
+
+    function void set_strategy(TransferStrategy s);
+        strategy = s;
+        $display("Protocol strategy set to: %s", s.get_name());
+    endfunction
+
+    task drive_transfer(bit [31:0] addr, bit [31:0] data);
+        if (strategy == null) begin
+            $error("No strategy set!");
+            return;
+        end
+        strategy.execute(addr, data);
+    endtask
+endclass
+
+// Usage example
+module test_strategy;
+    initial begin
+        ProtocolDriver driver;
+        AXIStrategy axi_strat;
+        APBStrategy apb_strat;
+        AvalonStrategy avalon_strat;
+
+        driver = new();
+        axi_strat = new();
+        apb_strat = new();
+        avalon_strat = new();
+
+        // Use AXI protocol
+        driver.set_strategy(axi_strat);
+        driver.drive_transfer(32'h1000, 32'hDEADBEEF);
+        #20ns;
+
+        // Switch to APB protocol
+        driver.set_strategy(apb_strat);
+        driver.drive_transfer(32'h2000, 32'hCAFEBABE);
+        #20ns;
+
+        // Switch to Avalon protocol
+        driver.set_strategy(avalon_strat);
+        driver.drive_transfer(32'h3000, 32'h12345678);
+        #20ns;
+
+        $display("\n=== Strategy Pattern Demo Complete ===");
+    end
+endmodule
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{The Builder Pattern}
+%----------------------------------------------------------------------------
+
+The Builder pattern separates the construction of a complex object from its representation, allowing the same construction process to create different representations.
+
+\begin{lstlisting}
+// Complex product: Verification Environment
+class VerificationEnvironment;
+    string name;
+    int num_agents;
+    bit has_scoreboard;
+    bit has_coverage;
+    bit has_monitor;
+    string protocol_type;
+
+    function void display();
+        $display("=== Verification Environment: %s ===", name);
+        $display("  Agents: %0d", num_agents);
+        $display("  Protocol: %s", protocol_type);
+        $display("  Scoreboard: %s", has_scoreboard ? "Yes" : "No");
+        $display("  Coverage: %s", has_coverage ? "Yes" : "No");
+        $display("  Monitor: %s", has_monitor ? "Yes" : "No");
+    endfunction
+endclass
+
+// Abstract Builder
+virtual class EnvironmentBuilder;
+    protected VerificationEnvironment env;
+
+    function new();
+        env = new();
+    endfunction
+
+    pure virtual function void build_agents();
+    pure virtual function void build_scoreboard();
+    pure virtual function void build_coverage();
+    pure virtual function void build_monitor();
+    pure virtual function void set_protocol();
+
+    function VerificationEnvironment get_result();
+        return env;
+    endfunction
+endclass
+
+// Concrete Builder: Simple Test Environment
+class SimpleTestBuilder extends EnvironmentBuilder;
+    function new();
+        super.new();
+        env.name = "Simple Test Environment";
+    endfunction
+
+    virtual function void build_agents();
+        env.num_agents = 1;
+    endfunction
+
+    virtual function void build_scoreboard();
+        env.has_scoreboard = 0;  // Simple test doesn't need scoreboard
+    endfunction
+
+    virtual function void build_coverage();
+        env.has_coverage = 0;
+    endfunction
+
+    virtual function void build_monitor();
+        env.has_monitor = 1;  // Basic monitoring
+    endfunction
+
+    virtual function void set_protocol();
+        env.protocol_type = "APB";
+    endfunction
+endclass
+
+// Concrete Builder: Advanced Verification Environment
+class AdvancedVerifBuilder extends EnvironmentBuilder;
+    function new();
+        super.new();
+        env.name = "Advanced Verification Environment";
+    endfunction
+
+    virtual function void build_agents();
+        env.num_agents = 4;  // Multiple agents
+    endfunction
+
+    virtual function void build_scoreboard();
+        env.has_scoreboard = 1;
+    endfunction
+
+    virtual function void build_coverage();
+        env.has_coverage = 1;
+    endfunction
+
+    virtual function void build_monitor();
+        env.has_monitor = 1;
+    endfunction
+
+    virtual function void set_protocol();
+        env.protocol_type = "AXI4";
+    endfunction
+endclass
+
+// Concrete Builder: Regression Test Environment
+class RegressionTestBuilder extends EnvironmentBuilder;
+    function new();
+        super.new();
+        env.name = "Regression Test Environment";
+    endfunction
+
+    virtual function void build_agents();
+        env.num_agents = 2;
+    endfunction
+
+    virtual function void build_scoreboard();
+        env.has_scoreboard = 1;
+    endfunction
+
+    virtual function void build_coverage();
+        env.has_coverage = 1;  // Full coverage for regression
+    endfunction
+
+    virtual function void build_monitor();
+        env.has_monitor = 1;
+    endfunction
+
+    virtual function void set_protocol();
+        env.protocol_type = "AXI4-Stream";
+    endfunction
+endclass
+
+// Director
+class EnvironmentDirector;
+    EnvironmentBuilder builder;
+
+    function void set_builder(EnvironmentBuilder b);
+        builder = b;
+    endfunction
+
+    function VerificationEnvironment construct();
+        builder.set_protocol();
+        builder.build_agents();
+        builder.build_scoreboard();
+        builder.build_coverage();
+        builder.build_monitor();
+        return builder.get_result();
+    endfunction
+endclass
+
+// Usage example
+module test_builder;
+    initial begin
+        EnvironmentDirector director;
+        SimpleTestBuilder simple_builder;
+        AdvancedVerifBuilder advanced_builder;
+        RegressionTestBuilder regression_builder;
+        VerificationEnvironment env;
+
+        director = new();
+
+        // Build simple environment
+        simple_builder = new();
+        director.set_builder(simple_builder);
+        env = director.construct();
+        env.display();
+        $display("");
+
+        // Build advanced environment
+        advanced_builder = new();
+        director.set_builder(advanced_builder);
+        env = director.construct();
+        env.display();
+        $display("");
+
+        // Build regression environment
+        regression_builder = new();
+        director.set_builder(regression_builder);
+        env = director.construct();
+        env.display();
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 51: Implement a Prototype Pattern}
+
+Create a \texttt{TransactionPrototype} class that implements the Prototype pattern for deep copying transactions. Include:
+\begin{itemize}
+    \item A \texttt{clone()} method for creating deep copies
+    \item Support for nested objects (e.g., transaction with embedded descriptor)
+    \item A prototype registry for managing prototypes
+    \item Demonstration of cloning vs. shallow copying
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 52: Command Pattern for Test Sequences}
+
+Implement the Command pattern to create reusable test sequences:
+\begin{itemize}
+    \item Abstract \texttt{Command} class with \texttt{execute()} and \texttt{undo()} methods
+    \item Concrete commands: \texttt{WriteCommand}, \texttt{ReadCommand}, \texttt{DelayCommand}
+    \item \texttt{CommandInvoker} to manage command queues
+    \item Support for command history and replay
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 53: Combine Multiple Patterns}
+
+Create a verification environment that combines:
+\begin{itemize}
+    \item Singleton for configuration
+    \item Factory for creating transactions
+    \item Observer for event notification
+    \item Strategy for protocol switching
+    \item Demonstrate how patterns work together
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 18: Design Patterns}
+
+\begin{enumerate}
+    \item What is the main purpose of the Singleton pattern in verification?
+    \item How does the Factory pattern improve testbench flexibility?
+    \item In the Observer pattern, what happens when \texttt{notify()} is called?
+    \item Why is the Strategy pattern useful for multi-protocol verification?
+    \item What advantage does the Builder pattern provide over direct object construction?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item Ensures only one instance of a class (e.g., configuration) exists globally; prevents multiple conflicting configurations
+    \item Decouples transaction creation from specific types; allows runtime selection of transaction types without modifying client code
+    \item All registered observers are notified concurrently; each observer's \texttt{update()} method is called with event data
+    \item Allows switching between protocol implementations (AXI, APB, Avalon) without changing driver code; promotes code reuse
+    \item Separates complex construction from representation; same builder process can create different configurations; improves readability
+\end{enumerate}
+\end{quizbox}
+
+\begin{tipbox}
+\textbf{Pattern Selection Guidelines:}
+\begin{itemize}
+    \item \textbf{Singleton}: Global configuration, message handlers, resource managers
+    \item \textbf{Factory}: Creating polymorphic objects based on runtime conditions
+    \item \textbf{Observer}: Event-driven architectures, scoreboarding, coverage collection
+    \item \textbf{Strategy}: Protocol abstraction, interchangeable algorithms
+    \item \textbf{Builder}: Complex object construction with many optional components
+\end{itemize}
+\end{tipbox}
+
+%============================================================================
+\section{Advanced Functional Coverage}
+%============================================================================
+
+Functional coverage measures how well the verification environment has exercised the design's functionality. Advanced coverage techniques help ensure comprehensive verification and identify coverage holes.
+
+%----------------------------------------------------------------------------
+\subsection{Covergroup Basics and Options}
+%----------------------------------------------------------------------------
+
+Covergroups define what to measure. Coverage options control how coverage is measured and reported.
+
+\begin{lstlisting}
+class AdvancedCoverageExample;
+    bit [7:0] data;
+    bit [1:0] mode;
+    bit error;
+
+    // Covergroup with advanced options
+    covergroup cg_advanced @(posedge clk);
+        option.per_instance = 1;  // Separate coverage per instance
+        option.at_least = 5;      // Each bin hit at least 5 times
+        option.auto_bin_max = 8;  // Auto bins limited to 8
+        option.comment = "Advanced coverage example";
+
+        // Simple coverpoint with automatic bins
+        cp_data: coverpoint data {
+            option.weight = 2;  // Higher weight for this coverpoint
+        }
+
+        // Coverpoint with explicit bins
+        cp_mode: coverpoint mode {
+            bins low_mode  = {0};
+            bins mid_mode  = {1, 2};
+            bins high_mode = {3};
+            option.weight = 1;
+        }
+
+        // Coverpoint with range bins
+        cp_data_ranges: coverpoint data {
+            bins low    = {[0:63]};
+            bins medium = {[64:191]};
+            bins high   = {[192:255]};
+        }
+
+        // Wildcard bins
+        cp_data_pattern: coverpoint data {
+            wildcard bins pattern_0x = {8'b0000_????};
+            wildcard bins pattern_f0 = {8'b1111_0???};
+            wildcard bins pattern_aa = {8'b1010_1010};
+        }
+
+        // Transition bins
+        cp_mode_transitions: coverpoint mode {
+            bins trans_0_1 = (0 => 1);
+            bins trans_1_2 = (1 => 2);
+            bins trans_2_3 = (2 => 3);
+            bins trans_any = (0,1,2,3 => 0,1,2,3);  // All transitions
+            bins trans_seq = (0 => 1 => 2 => 3);    // Specific sequence
+        }
+
+        // Illegal and ignore bins
+        cp_data_special: coverpoint data {
+            bins valid = {[0:250]};
+            illegal_bins forbidden = {251, 252};
+            ignore_bins  reserved  = {[253:255]};
+        }
+    endgroup
+
+    function new();
+        cg_advanced = new();
+    endfunction
+
+    function void sample(bit [7:0] d, bit [1:0] m);
+        data = d;
+        mode = m;
+        cg_advanced.sample();
+    endfunction
+endclass
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{Cross Coverage}
+%----------------------------------------------------------------------------
+
+Cross coverage captures interactions between multiple variables, which is crucial for finding corner cases.
+
+\begin{lstlisting}
+class TransactionCoverage;
+    typedef enum {READ, WRITE, BURST} trans_type_t;
+    typedef enum {OKAY, EXOKAY, SLVERR, DECERR} resp_type_t;
+
+    trans_type_t trans_type;
+    resp_type_t  response;
+    bit [3:0]    burst_len;
+    bit [2:0]    burst_size;
+
+    covergroup cg_transaction;
+        // Individual coverpoints
+        cp_type: coverpoint trans_type;
+
+        cp_resp: coverpoint response;
+
+        cp_burst_len: coverpoint burst_len {
+            bins small  = {[1:4]};
+            bins medium = {[5:8]};
+            bins large  = {[9:16]};
+        }
+
+        cp_size: coverpoint burst_size {
+            bins byte_transfer = {0};
+            bins half_transfer = {1};
+            bins word_transfer = {2};
+            bins dword_transfer = {3};
+        }
+
+        // Cross coverage: type x response
+        cross_type_resp: cross cp_type, cp_resp {
+            // Some combinations are illegal
+            illegal_bins illegal_burst_error =
+                binsof(cp_type) intersect {BURST} &&
+                binsof(cp_resp) intersect {SLVERR, DECERR};
+        }
+
+        // Cross coverage: type x burst_len x size
+        cross_burst_params: cross cp_type, cp_burst_len, cp_size {
+            // Only care about burst transactions
+            ignore_bins non_burst =
+                binsof(cp_type) intersect {READ, WRITE};
+
+            // Large bursts with byte transfers are interesting
+            bins large_byte_bursts =
+                binsof(cp_burst_len) intersect {[9:16]} &&
+                binsof(cp_size) intersect {0};
+        }
+
+        // Advanced cross with explicit bins
+        cross_detailed: cross cp_type, cp_resp {
+            bins read_ok    = binsof(cp_type) intersect {READ} &&
+                              binsof(cp_resp) intersect {OKAY};
+            bins write_ok   = binsof(cp_type) intersect {WRITE} &&
+                              binsof(cp_resp) intersect {OKAY};
+            bins any_error  = binsof(cp_resp) intersect {SLVERR, DECERR};
+
+            // Ignore some crosses
+            ignore_bins read_exokay = binsof(cp_type) intersect {READ} &&
+                                      binsof(cp_resp) intersect {EXOKAY};
+        }
+    endgroup
+
+    function new();
+        cg_transaction = new();
+    endfunction
+endclass
+
+// Usage example with comprehensive coverage
+module test_cross_coverage;
+    initial begin
+        TransactionCoverage tc;
+        tc = new();
+
+        // Sample various scenarios
+        tc.trans_type = TransactionCoverage::READ;
+        tc.response = TransactionCoverage::OKAY;
+        tc.burst_len = 4;
+        tc.burst_size = 2;
+        tc.cg_transaction.sample();
+
+        tc.trans_type = TransactionCoverage::BURST;
+        tc.response = TransactionCoverage::OKAY;
+        tc.burst_len = 16;
+        tc.burst_size = 0;  // Large byte burst - interesting case
+        tc.cg_transaction.sample();
+
+        // Print coverage
+        $display("Coverage: %0.2f%%", tc.cg_transaction.get_coverage());
+    end
+endmodule
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{Coverage-Driven Verification}
+%----------------------------------------------------------------------------
+
+Using coverage feedback to guide stimulus generation and identify coverage holes.
+
+\begin{lstlisting}
+class CoverageDrivenGenerator;
+    rand bit [7:0] address;
+    rand bit [1:0] mode;
+    rand bit [3:0] burst;
+
+    // Coverage-driven constraints
+    bit enable_address_focus = 0;
+    bit enable_mode_focus = 0;
+
+    // Track what we've covered
+    bit address_low_covered = 0;
+    bit address_high_covered = 0;
+
+    covergroup cg_stimulus;
+        cp_addr: coverpoint address {
+            bins low    = {[0:63]};
+            bins medium = {[64:191]};
+            bins high   = {[192:255]};
+        }
+
+        cp_mode: coverpoint mode;
+
+        cp_burst: coverpoint burst {
+            bins small = {[1:4]};
+            bins large = {[5:15]};
+        }
+
+        cross_addr_mode: cross cp_addr, cp_mode;
+    endgroup
+
+    constraint c_directed {
+        // Use coverage feedback to direct stimulus
+        if (enable_address_focus && !address_low_covered) {
+            address inside {[0:63]};
+        }
+        if (enable_address_focus && !address_high_covered) {
+            address inside {[192:255]};
+        }
+        if (enable_mode_focus) {
+            mode dist {0 := 10, [1:2] := 30, 3 := 60};
+        }
+    }
+
+    function new();
+        cg_stimulus = new();
+    endfunction
+
+    function void update_coverage_state();
+        real cov;
+        // Check coverage for specific bins
+        cov = cg_stimulus.cp_addr.get_inst_coverage();
+
+        // This is simplified - in reality, you'd query specific bins
+        if (cov > 30.0) address_low_covered = 1;
+        if (cov > 60.0) address_high_covered = 1;
+    endfunction
+
+    task run_coverage_driven_test(int num_iterations);
+        for (int i = 0; i < num_iterations; i++) begin
+            // Generate stimulus
+            assert(this.randomize());
+
+            // Apply stimulus (simplified)
+            $display("[%0d] addr=0x%0h, mode=%0d, burst=%0d",
+                     i, address, mode, burst);
+
+            // Sample coverage
+            cg_stimulus.sample();
+
+            // Update coverage state every 10 iterations
+            if (i % 10 == 0) begin
+                update_coverage_state();
+                real current_cov = cg_stimulus.get_coverage();
+                $display("  Coverage: %0.2f%%", current_cov);
+
+                // Adjust stimulus based on coverage
+                if (current_cov < 50.0)
+                    enable_address_focus = 1;
+                else if (current_cov < 80.0)
+                    enable_mode_focus = 1;
+            end
+        end
+
+        // Final coverage report
+        $display("\n=== Final Coverage Report ===");
+        $display("Overall: %0.2f%%", cg_stimulus.get_coverage());
+        $display("Address: %0.2f%%", cg_stimulus.cp_addr.get_coverage());
+        $display("Mode: %0.2f%%", cg_stimulus.cp_mode.get_coverage());
+        $display("Cross: %0.2f%%", cg_stimulus.cross_addr_mode.get_coverage());
+    endtask
+endclass
+
+module test_coverage_driven;
+    initial begin
+        CoverageDrivenGenerator gen;
+        gen = new();
+        gen.run_coverage_driven_test(100);
+    end
+endmodule
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{Advanced Coverage Techniques}
+%----------------------------------------------------------------------------
+
+\begin{lstlisting}
+// Generic coverage for parameterized designs
+class GenericCoverage #(parameter ADDR_WIDTH = 32, DATA_WIDTH = 32);
+    bit [ADDR_WIDTH-1:0] addr;
+    bit [DATA_WIDTH-1:0] data;
+
+    covergroup cg_generic;
+        cp_addr: coverpoint addr {
+            bins low    = {[0:(2**(ADDR_WIDTH-1))-1]};
+            bins high   = {[2**(ADDR_WIDTH-1):2**ADDR_WIDTH-1]};
+        }
+
+        cp_data_msb: coverpoint data[DATA_WIDTH-1];
+        cp_data_lsb: coverpoint data[0];
+    endgroup
+
+    function new();
+        cg_generic = new();
+    endfunction
+endclass
+
+// Coverage callbacks for advanced analysis
+class CoverageCallbacks;
+    covergroup cg_with_callbacks;
+        cp_value: coverpoint value {
+            bins low  = {[0:49]};
+            bins mid  = {[50:99]};
+            bins high = {[100:255]};
+        }
+    endgroup
+
+    int value;
+    int coverage_hits[$];
+
+    function new();
+        cg_with_callbacks = new();
+    endfunction
+
+    function void sample_and_track(int val);
+        value = val;
+        cg_with_callbacks.sample();
+        coverage_hits.push_back(val);
+
+        // Analyze coverage holes
+        if (coverage_hits.size() > 20) begin
+            analyze_coverage_holes();
+        end
+    endfunction
+
+    function void analyze_coverage_holes();
+        int low_count = 0, mid_count = 0, high_count = 0;
+
+        foreach (coverage_hits[i]) begin
+            if (coverage_hits[i] < 50) low_count++;
+            else if (coverage_hits[i] < 100) mid_count++;
+            else high_count++;
+        end
+
+        $display("\n=== Coverage Distribution ===");
+        $display("Low bins:  %0d hits", low_count);
+        $display("Mid bins:  %0d hits", mid_count);
+        $display("High bins: %0d hits", high_count);
+
+        // Identify holes
+        if (low_count < 5)
+            $display("WARNING: Low coverage in low range!");
+        if (mid_count < 5)
+            $display("WARNING: Low coverage in mid range!");
+        if (high_count < 5)
+            $display("WARNING: Low coverage in high range!");
+    endfunction
+endclass
+
+// Coverage for state machines
+typedef enum {IDLE, ACTIVE, WAIT, ERROR, DONE} state_t;
+
+class StateMachineCoverage;
+    state_t current_state, prev_state;
+
+    covergroup cg_fsm;
+        cp_state: coverpoint current_state;
+
+        // State transitions
+        cp_transitions: coverpoint current_state {
+            bins idle_to_active = (IDLE => ACTIVE);
+            bins active_to_wait = (ACTIVE => WAIT);
+            bins wait_to_active = (WAIT => ACTIVE);
+            bins any_to_error   = (IDLE, ACTIVE, WAIT => ERROR);
+            bins error_to_idle  = (ERROR => IDLE);
+            bins active_to_done = (ACTIVE => DONE);
+            bins done_to_idle   = (DONE => IDLE);
+
+            // Illegal transitions
+            illegal_bins bad_trans = (DONE => ACTIVE);
+        }
+
+        // Multistate sequences
+        cp_sequences: coverpoint current_state {
+            bins normal_flow = (IDLE => ACTIVE => WAIT => ACTIVE => DONE);
+            bins error_recovery = (ACTIVE => ERROR => IDLE => ACTIVE);
+            bins quick_complete = (IDLE => ACTIVE => DONE);
+        }
+    endgroup
+
+    function new();
+        cg_fsm = new();
+    endfunction
+
+    function void update_state(state_t new_state);
+        prev_state = current_state;
+        current_state = new_state;
+        cg_fsm.sample();
+        $display("State: %s -> %s (Coverage: %0.2f%%)",
+                 prev_state.name(), current_state.name(),
+                 cg_fsm.get_coverage());
+    endfunction
+endclass
+
+// Example usage
+module test_advanced_coverage;
+    initial begin
+        GenericCoverage#(8, 16) gen_cov;
+        CoverageCallbacks cov_cb;
+        StateMachineCoverage fsm_cov;
+
+        // Test generic coverage
+        gen_cov = new();
+        gen_cov.addr = 8'h7F;
+        gen_cov.data = 16'hABCD;
+        gen_cov.cg_generic.sample();
+
+        // Test coverage with callbacks
+        cov_cb = new();
+        repeat(30) begin
+            cov_cb.sample_and_track($urandom_range(0, 255));
+        end
+
+        // Test FSM coverage
+        fsm_cov = new();
+        fsm_cov.update_state(IDLE);
+        fsm_cov.update_state(ACTIVE);
+        fsm_cov.update_state(WAIT);
+        fsm_cov.update_state(ACTIVE);
+        fsm_cov.update_state(DONE);
+        fsm_cov.update_state(IDLE);
+
+        $display("\nFinal FSM Coverage: %0.2f%%",
+                 fsm_cov.cg_fsm.get_coverage());
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 54: Comprehensive Protocol Coverage}
+
+Create a coverage model for an AXI4 protocol with:
+\begin{itemize}
+    \item Coverpoints for address, burst length, burst size, burst type
+    \item Cross coverage for all valid combinations
+    \item Illegal bins for protocol violations
+    \item Transition coverage for AWVALID/AWREADY handshaking
+    \item Coverage options to ensure at least 10 hits per bin
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 55: Coverage-Driven Constraint Tuning}
+
+Implement a self-adjusting generator that:
+\begin{itemize}
+    \item Monitors coverage in real-time
+    \item Automatically adjusts constraint weights based on coverage holes
+    \item Implements at least 3 different stimulus modes
+    \item Provides coverage closure report showing how holes were filled
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 56: Hierarchical Coverage}
+
+Design a hierarchical coverage structure for a complete SoC:
+\begin{itemize}
+    \item Top-level covergroup for system-level scenarios
+    \item Component-level covergroups for each IP block
+    \item Cross-hierarchy coverage relationships
+    \item Methods to merge and report coverage at different levels
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 19: Advanced Coverage}
+
+\begin{enumerate}
+    \item What is the difference between \texttt{illegal\_bins} and \texttt{ignore\_bins}?
+    \item How does \texttt{option.at\_least} affect coverage calculation?
+    \item What does cross coverage measure that individual coverpoints cannot?
+    \item When would you use transition bins instead of simple value bins?
+    \item How can coverage feedback be used to improve stimulus generation?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item \texttt{illegal\_bins}: Hit causes error/warning; represents illegal scenarios. \texttt{ignore\_bins}: Excluded from coverage calculation; represents don't-care scenarios
+    \item Sets minimum hit count for 100\% coverage; bin with fewer hits counts as uncovered; ensures robust verification
+    \item Interactions between multiple variables; corner cases from combinations; individual coverpoints only measure single dimensions
+    \item When order of values matters; state machine transitions; protocol sequences; temporal relationships are important
+    \item Analyze uncovered bins; adjust constraints to target holes; weight distributions toward low-coverage areas; iterative refinement
+\end{enumerate}
+\end{quizbox}
+
+\begin{warningbox}
+\textbf{Common Coverage Pitfalls:}
+\begin{itemize}
+    \item Over-specification: Too many bins leading to uncloseable coverage
+    \item Under-specification: Missing important corner cases
+    \item Ignoring cross coverage: Missing interaction bugs
+    \item Not using coverage feedback: Random stimulus may never hit some bins
+    \item Illegal bin errors: Ensure constraints prevent illegal scenarios
+\end{itemize}
+\end{warningbox}
+
+%============================================================================
+\section{Introduction to UVM (Universal Verification Methodology)}
+%============================================================================
+
+UVM is an industry-standard methodology for SystemVerilog verification. It provides a framework, base classes, and best practices for building reusable, scalable verification environments.
+
+%----------------------------------------------------------------------------
+\subsection{UVM Fundamentals}
+%----------------------------------------------------------------------------
+
+UVM is built on several key concepts: hierarchy, phases, configuration, and reusability.
+
+\begin{lstlisting}
+// Basic UVM includes - required for all UVM testbenches
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
+// Simple UVM component example
+class my_component extends uvm_component;
+    // Register with factory
+    `uvm_component_utils(my_component)
+
+    // Constructor
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    // Build phase - construct sub-components
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        `uvm_info(get_type_name(), "Build phase executing", UVM_LOW)
+    endfunction
+
+    // Connect phase - connect components together
+    virtual function void connect_phase(uvm_phase phase);
+        super.connect_phase(phase);
+        `uvm_info(get_type_name(), "Connect phase executing", UVM_LOW)
+    endfunction
+
+    // Run phase - main execution
+    virtual task run_phase(uvm_phase phase);
+        `uvm_info(get_type_name(), "Run phase executing", UVM_LOW)
+        #100ns;
+    endtask
+endclass
+
+// Simple UVM test
+class my_test extends uvm_test;
+    `uvm_component_utils(my_test)
+
+    my_component comp;
+
+    function new(string name = "my_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        comp = my_component::type_id::create("comp", this);
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        `uvm_info(get_type_name(), "Test starting", UVM_LOW)
+        #500ns;
+        `uvm_info(get_type_name(), "Test ending", UVM_LOW)
+        phase.drop_objection(this);
+    endtask
+endclass
+
+// Top-level module
+module top;
+    initial begin
+        run_test("my_test");
+    end
+endmodule
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{UVM Phases}
+%----------------------------------------------------------------------------
+
+UVM defines a standardized execution flow through phases. Understanding phases is critical for proper component initialization and coordination.
+
+\begin{lstlisting}
+class phase_demo extends uvm_component;
+    `uvm_component_utils(phase_demo)
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+        `uvm_info(get_type_name(), "Constructor called", UVM_LOW)
+    endfunction
+
+    // 1. Build Phase (bottom-up)
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        `uvm_info(get_type_name(),
+            "BUILD: Create and configure sub-components", UVM_MEDIUM)
+    endfunction
+
+    // 2. Connect Phase (bottom-up)
+    virtual function void connect_phase(uvm_phase phase);
+        super.connect_phase(phase);
+        `uvm_info(get_type_name(),
+            "CONNECT: Link components via TLM ports", UVM_MEDIUM)
+    endfunction
+
+    // 3. End of Elaboration (bottom-up)
+    virtual function void end_of_elaboration_phase(uvm_phase phase);
+        super.end_of_elaboration_phase(phase);
+        `uvm_info(get_type_name(),
+            "END_ELAB: Hierarchy is complete", UVM_MEDIUM)
+    endfunction
+
+    // 4. Start of Simulation (bottom-up)
+    virtual function void start_of_simulation_phase(uvm_phase phase);
+        super.start_of_simulation_phase(phase);
+        `uvm_info(get_type_name(),
+            "START_SIM: Display topology, open files", UVM_MEDIUM)
+    endfunction
+
+    // 5. Run Phase (parallel for all components)
+    virtual task run_phase(uvm_phase phase);
+        `uvm_info(get_type_name(),
+            "RUN: Main execution phase", UVM_MEDIUM)
+        #50ns;
+    endtask
+
+    // 6. Extract Phase (bottom-up)
+    virtual function void extract_phase(uvm_phase phase);
+        super.extract_phase(phase);
+        `uvm_info(get_type_name(),
+            "EXTRACT: Collect results", UVM_MEDIUM)
+    endfunction
+
+    // 7. Check Phase (bottom-up)
+    virtual function void check_phase(uvm_phase phase);
+        super.check_phase(phase);
+        `uvm_info(get_type_name(),
+            "CHECK: Verify results", UVM_MEDIUM)
+    endfunction
+
+    // 8. Report Phase (bottom-up)
+    virtual function void report_phase(uvm_phase phase);
+        super.report_phase(phase);
+        `uvm_info(get_type_name(),
+            "REPORT: Display final statistics", UVM_MEDIUM)
+    endfunction
+
+    // 9. Final Phase (top-down)
+    virtual function void final_phase(uvm_phase phase);
+        super.final_phase(phase);
+        `uvm_info(get_type_name(),
+            "FINAL: Close files, cleanup", UVM_MEDIUM)
+    endfunction
+endclass
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{UVM Transaction and Sequence Item}
+%----------------------------------------------------------------------------
+
+Transactions are the fundamental unit of communication in UVM. They represent data to be transferred between components.
+
+\begin{lstlisting}
+// Transaction class
+class simple_transaction extends uvm_sequence_item;
+    // Transaction fields
+    rand bit [31:0] addr;
+    rand bit [31:0] data;
+    rand bit        write;  // 1 = write, 0 = read
+    bit [31:0]      response_data;
+
+    // Constraints
+    constraint c_addr { addr[1:0] == 2'b00; }  // Word aligned
+
+    // UVM automation macros
+    `uvm_object_utils_begin(simple_transaction)
+        `uvm_field_int(addr, UVM_ALL_ON)
+        `uvm_field_int(data, UVM_ALL_ON)
+        `uvm_field_int(write, UVM_ALL_ON)
+        `uvm_field_int(response_data, UVM_ALL_ON | UVM_NOCOMPARE)
+    `uvm_object_utils_end
+
+    // Constructor
+    function new(string name = "simple_transaction");
+        super.new(name);
+    endfunction
+
+    // Convert to string for printing
+    virtual function string convert2string();
+        return $sformatf("addr=0x%0h, data=0x%0h, write=%0b, resp=0x%0h",
+                         addr, data, write, response_data);
+    endfunction
+endclass
+
+// Sequence - generates transactions
+class simple_sequence extends uvm_sequence#(simple_transaction);
+    `uvm_object_utils(simple_sequence)
+
+    function new(string name = "simple_sequence");
+        super.new(name);
+    endfunction
+
+    virtual task body();
+        simple_transaction tr;
+
+        // Generate 5 random transactions
+        repeat(5) begin
+            tr = simple_transaction::type_id::create("tr");
+            start_item(tr);
+            assert(tr.randomize());
+            `uvm_info(get_type_name(),
+                $sformatf("Sending: %s", tr.convert2string()), UVM_MEDIUM)
+            finish_item(tr);
+        end
+
+        // Generate specific write transaction
+        tr = simple_transaction::type_id::create("tr");
+        start_item(tr);
+        assert(tr.randomize() with {
+            write == 1;
+            addr == 32'h1000;
+            data == 32'hDEADBEEF;
+        });
+        `uvm_info(get_type_name(),
+            $sformatf("Sending directed: %s", tr.convert2string()), UVM_MEDIUM)
+        finish_item(tr);
+    endtask
+endclass
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{UVM Driver}
+%----------------------------------------------------------------------------
+
+The driver receives transactions from the sequencer and drives them onto the DUT interface.
+
+\begin{lstlisting}
+// Interface for the DUT
+interface simple_if(input logic clk, input logic rst_n);
+    logic [31:0] addr;
+    logic [31:0] wdata;
+    logic [31:0] rdata;
+    logic        write;
+    logic        valid;
+    logic        ready;
+endinterface
+
+// UVM Driver
+class simple_driver extends uvm_driver#(simple_transaction);
+    `uvm_component_utils(simple_driver)
+
+    virtual simple_if vif;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        // Get virtual interface from config DB
+        if (!uvm_config_db#(virtual simple_if)::get(this, "", "vif", vif))
+            `uvm_fatal(get_type_name(), "Virtual interface not found!")
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        simple_transaction tr;
+
+        // Initialize signals
+        vif.valid <= 0;
+        vif.addr  <= 0;
+        vif.wdata <= 0;
+        vif.write <= 0;
+
+        forever begin
+            // Get next transaction from sequencer
+            seq_item_port.get_next_item(tr);
+
+            // Drive transaction onto interface
+            drive_transaction(tr);
+
+            // Indicate completion
+            seq_item_port.item_done();
+        end
+    endtask
+
+    virtual task drive_transaction(simple_transaction tr);
+        `uvm_info(get_type_name(),
+            $sformatf("Driving: %s", tr.convert2string()), UVM_HIGH)
+
+        @(posedge vif.clk);
+        vif.addr  <= tr.addr;
+        vif.write <= tr.write;
+        if (tr.write)
+            vif.wdata <= tr.data;
+        vif.valid <= 1;
+
+        // Wait for ready
+        @(posedge vif.clk);
+        while (!vif.ready) @(posedge vif.clk);
+
+        // Capture read data if read transaction
+        if (!tr.write)
+            tr.response_data = vif.rdata;
+
+        vif.valid <= 0;
+        @(posedge vif.clk);
+    endtask
+endclass
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{UVM Monitor}
+%----------------------------------------------------------------------------
+
+The monitor observes the DUT interface and reports transactions to other components via analysis ports.
+
+\begin{lstlisting}
+class simple_monitor extends uvm_monitor;
+    `uvm_component_utils(simple_monitor)
+
+    virtual simple_if vif;
+
+    // Analysis port to broadcast observed transactions
+    uvm_analysis_port#(simple_transaction) ap;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        ap = new("ap", this);
+        if (!uvm_config_db#(virtual simple_if)::get(this, "", "vif", vif))
+            `uvm_fatal(get_type_name(), "Virtual interface not found!")
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        simple_transaction tr;
+
+        forever begin
+            // Wait for valid transaction
+            @(posedge vif.clk);
+            if (vif.valid && vif.ready) begin
+                tr = simple_transaction::type_id::create("tr");
+
+                // Capture transaction
+                tr.addr = vif.addr;
+                tr.write = vif.write;
+                if (tr.write)
+                    tr.data = vif.wdata;
+                else
+                    tr.response_data = vif.rdata;
+
+                `uvm_info(get_type_name(),
+                    $sformatf("Observed: %s", tr.convert2string()), UVM_HIGH)
+
+                // Broadcast to subscribers
+                ap.write(tr);
+            end
+        end
+    endtask
+endclass
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{Complete UVM Environment Example}
+%----------------------------------------------------------------------------
+
+\begin{lstlisting}
+// UVM Agent - contains driver, sequencer, monitor
+class simple_agent extends uvm_agent;
+    `uvm_component_utils(simple_agent)
+
+    simple_driver    driver;
+    uvm_sequencer#(simple_transaction) sequencer;
+    simple_monitor   monitor;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+
+        monitor = simple_monitor::type_id::create("monitor", this);
+
+        // Only create driver/sequencer if active
+        if (get_is_active() == UVM_ACTIVE) begin
+            driver = simple_driver::type_id::create("driver", this);
+            sequencer = uvm_sequencer#(simple_transaction)::type_id::create(
+                "sequencer", this);
+        end
+    endfunction
+
+    virtual function void connect_phase(uvm_phase phase);
+        super.connect_phase(phase);
+        if (get_is_active() == UVM_ACTIVE) begin
+            driver.seq_item_port.connect(sequencer.seq_item_export);
+        end
+    endfunction
+endclass
+
+// UVM Environment - top-level container
+class simple_env extends uvm_env;
+    `uvm_component_utils(simple_env)
+
+    simple_agent agent;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        agent = simple_agent::type_id::create("agent", this);
+    endfunction
+endclass
+
+// UVM Test
+class simple_uvm_test extends uvm_test;
+    `uvm_component_utils(simple_uvm_test)
+
+    simple_env env;
+
+    function new(string name = "simple_uvm_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        env = simple_env::type_id::create("env", this);
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        simple_sequence seq;
+
+        phase.raise_objection(this);
+
+        seq = simple_sequence::type_id::create("seq");
+        seq.start(env.agent.sequencer);
+
+        #1000ns;
+
+        phase.drop_objection(this);
+    endtask
+
+    virtual function void report_phase(uvm_phase phase);
+        uvm_report_server svr;
+        super.report_phase(phase);
+
+        svr = uvm_report_server::get_server();
+        if (svr.get_severity_count(UVM_FATAL) +
+            svr.get_severity_count(UVM_ERROR) == 0) begin
+            `uvm_info(get_type_name(), "** TEST PASSED **", UVM_NONE)
+        end else begin
+            `uvm_error(get_type_name(), "** TEST FAILED **")
+        end
+    endfunction
+endclass
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 57: Build a UVM Testbench}
+
+Create a complete UVM testbench for a simple FIFO:
+\begin{itemize}
+    \item Transaction with write/read operations
+    \item Sequence generating various FIFO scenarios (full, empty, normal)
+    \item Driver to drive FIFO interface
+    \item Monitor to observe FIFO outputs
+    \item Agent combining all components
+    \item Test that runs the sequence
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 58: UVM Configuration}
+
+Implement UVM configuration database usage:
+\begin{itemize}
+    \item Create configurable parameters (FIFO depth, data width)
+    \item Use \texttt{uvm\_config\_db} to set/get configuration
+    \item Support multiple configuration scenarios
+    \item Demonstrate configuration override in tests
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 59: UVM Reporting and Messaging}
+
+Implement comprehensive UVM reporting:
+\begin{itemize}
+    \item Use all verbosity levels (UVM\_NONE to UVM\_DEBUG)
+    \item Implement custom report catcher
+    \item Add transaction recording with \texttt{uvm\_recorder}
+    \item Create formatted reports with statistics
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 20: UVM Fundamentals}
+
+\begin{enumerate}
+    \item What is the purpose of the factory pattern in UVM?
+    \item Why must you call \texttt{raise\_objection} in the run phase?
+    \item What is the difference between \texttt{uvm\_component} and \texttt{uvm\_object}?
+    \item How does a driver get transactions from a sequencer?
+    \item What is the purpose of analysis ports in UVM?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item Enables object creation by type name; supports test-time type overrides; promotes reusability and flexibility
+    \item Prevents simulation from ending prematurely; keeps run phase alive; must be paired with \texttt{drop\_objection}
+    \item \texttt{uvm\_component}: Has hierarchy, phase support, location (e.g., driver, monitor). \texttt{uvm\_object}: Lightweight, no hierarchy (e.g., transactions, sequences)
+    \item Via \texttt{seq\_item\_port.get\_next\_item()} which connects to sequencer's export; blocking call waits for sequence
+    \item Broadcast transactions to multiple subscribers (scoreboard, coverage); one-to-many communication; decouples components
+\end{enumerate}
+\end{quizbox}
+
+\begin{tipbox}
+\textbf{UVM Best Practices:}
+\begin{itemize}
+    \item Always use factory registration (\texttt{`uvm\_component\_utils})
+    \item Never call \texttt{new()} directly; use \texttt{type\_id::create()}
+    \item Set virtual interfaces via \texttt{uvm\_config\_db}
+    \item Use appropriate message verbosity levels
+    \item Always balance \texttt{raise\_objection} / \texttt{drop\_objection}
+    \item Leverage UVM field macros for common operations (copy, compare, print)
+\end{itemize}
+\end{tipbox}
+
+%============================================================================
+\section{UVM Advanced Components: Scoreboard, RAL, and Virtual Sequences}
+%============================================================================
+
+Advanced UVM components enable sophisticated verification strategies including self-checking, register abstraction, and coordinated multi-interface testing.
+
+%----------------------------------------------------------------------------
+\subsection{UVM Scoreboard with TLM}
+%----------------------------------------------------------------------------
+
+Scoreboards verify correctness by comparing actual DUT behavior against expected behavior using Transaction-Level Modeling (TLM).
+
+\begin{lstlisting}
+// Scoreboard with analysis imports
+`uvm_analysis_imp_decl(_expected)
+`uvm_analysis_imp_decl(_actual)
+
+class uvm_scoreboard_example extends uvm_scoreboard;
+    `uvm_component_utils(uvm_scoreboard_example)
+
+    // Analysis imports for receiving transactions
+    uvm_analysis_imp_expected#(simple_transaction, uvm_scoreboard_example) expected_export;
+    uvm_analysis_imp_actual#(simple_transaction, uvm_scoreboard_example) actual_export;
+
+    // Queues for storing transactions
+    simple_transaction expected_q[$];
+    simple_transaction actual_q[$];
+
+    // Statistics
+    int matches = 0;
+    int mismatches = 0;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        expected_export = new("expected_export", this);
+        actual_export = new("actual_export", this);
+    endfunction
+
+    // Receive expected transaction
+    virtual function void write_expected(simple_transaction tr);
+        simple_transaction tr_clone;
+        $cast(tr_clone, tr.clone());
+        expected_q.push_back(tr_clone);
+        `uvm_info(get_type_name(),
+            $sformatf("Received EXPECTED: %s", tr.convert2string()), UVM_HIGH)
+        compare_transactions();
+    endfunction
+
+    // Receive actual transaction
+    virtual function void write_actual(simple_transaction tr);
+        simple_transaction tr_clone;
+        $cast(tr_clone, tr.clone());
+        actual_q.push_back(tr_clone);
+        `uvm_info(get_type_name(),
+            $sformatf("Received ACTUAL: %s", tr.convert2string()), UVM_HIGH)
+        compare_transactions();
+    endfunction
+
+    // Compare transactions
+    virtual function void compare_transactions();
+        simple_transaction exp, act;
+
+        while (expected_q.size() > 0 && actual_q.size() > 0) begin
+            exp = expected_q.pop_front();
+            act = actual_q.pop_front();
+
+            if (exp.compare(act)) begin
+                matches++;
+                `uvm_info(get_type_name(),
+                    $sformatf("MATCH #%0d: %s", matches, exp.convert2string()),
+                    UVM_MEDIUM)
+            end else begin
+                mismatches++;
+                `uvm_error(get_type_name(),
+                    $sformatf("MISMATCH #%0d:\n  Expected: %s\n  Actual:   %s",
+                              mismatches, exp.convert2string(), act.convert2string()))
+            end
+        end
+    endfunction
+
+    virtual function void report_phase(uvm_phase phase);
+        super.report_phase(phase);
+        `uvm_info(get_type_name(),
+            $sformatf("=== SCOREBOARD REPORT ===\nMatches: %0d\nMismatches: %0d",
+                      matches, mismatches), UVM_LOW)
+
+        if (mismatches > 0)
+            `uvm_error(get_type_name(), "Test FAILED due to mismatches")
+    endfunction
+endclass
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{Advanced Sequences: Layering and Virtual Sequences}
+%----------------------------------------------------------------------------
+
+Virtual sequences coordinate multiple sequences across different agents, enabling complex test scenarios.
+
+\begin{lstlisting}
+// Virtual sequence operating on multiple sequencers
+class virtual_sequence extends uvm_sequence;
+    `uvm_object_utils(virtual_sequence)
+    `uvm_declare_p_sequencer(virtual_sequencer)
+
+    simple_sequence seq_master;
+    simple_sequence seq_slave;
+
+    function new(string name = "virtual_sequence");
+        super.new(name);
+    endfunction
+
+    virtual task body();
+        `uvm_info(get_type_name(), "Virtual sequence starting", UVM_MEDIUM)
+
+        // Create sequences
+        seq_master = simple_sequence::type_id::create("seq_master");
+        seq_slave = simple_sequence::type_id::create("seq_slave");
+
+        // Run sequences in parallel on different sequencers
+        fork
+            seq_master.start(p_sequencer.master_sequencer);
+            seq_slave.start(p_sequencer.slave_sequencer);
+        join
+
+        `uvm_info(get_type_name(), "Virtual sequence complete", UVM_MEDIUM)
+    endtask
+endclass
+
+// Virtual sequencer
+class virtual_sequencer extends uvm_sequencer;
+    `uvm_component_utils(virtual_sequencer)
+
+    uvm_sequencer#(simple_transaction) master_sequencer;
+    uvm_sequencer#(simple_transaction) slave_sequencer;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+endclass
+
+// Layered sequence example
+class protocol_sequence extends uvm_sequence#(simple_transaction);
+    `uvm_object_utils(protocol_sequence)
+
+    rand int num_transactions;
+    constraint c_num { num_transactions inside {[5:20]}; }
+
+    function new(string name = "protocol_sequence");
+        super.new(name);
+    endfunction
+
+    virtual task body();
+        repeat(num_transactions) begin
+            `uvm_do_with(req, {
+                write dist {1 := 70, 0 := 30};  // 70% writes, 30% reads
+                addr inside {[32'h0:32'hFFF]};
+            })
+        end
+    endtask
+endclass
+
+// Sequence library for test selection
+class sequence_library_example extends uvm_sequence_library#(simple_transaction);
+    `uvm_object_utils(sequence_library_example)
+    `uvm_sequence_library_utils(sequence_library_example)
+
+    function new(string name = "sequence_library_example");
+        super.new(name);
+        init_sequence_library();
+    endfunction
+
+    virtual function void init_sequence_library();
+        add_sequence(simple_sequence::get_type());
+        add_sequence(protocol_sequence::get_type());
+        // Add more sequences as needed
+    endfunction
+endclass
+\end{lstlisting}
+
+%----------------------------------------------------------------------------
+\subsection{UVM Register Abstraction Layer (RAL)}
+%----------------------------------------------------------------------------
+
+RAL provides a high-level API for accessing design registers, supporting both front-door and back-door access.
+
+\begin{lstlisting}
+// Register definition
+class control_register extends uvm_reg;
+    rand uvm_reg_field enable;
+    rand uvm_reg_field mode;
+    rand uvm_reg_field interrupt_mask;
+
+    function new(string name = "control_register");
+        super.new(name, 32, UVM_NO_COVERAGE);
+    endfunction
+
+    virtual function void build();
+        enable = uvm_reg_field::type_id::create("enable");
+        mode = uvm_reg_field::type_id::create("mode");
+        interrupt_mask = uvm_reg_field::type_id::create("interrupt_mask");
+
+        // Configure fields: parent, size, lsb_pos, access, volatile, reset, has_reset, is_rand, individually_accessible
+        enable.configure(this, 1, 0, "RW", 0, 1'h0, 1, 1, 0);
+        mode.configure(this, 2, 1, "RW", 0, 2'h0, 1, 1, 0);
+        interrupt_mask.configure(this, 8, 8, "RW", 0, 8'hFF, 1, 1, 0);
+    endfunction
+
+    `uvm_object_utils(control_register)
+endclass
+
+// Register block
+class register_block extends uvm_reg_block;
+    rand control_register ctrl_reg;
+    rand uvm_reg status_reg;
+
+    function new(string name = "register_block");
+        super.new(name, UVM_NO_COVERAGE);
+    endfunction
+
+    virtual function void build();
+        // Create registers
+        ctrl_reg = control_register::type_id::create("ctrl_reg");
+        ctrl_reg.configure(this, null, "");
+        ctrl_reg.build();
+
+        // Create address map
+        default_map = create_map("default_map", 'h0, 4, UVM_LITTLE_ENDIAN);
+        default_map.add_reg(ctrl_reg, 'h00, "RW");
+    endfunction
+
+    `uvm_object_utils(register_block)
+endclass
+
+// RAL adapter
+class reg_adapter extends uvm_reg_adapter;
+    `uvm_object_utils(reg_adapter)
+
+    function new(string name = "reg_adapter");
+        super.new(name);
+    endfunction
+
+    virtual function uvm_sequence_item reg2bus(const ref uvm_reg_bus_op rw);
+        simple_transaction tr = simple_transaction::type_id::create("tr");
+        tr.write = (rw.kind == UVM_WRITE);
+        tr.addr = rw.addr;
+        if (tr.write)
+            tr.data = rw.data;
+        return tr;
+    endfunction
+
+    virtual function void bus2reg(uvm_sequence_item bus_item,
+                                   ref uvm_reg_bus_op rw);
+        simple_transaction tr;
+        if (!$cast(tr, bus_item)) begin
+            `uvm_fatal("CAST_FAIL", "Failed to cast bus_item")
+        end
+        rw.kind = tr.write ? UVM_WRITE : UVM_READ;
+        rw.addr = tr.addr;
+        rw.data = tr.write ? tr.data : tr.response_data;
+        rw.status = UVM_IS_OK;
+    endfunction
+endclass
+
+// Using RAL in a test
+class ral_test extends uvm_test;
+    `uvm_component_utils(ral_test)
+
+    register_block regmodel;
+    simple_env env;
+
+    function new(string name = "ral_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+
+        // Create register model
+        regmodel = register_block::type_id::create("regmodel");
+        regmodel.build();
+        regmodel.lock_model();
+
+        env = simple_env::type_id::create("env", this);
+    endfunction
+
+    virtual function void connect_phase(uvm_phase phase);
+        reg_adapter adapter = reg_adapter::type_id::create("adapter");
+
+        // Connect RAL to sequencer
+        regmodel.default_map.set_sequencer(env.agent.sequencer, adapter);
+        regmodel.default_map.set_auto_predict(1);
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        uvm_status_e status;
+        uvm_reg_data_t data;
+
+        phase.raise_objection(this);
+
+        // Write to control register
+        regmodel.ctrl_reg.write(status, 32'h0000_0105);
+        `uvm_info(get_type_name(), "Wrote to control register", UVM_LOW)
+
+        // Read back
+        regmodel.ctrl_reg.read(status, data);
+        `uvm_info(get_type_name(),
+            $sformatf("Read from control register: 0x%0h", data), UVM_LOW)
+
+        // Check field values
+        if (regmodel.ctrl_reg.enable.get() == 1)
+            `uvm_info(get_type_name(), "Enable bit is set", UVM_LOW)
+
+        #500ns;
+        phase.drop_objection(this);
+    endtask
+endclass
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 60: Build a Scoreboard with Predictor}
+
+Create an intelligent scoreboard that:
+\begin{itemize}
+    \item Uses a reference model to predict expected outputs
+    \item Supports out-of-order transaction comparison
+    \item Implements timeout detection for missing transactions
+    \item Provides detailed mismatch analysis
+\end{itemize}
+\end{exercisebox}
+
+%============================================================================
+\section{Advanced Interface Techniques and Protocols}
+%============================================================================
+
+%----------------------------------------------------------------------------
+\subsection{Parameterized Interfaces}
+%----------------------------------------------------------------------------
+
+\begin{lstlisting}
+// Parameterized interface for flexible protocol implementation
+interface generic_bus_if #(
+    parameter ADDR_WIDTH = 32,
+    parameter DATA_WIDTH = 32,
+    parameter HAS_PARITY = 1
+)(input logic clk, input logic rst_n);
+
+    logic [ADDR_WIDTH-1:0] addr;
+    logic [DATA_WIDTH-1:0] wdata;
+    logic [DATA_WIDTH-1:0] rdata;
+    logic                  valid;
+    logic                  ready;
+    logic                  parity;
+
+    // Modport for master
+    modport master (
+        output addr, wdata, valid,
+        input  rdata, ready, parity
+    );
+
+    // Modport for slave
+    modport slave (
+        input  addr, wdata, valid,
+        output rdata, ready, parity
+    );
+
+    // Protocol checker as clocking block
+    clocking cb_monitor @(posedge clk);
+        input addr, wdata, rdata, valid, ready;
+    endclocking
+
+    // Assertions
+    property p_valid_stable;
+        @(posedge clk) disable iff (!rst_n)
+        (valid && !ready) |=> $stable(valid) && $stable(addr);
+    endproperty
+
+    assert property (p_valid_stable)
+        else $error("Valid/Address not stable during wait");
+endinterface
+\end{lstlisting}
+
+%============================================================================
+\section{Performance Optimization and Debugging}
+%============================================================================
+
+%----------------------------------------------------------------------------
+\subsection{Simulation Performance Techniques}
+%----------------------------------------------------------------------------
+
+\begin{lstlisting}
+// Efficient coding practices
+class optimized_driver extends uvm_driver#(simple_transaction);
+    `uvm_component_utils(optimized_driver)
+
+    virtual simple_if vif;
+    simple_transaction trans_queue[$];  // Queue for pipelining
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    // Use non-blocking assignments for better performance
+    virtual task drive_optimized(simple_transaction tr);
+        // Minimize clock edge waits
+        @(posedge vif.clk);
+        vif.addr = tr.addr;      // Non-blocking in sequential block
+        vif.wdata = tr.data;
+        vif.valid = 1;
+
+        // Fork off independent monitoring
+        fork
+            wait_for_ready();
+        join_none
+    endtask
+
+    task wait_for_ready();
+        while (!vif.ready) @(posedge vif.clk);
+        vif.valid = 0;
+    endtask
+endclass
+
+// Constrained random optimization
+class optimized_transaction extends uvm_sequence_item;
+    rand bit [31:0] addr;
+    rand bit [31:0] data;
+
+    // Use randc for better distribution (cycles through all values)
+    randc bit [7:0] tag;
+
+    // Minimize constraint complexity
+    constraint c_addr {
+        addr[1:0] == 2'b00;  // Simple bitwise constraint
+        // Avoid: addr % 4 == 0;  // Division is slower
+    }
+
+    // Pre-calculate complex constraints
+    constraint c_data {
+        data dist {[0:100] := 70, [101:1000] := 30};
+    }
+
+    `uvm_object_utils(optimized_transaction)
+endclass
+\end{lstlisting}
+
+%============================================================================
+\section{Real-World Verification: Complete AXI4-Lite Testbench}
+%============================================================================
+
+\begin{lstlisting}
+// Complete AXI4-Lite transaction
+class axi4_lite_transaction extends uvm_sequence_item;
+    rand bit [31:0] awaddr;
+    rand bit [31:0] wdata;
+    rand bit [3:0]  wstrb;
+    rand bit [31:0] araddr;
+    bit [31:0]      rdata;
+    bit [1:0]       bresp;
+    bit [1:0]       rresp;
+    rand bit        is_write;
+
+    constraint c_aligned { awaddr[1:0] == 0; araddr[1:0] == 0; }
+    constraint c_strb { wstrb != 4'b0000; }
+
+    `uvm_object_utils_begin(axi4_lite_transaction)
+        `uvm_field_int(awaddr, UVM_ALL_ON)
+        `uvm_field_int(wdata, UVM_ALL_ON)
+        `uvm_field_int(is_write, UVM_ALL_ON)
+    `uvm_object_utils_end
+
+    function new(string name = "axi4_lite_transaction");
+        super.new(name);
+    endfunction
+endclass
+
+// AXI4-Lite sequence with realistic patterns
+class axi4_burst_sequence extends uvm_sequence#(axi4_lite_transaction);
+    `uvm_object_utils(axi4_burst_sequence)
+
+    rand int num_writes;
+    rand int num_reads;
+    bit [31:0] base_addr = 32'h1000;
+
+    constraint c_transactions {
+        num_writes inside {[5:20]};
+        num_reads inside {[5:20]};
+    }
+
+    function new(string name = "axi4_burst_sequence");
+        super.new(name);
+    endfunction
+
+    virtual task body();
+        // Write phase
+        for (int i = 0; i < num_writes; i++) begin
+            `uvm_do_with(req, {
+                is_write == 1;
+                awaddr == base_addr + (i * 4);
+                wdata == 32'hA000_0000 + i;
+            })
+        end
+
+        // Read phase
+        for (int i = 0; i < num_reads; i++) begin
+            `uvm_do_with(req, {
+                is_write == 0;
+                araddr == base_addr + (i * 4);
+            })
+        end
+    endtask
+endclass
+\end{lstlisting}
+
+%============================================================================
+\section{Best Practices and Interview Preparation}
+%============================================================================
+
+%----------------------------------------------------------------------------
+\subsection{SystemVerilog Interview Topics}
+%----------------------------------------------------------------------------
+
+\begin{quizbox}
+\textbf{Quiz 21: Expert-Level Interview Questions}
+
+\begin{enumerate}
+    \item Explain the difference between program blocks and modules for testbenches
+    \item What are the four-state and two-state data types? When would you use each?
+    \item How does fork-join\_none differ from fork-join and fork-join\_any?
+    \item Explain how the UVM factory pattern enables test flexibility
+    \item What is the difference between assertions in immediate vs concurrent form?
+    \item How do you prevent race conditions between testbench and DUT?
+    \item Explain covergroup sampling: automatic vs explicit
+    \item What are the phases of UVM and their execution order?
+    \item How does constraint solving with cyclic dependencies work?
+    \item Explain the difference between virtual and pure virtual functions
+\end{enumerate}
+
+\textbf{Sample Answers:}
+\begin{enumerate}
+    \item \textbf{Program vs Module}: Programs execute in reactive region (after NBA), preventing races. Modules execute in active region. Programs are better for testbenches.
+
+    \item \textbf{Four-state vs Two-state}: Four-state (logic, reg) support X/Z for hardware modeling. Two-state (bit, int) faster simulation, used in testbenches.
+
+    \item \textbf{Fork-join variants}: join waits all processes; join\_any waits first; join\_none spawns and continues immediately.
+
+    \item \textbf{UVM Factory}: Enables type override at runtime without modifying code. test can replace transaction type globally via set\_type\_override().
+
+    \item \textbf{Immediate vs Concurrent}: Immediate assertions execute procedurally like if statement. Concurrent use temporal logic, evaluated on clock edges.
+\end{enumerate}
+\end{quizbox}
+
+\begin{tipbox}
+\textbf{Key Best Practices:}
+\begin{itemize}
+    \item \textbf{Constraint Strategy}: Layer constraints (base + scenario) for flexibility
+    \item \textbf{Coverage Goals}: Aim for 100\% code coverage, 90\%+ functional coverage
+    \item \textbf{Assertions}: Add at module boundaries and for protocol checks
+    \item \textbf{Reusability}: Use interfaces, classes, and packages for modularity
+    \item \textbf{Debugging}: Use \$display with hierarchical names, waveform viewers
+    \item \textbf{Performance}: Minimize randomization solve time, use efficient constraints
+    \item \textbf{Documentation}: Comment complex constraints and coverage bins
+    \item \textbf{Version Control}: Modular testbench enables team collaboration
+\end{itemize}
+\end{tipbox}
+
+\begin{exercisebox}
+\textbf{Exercise 61-65: Capstone Projects}
+
+\textbf{61. Complete UART Verification Environment}
+\begin{itemize}
+    \item Full UVM testbench with configurable baud rate
+    \item Randomized packet generation with parity/frame errors
+    \item Protocol checker with assertions
+    \item 100\% functional coverage plan
+\end{itemize}
+
+\textbf{62. AXI4 Master-Slave Verification}
+\begin{itemize}
+    \item Multi-master, multi-slave environment
+    \item Virtual sequences for complex scenarios
+    \item RAL model for register access
+    \item Performance analysis (bandwidth, latency)
+\end{itemize}
+
+\textbf{63. Cache Coherency Protocol Verification}
+\begin{itemize}
+    \item MESI protocol implementation
+    \item Random multi-core access patterns
+    \item Assertion-based verification of coherency
+    \item Coverage of all state transitions
+\end{itemize}
+
+\textbf{64. Network Switch Testbench}
+\begin{itemize}
+    \item Multiple input/output ports
+    \item Packet routing with priority queues
+    \item Back-pressure handling
+    \item Traffic generator with realistic patterns
+\end{itemize}
+
+\textbf{65. DDR Controller Verification}
+\begin{itemize}
+    \item Memory model with timing checks
+    \item Command sequence verification
+    \item Refresh and power-down scenarios
+    \item Constraint-driven address generation
+\end{itemize}
+\end{exercisebox}
+
+\begin{warningbox}
+\textbf{Common Verification Mistakes to Avoid:}
+\begin{itemize}
+    \item Not randomizing constraint ordering (use solve-before)
+    \item Forgetting to clone transactions in scoreboard
+    \item Missing objection raise/drop pairs in UVM
+    \item Not using virtual interfaces (causes NULL pointer errors)
+    \item Inadequate reset handling in drivers/monitors
+    \item Ignoring X-propagation in four-state logic
+    \item Over-constraining randomization (no solution space)
+    \item Not verifying assertions are actually checked
+\end{itemize}
+\end{warningbox}
+
+\vfill
+\begin{center}
+\rule{0.8\textwidth}{0.4pt}\\[0.5cm]
+{\Large\textbf{Congratulations!}}\\[0.3cm]
+{\large You have completed the Comprehensive SystemVerilog Guide}\\[0.2cm]
+\normalsize
+This guide covered 30 sections from beginner to expert level,\\
+including 65+ exercises and 100+ code examples.\\[0.3cm]
+\textit{Continue practicing with real-world projects to master verification!}\\[0.5cm]
+\rule{0.8\textwidth}{0.4pt}
 \end{center}
 
 \end{document}
