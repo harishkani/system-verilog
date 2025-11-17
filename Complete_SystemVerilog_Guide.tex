@@ -3812,16 +3812,541 @@ Develop random testbench for 8-bit ALU:
 \end{enumerate}
 \end{exercisebox}
 
-% Continue with Section 10 (final beginner section)
+% ============================================================================
+\section{Basic Arrays}
+
+\subsection{What are Arrays?}
+
+Arrays are collections of elements that allow you to:
+\begin{itemize}
+  \item Store multiple values of the same type
+  \item Access elements using an index
+  \item Model memories, register files, lookup tables
+  \item Process data efficiently in loops
+\end{itemize}
+
+\subsection{Packed vs Unpacked Arrays}
+
+SystemVerilog has two types of arrays with different characteristics:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{5.5cm}|p{5.5cm}|}
+\hline
+\textbf{Feature} & \textbf{Packed Array} & \textbf{Unpacked Array} \\
+\hline
+Syntax & \texttt{logic [7:0] data;} & \texttt{logic data [0:7];} \\
+       & (before variable name) & (after variable name) \\
+\hline
+Storage & Contiguous bits & Separate elements \\
+\hline
+Operations & Bit-wise, arithmetic & Element-wise only \\
+\hline
+Use case & Vectors, buses & Memories, tables \\
+\hline
+Example & \texttt{logic [15:0] word;} & \texttt{int memory [256];} \\
+\hline
+\end{tabular}
+\caption{Packed vs Unpacked Arrays}
+\end{table}
+
+\subsection{Packed Arrays}
+
+Packed arrays are treated as a single vector of bits:
+
+\begin{lstlisting}[caption={Packed Arrays}]
+module packed_arrays;
+  // Packed array: 8 bits as a single unit
+  logic [7:0] byte_data;   // 8-bit vector
+  logic [15:0] word_data;  // 16-bit vector
+
+  initial begin
+    // Initialize entire packed array
+    byte_data = 8'hA5;     // Set all 8 bits at once
+    word_data = 16'hBEEF;
+
+    // Access individual bits
+    byte_data[0] = 1'b1;   // Set bit 0
+    byte_data[7] = 1'b0;   // Clear bit 7
+
+    // Access bit slices
+    byte_data[3:0] = 4'hF;   // Set lower 4 bits
+    byte_data[7:4] = 4'h3;   // Set upper 4 bits
+
+    // Arithmetic operations work
+    byte_data = byte_data + 1;
+
+    // Bit-wise operations work
+    byte_data = byte_data & 8'hF0;
+
+    $display("byte_data = %h", byte_data);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Unpacked Arrays}
+
+Unpacked arrays are collections of separate elements:
+
+\begin{lstlisting}[caption={Unpacked Arrays}]
+module unpacked_arrays;
+  // Unpacked array: 8 separate integers
+  int memory [8];          // 8 elements, indexed 0-7
+  logic [7:0] lookup [16]; // 16 bytes
+
+  initial begin
+    // Initialize elements individually
+    memory[0] = 100;
+    memory[1] = 200;
+    memory[2] = 300;
+
+    // Initialize using loop
+    for (int i = 0; i < 8; i++) begin
+      memory[i] = i * 10;
+    end
+
+    // Initialize lookup table
+    for (int i = 0; i < 16; i++) begin
+      lookup[i] = i * 2;
+    end
+
+    // Access elements
+    $display("memory[3] = %0d", memory[3]);
+    $display("lookup[5] = %h", lookup[5]);
+
+    // Cannot do arithmetic on entire array (this would be an error):
+    // memory = memory + 1;  // ERROR!
+
+    // Must operate element-by-element
+    for (int i = 0; i < 8; i++) begin
+      memory[i] = memory[i] + 1;
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Array Declaration Styles}
+
+\begin{lstlisting}[caption={Various Array Declarations}]
+module array_declarations;
+  // Packed arrays (bit vectors)
+  logic [7:0]  byte1;      // 8 bits
+  logic [15:0] word1;      // 16 bits
+  bit [31:0]   dword1;     // 32 bits (2-state)
+
+  // Unpacked arrays
+  int    numbers [10];     // 10 integers
+  logic  bits [100];       // 100 single bits
+  real   samples [256];    // 256 real numbers
+
+  // Array with specified range
+  int    data [0:15];      // Indices 0 to 15
+  int    data2 [1:10];     // Indices 1 to 10 (not common)
+
+  // Multi-dimensional unpacked
+  int    matrix [4][4];    // 4x4 matrix
+  logic  mem [256][8];     // 256 locations of 8 bits each
+
+  // Mixed packed and unpacked
+  logic [7:0] ram [256];   // 256 bytes (common for memories)
+                           // Packed [7:0], unpacked [256]
+endmodule
+\end{lstlisting}
+
+\subsection{Array Initialization}
+
+\begin{lstlisting}[caption={Initializing Arrays}]
+module array_initialization;
+  int numbers [5];
+  logic [7:0] bytes [4];
+  int matrix [2][3];
+
+  initial begin
+    // Method 1: Element by element
+    numbers[0] = 10;
+    numbers[1] = 20;
+    numbers[2] = 30;
+
+    // Method 2: Using '{...} aggregate
+    numbers = '{100, 200, 300, 400, 500};
+
+    // Initialize with default value
+    bytes = '{default: 8'hFF};  // All elements = 0xFF
+
+    // Specific elements with default
+    bytes = '{0: 8'hAA, 3: 8'hBB, default: 8'h00};
+    // bytes[0] = AA, bytes[1] = 00, bytes[2] = 00, bytes[3] = BB
+
+    // Initialize 2D array
+    matrix = '{'{1, 2, 3}, '{4, 5, 6}};
+    // matrix[0][0]=1, matrix[0][1]=2, matrix[0][2]=3
+    // matrix[1][0]=4, matrix[1][1]=5, matrix[1][2]=6
+
+    // Using loops
+    for (int i = 0; i < 5; i++) begin
+      numbers[i] = i * i;  // 0, 1, 4, 9, 16
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Array Operations}
+
+\begin{lstlisting}[caption={Common Array Operations}]
+module array_operations;
+  int numbers [10];
+  int sum, max, min;
+
+  initial begin
+    // Initialize array
+    for (int i = 0; i < 10; i++) begin
+      numbers[i] = $urandom_range(1, 100);
+    end
+
+    // Find sum
+    sum = 0;
+    for (int i = 0; i < 10; i++) begin
+      sum = sum + numbers[i];
+    end
+    $display("Sum = %0d", sum);
+
+    // Find maximum
+    max = numbers[0];
+    for (int i = 1; i < 10; i++) begin
+      if (numbers[i] > max)
+        max = numbers[i];
+    end
+    $display("Max = %0d", max);
+
+    // Find minimum
+    min = numbers[0];
+    for (int i = 1; i < 10; i++) begin
+      if (numbers[i] < min)
+        min = numbers[i];
+    end
+    $display("Min = %0d", min);
+
+    // Copy array
+    int copy [10];
+    for (int i = 0; i < 10; i++) begin
+      copy[i] = numbers[i];
+    end
+
+    // Reverse array
+    int reversed [10];
+    for (int i = 0; i < 10; i++) begin
+      reversed[i] = numbers[9-i];
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Multidimensional Arrays}
+
+\begin{lstlisting}[caption={2D Arrays (Matrices)}]
+module multidimensional_arrays;
+  int matrix [4][4];  // 4x4 matrix
+
+  initial begin
+    // Initialize 2D array
+    for (int row = 0; row < 4; row++) begin
+      for (int col = 0; col < 4; col++) begin
+        matrix[row][col] = row * 4 + col;
+      end
+    end
+
+    // Display matrix
+    $display("Matrix:");
+    for (int row = 0; row < 4; row++) begin
+      $write("Row %0d: ", row);
+      for (int col = 0; col < 4; col++) begin
+        $write("%3d ", matrix[row][col]);
+      end
+      $display("");
+    end
+
+    // Transpose matrix
+    int transposed [4][4];
+    for (int row = 0; row < 4; row++) begin
+      for (int col = 0; col < 4; col++) begin
+        transposed[col][row] = matrix[row][col];
+      end
+    end
+
+    // Matrix addition
+    int matrix_b [4][4];
+    int result [4][4];
+
+    for (int row = 0; row < 4; row++) begin
+      for (int col = 0; col < 4; col++) begin
+        matrix_b[row][col] = 1;  // Initialize to 1
+        result[row][col] = matrix[row][col] + matrix_b[row][col];
+      end
+    end
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Array Size and Bounds}
+
+\begin{lstlisting}[caption={Array Size Functions}]
+module array_size;
+  int numbers [10];
+  logic [7:0] data [0:15];
+
+  initial begin
+    // $size returns number of elements
+    $display("numbers has %0d elements", $size(numbers));  // 10
+    $display("data has %0d elements", $size(data));        // 16
+
+    // Useful for parameterized code
+    for (int i = 0; i < $size(numbers); i++) begin
+      numbers[i] = i;
+    end
+
+    // $left, $right for bounds
+    $display("data left bound: %0d", $left(data));   // 0
+    $display("data right bound: %0d", $right(data)); // 15
+
+    // $low, $high for min and max index
+    $display("data low: %0d", $low(data));   // 0
+    $display("data high: %0d", $high(data)); // 15
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Common Array Use Cases}
+
+\subsubsection{Memory Model}
+
+\begin{lstlisting}[caption={Simple Memory Model}]
+module simple_memory #(
+  parameter ADDR_WIDTH = 8,
+  parameter DATA_WIDTH = 8,
+  parameter DEPTH = 256
+)(
+  input  logic                    clk,
+  input  logic                    wr_en,
+  input  logic [ADDR_WIDTH-1:0]   addr,
+  input  logic [DATA_WIDTH-1:0]   wr_data,
+  output logic [DATA_WIDTH-1:0]   rd_data
+);
+  // Memory array
+  logic [DATA_WIDTH-1:0] mem [DEPTH];
+
+  // Write
+  always_ff @(posedge clk) begin
+    if (wr_en)
+      mem[addr] <= wr_data;
+  end
+
+  // Read
+  assign rd_data = mem[addr];
+endmodule
+\end{lstlisting}
+
+\subsubsection{Lookup Table (LUT)}
+
+\begin{lstlisting}[caption={Sine Wave Lookup Table}]
+module sine_lut (
+  input  logic [7:0]  angle,     // 0-255 represents 0-360 degrees
+  output logic [15:0] sine_value
+);
+  // Lookup table with 256 sine values
+  logic [15:0] sine_table [256];
+
+  initial begin
+    // Initialize lookup table (simplified example)
+    for (int i = 0; i < 256; i++) begin
+      // In real design, pre-compute sine values
+      sine_table[i] = 16'd0;  // Placeholder
+    end
+
+    // Example values
+    sine_table[0]   = 16'd0;      // sin(0) = 0
+    sine_table[64]  = 16'd32767;  // sin(90) = 1
+    sine_table[128] = 16'd0;      // sin(180) = 0
+    sine_table[192] = -16'd32767; // sin(270) = -1
+  end
+
+  // Lookup
+  assign sine_value = sine_table[angle];
+endmodule
+\end{lstlisting}
+
+\subsubsection{FIFO Buffer}
+
+\begin{lstlisting}[caption={Simple FIFO using Array}]
+module fifo_buffer #(
+  parameter DATA_WIDTH = 8,
+  parameter DEPTH = 16
+)(
+  input  logic                   clk,
+  input  logic                   rst_n,
+  input  logic                   wr_en,
+  input  logic                   rd_en,
+  input  logic [DATA_WIDTH-1:0]  wr_data,
+  output logic [DATA_WIDTH-1:0]  rd_data,
+  output logic                   full,
+  output logic                   empty
+);
+  // Storage array
+  logic [DATA_WIDTH-1:0] buffer [DEPTH];
+
+  // Pointers
+  logic [$clog2(DEPTH):0] wr_ptr, rd_ptr;
+  logic [$clog2(DEPTH):0] count;
+
+  // Write
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      wr_ptr <= 0;
+    else if (wr_en && !full) begin
+      buffer[wr_ptr[$clog2(DEPTH)-1:0]] <= wr_data;
+      wr_ptr <= wr_ptr + 1;
+    end
+  end
+
+  // Read
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      rd_ptr <= 0;
+    else if (rd_en && !empty) begin
+      rd_ptr <= rd_ptr + 1;
+    end
+  end
+
+  assign rd_data = buffer[rd_ptr[$clog2(DEPTH)-1:0]];
+
+  // Count
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      count <= 0;
+    else begin
+      case ({wr_en && !full, rd_en && !empty})
+        2'b10: count <= count + 1;  // Write only
+        2'b01: count <= count - 1;  // Read only
+        default: count <= count;    // Both or neither
+      endcase
+    end
+  end
+
+  // Status flags
+  assign full  = (count == DEPTH);
+  assign empty = (count == 0);
+endmodule
+\end{lstlisting}
+
+\subsection{Array Best Practices}
+
+\begin{coloredbox}{tipcolor}{Best Practices for Arrays}
+\begin{enumerate}
+  \item \textbf{Choose correct type:} Packed for bit vectors, unpacked for collections
+  \item \textbf{Use parameters:} Make array sizes configurable
+  \item \textbf{Use \$size():} Avoid hardcoding array sizes in loops
+  \item \textbf{Initialize arrays:} Avoid X's and Z's in simulation
+  \item \textbf{Index carefully:} Check bounds to avoid out-of-range access
+  \item \textbf{Comment memory maps:} Document what each array represents
+  \item \textbf{Consider storage:} Large arrays consume memory in simulation
+\end{enumerate}
+\end{coloredbox}
+
+\subsection{Arrays Cheat Sheet}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Operation} & \textbf{Syntax} \\
+\hline
+Packed array & \texttt{logic [7:0] data;} \\
+Unpacked array & \texttt{int data [10];} \\
+Access element & \texttt{data[3]} \\
+Access bit slice & \texttt{data[7:4]} (packed only) \\
+Initialize aggregate & \texttt{data = '\{1, 2, 3\};} \\
+Initialize default & \texttt{data = '\{default: 0\};} \\
+Array size & \texttt{\$size(data)} \\
+Left bound & \texttt{\$left(data)} \\
+Right bound & \texttt{\$right(data)} \\
+2D array & \texttt{int matrix [4][4];} \\
+Mixed & \texttt{logic [7:0] mem [256];} \\
+\hline
+\end{tabular}
+\caption{Arrays Quick Reference}
+\end{table}
+
+\subsection{Exercises - Arrays}
+
+\begin{exercisebox}
+\textbf{Exercise 29: Array Sorting}
+
+Implement bubble sort for an integer array:
+\begin{enumerate}
+  \item Create array of 10 random integers (1-100)
+  \item Implement bubble sort algorithm
+  \item Display array before and after sorting
+  \item Count number of swaps performed
+  \item Verify array is sorted correctly
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 30: 2D Matrix Operations}
+
+Create module for 4x4 matrix operations:
+\begin{enumerate}
+  \item Initialize two 4x4 matrices with random values
+  \item Implement matrix addition
+  \item Implement matrix transpose
+  \item Implement matrix multiplication (optional challenge)
+  \item Display all results in formatted output
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 31: Histogram}
+
+Create a histogram generator:
+\begin{enumerate}
+  \item Generate 1000 random numbers (0-9)
+  \item Use array to count occurrences of each digit
+  \item Display histogram showing frequency of each digit
+  \item Verify total count equals 1000
+  \item Display as bar chart using asterisks
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 32: Parameterized Memory}
+
+Design a parameterized dual-port RAM:
+\begin{enumerate}
+  \item Parameters: DATA\_WIDTH, DEPTH
+  \item Two independent read ports
+  \item One write port
+  \item Write testbench to verify functionality
+  \item Test with DATA\_WIDTH=16, DEPTH=64
+\end{enumerate}
+\end{exercisebox}
+
+% ============================================================================
+% Beginner Level Complete!
+% Next: Intermediate Level (Sections 11-20)
 
 \vfill
 \begin{center}
 \rule{0.5\textwidth}{0.4pt}\\
+\Huge\textbf{Beginner Level Complete!}\\
+\vspace{0.5cm}
 \Large\textbf{Complete SystemVerilog Guide}\\
 \normalsize
-Version 1.3 - Sections 1-9 Complete\\
+Version 2.0 - Sections 1-10 Complete\\
 \vspace{0.3cm}
-\textit{Beginner Level: 90\% Complete}\\
+\textit{Beginner Level: 100\% Complete (32 exercises)}\\
+\textit{Ready for Intermediate Level}\\
+\vspace{0.3cm}
 \textit{Last Updated: \today}\\
 \end{center}
 
