@@ -1,0 +1,3416 @@
+\documentclass[11pt,a4paper]{article}
+
+% Basic packages - compatible with all online compilers
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multicol}
+
+% Colors
+\definecolor{commentgreen}{RGB}{34,139,34}
+\definecolor{stringcolor}{RGB}{208,76,239}
+\definecolor{keywordcolor}{RGB}{0,0,255}
+\definecolor{backgroundcolor}{RGB}{248,248,248}
+\definecolor{numbercolor}{RGB}{128,128,128}
+\definecolor{exercisecolor}{RGB}{255,250,205}
+\definecolor{solutioncolor}{RGB}{230,255,230}
+\definecolor{warningcolor}{RGB}{255,230,230}
+\definecolor{tipcolor}{RGB}{230,240,255}
+\definecolor{quizcolor}{RGB}{255,240,245}
+\definecolor{notecolor}{RGB}{255,248,220}
+
+% SystemVerilog language definition
+\lstdefinelanguage{SystemVerilog}{
+  alsoletter={@,\$},
+  morekeywords={
+    module, endmodule, input, output, inout, wire, reg, logic, bit,
+    always, always_ff, always_comb, always_latch, initial, begin, end,
+    if, else, case, endcase, for, while, repeat, forever, do,
+    function, endfunction, task, endtask, return, automatic, static,
+    class, endclass, new, extends, virtual, pure, extern, this, super,
+    typedef, struct, packed, enum, union, interface, endinterface, modport,
+    fork, join, join_any, join_none, disable, wait, wait_order,
+    rand, randc, constraint, randomize, covergroup, endgroup, coverpoint,
+    bins, import, export, ref, const, local, protected, string, int, byte,
+    real, void, assert, assume, cover, property, sequence, expect,
+    clocking, endclocking, program, endprogram, package, endpackage,
+    timeunit, timeprecision, unique, priority, final, with, inside,
+    shortint, longint, time, shortreal, chandle, null, signed, unsigned,
+    supply0, supply1, tri, triand, trior, tri0, tri1, uwire, wand, wor,
+    genvar, generate, endgenerate, localparam, parameter,
+  },
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+}
+
+\lstset{
+  language=SystemVerilog,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{keywordcolor}\bfseries,
+  commentstyle=\color{commentgreen}\itshape,
+  stringstyle=\color{stringcolor},
+  numberstyle=\tiny\color{numbercolor},
+  backgroundcolor=\color{backgroundcolor},
+  frame=single,
+  rulecolor=\color{black!30},
+  numbers=left,
+  numbersep=8pt,
+  tabsize=4,
+  breaklines=true,
+  breakatwhitespace=false,
+  showstringspaces=false,
+  captionpos=b,
+  xleftmargin=15pt,
+  xrightmargin=5pt,
+  aboveskip=10pt,
+  belowskip=10pt,
+  keepspaces=true,
+  columns=flexible
+}
+
+% Colored boxes
+\newenvironment{coloredbox}[2]{%
+  \par\medskip\noindent
+  \begin{minipage}{\linewidth}
+  \setlength{\fboxsep}{10pt}%
+  \fcolorbox{#1!75!black}{#1}{%
+  \begin{minipage}{0.95\linewidth}%
+  \textbf{#2}\\[5pt]%
+}{%
+  \end{minipage}}%
+  \end{minipage}%
+  \medskip\par
+}
+
+\newenvironment{exercisebox}{\begin{coloredbox}{exercisecolor}{Exercise}}{\end{coloredbox}}
+\newenvironment{solutionbox}{\begin{coloredbox}{solutioncolor}{Solution}}{\end{coloredbox}}
+\newenvironment{warningbox}{\begin{coloredbox}{warningcolor}{Warning}}{\end{coloredbox}}
+\newenvironment{tipbox}{\begin{coloredbox}{tipcolor}{Tip}}{\end{coloredbox}}
+\newenvironment{quizbox}{\begin{coloredbox}{quizcolor}{Quiz}}{\end{coloredbox}}
+\newenvironment{notebox}{\begin{coloredbox}{notecolor}{Note}}{\end{coloredbox}}
+
+% Hyperref setup
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  filecolor=magenta,
+  urlcolor=cyan,
+  pdftitle={The Complete SystemVerilog Guide: From Beginner to Expert},
+  pdfauthor={},
+  pdfsubject={SystemVerilog Programming and Verification},
+  pdfkeywords={SystemVerilog, HDL, Verification, UVM, OOP},
+  bookmarksnumbered=true,
+}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Complete SystemVerilog Guide}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{From Beginner to Expert - 100+ Exercises}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Title formatting
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{blue!70!black}}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{blue!50!black}}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{blue!30!black}}
+  {\thesubsubsection}{1em}{}
+
+% Title
+\title{
+  \vspace{-2cm}
+  \Huge\textbf{The Complete SystemVerilog Guide} \\
+  \LARGE From Beginner to Expert \\
+  \Large With 100+ Exercises and Real-World Examples \\
+  \vspace{0.5cm}
+  \large Comprehensive Coverage: Data Types, OOP, Interfaces, Verification
+}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This is the most comprehensive SystemVerilog learning resource available, designed to take you from absolute beginner to expert level. This guide includes:
+
+\begin{itemize}
+  \item \textbf{Complete Coverage}: All SystemVerilog concepts from basic syntax to advanced verification
+  \item \textbf{100+ Hands-on Exercises}: Progressive learning with detailed solutions
+  \item \textbf{Real-World Examples}: Complete testbenches, protocol drivers, and verification components
+  \item \textbf{20+ Sections}: Organized from beginner through intermediate to advanced topics
+  \item \textbf{Visual Aids}: Timing diagrams, memory layouts, class hierarchies, and flowcharts
+  \item \textbf{Self-Assessment Quizzes}: Test your knowledge after each major section
+  \item \textbf{Best Practices}: Industry-standard coding guidelines and optimization techniques
+\end{itemize}
+
+\textbf{Scope}: This guide covers beginner level (Sections 1-10), intermediate level (Sections 11-20), and advanced level (Sections 21-30+), making it suitable for:
+\begin{itemize}
+  \item Self-study and online learning
+  \item University courses in digital design and verification
+  \item Professional training and reference
+  \item Interview preparation for ASIC/FPGA positions
+\end{itemize}
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{How to Use This Complete Guide}
+
+\subsection{Document Organization}
+
+This guide is divided into three main levels:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Level} & \textbf{Sections} & \textbf{Topics Covered} \\
+\hline
+Beginner & 1-10 & Basic syntax, data types, operators, procedural blocks \\
+Intermediate & 11-20 & Advanced types, arrays, interfaces, OOP, packages \\
+Advanced & 21-30+ & Verification, UVM, assertions, advanced patterns \\
+\hline
+\end{tabular}
+\caption{Guide Organization}
+\end{table}
+
+\subsection{Learning Path}
+
+\textbf{Recommended Study Approach:}
+
+\begin{enumerate}
+  \item \textbf{Read Theory}: Understand concepts with clear explanations
+  \item \textbf{Study Examples}: Examine working code demonstrating each concept
+  \item \textbf{Practice Exercises}: Complete hands-on exercises (essential!)
+  \item \textbf{Check Solutions}: Review detailed solutions with explanations
+  \item \textbf{Take Quizzes}: Self-assess your understanding
+  \item \textbf{Build Projects}: Apply knowledge to real-world scenarios
+\end{enumerate}
+
+\subsection{Time Commitment}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Goal} & \textbf{Time Required} & \textbf{Focus Areas} \\
+\hline
+Beginner Proficiency & 20-30 hours & Sections 1-10, Exercises 1-30 \\
+Intermediate Skills & 30-40 hours & Sections 11-20, Exercises 31-70 \\
+Advanced Mastery & 40-60 hours & Sections 21-30, Exercises 71-100+ \\
+Complete Expertise & 100+ hours & All sections, all exercises, projects \\
+\hline
+\end{tabular}
+\caption{Estimated Learning Timeline}
+\end{table}
+
+\subsection{Prerequisites}
+
+\begin{itemize}
+  \item \textbf{Required}: Basic digital logic concepts (AND, OR, flip-flops, registers)
+  \item \textbf{Helpful}: Programming experience in any language (C, Python, Java, etc.)
+  \item \textbf{Helpful}: Familiarity with Verilog (but not required)
+  \item \textbf{Tools}: Access to a SystemVerilog simulator:
+  \begin{itemize}
+    \item Commercial: ModelSim, VCS, Xcelium, Riviera-PRO
+    \item Open-source: Verilator, Icarus Verilog (partial SV support)
+    \item Online: EDA Playground (\url{https://www.edaplayground.com})
+  \end{itemize}
+\end{itemize}
+
+\newpage
+% ============================================================================
+% BEGINNER LEVEL - SECTIONS 1-10 (Brief Overview)
+% ============================================================================
+
+\part{Beginner Level (Sections 1-10)}
+
+\textit{Note: Sections 1-10 provide foundational knowledge. The main focus of this document is Intermediate (11-20) and Advanced (21+) topics.}
+
+% ============================================================================
+\section{Introduction to SystemVerilog}
+
+\subsection{What is SystemVerilog?}
+
+SystemVerilog is a hardware description and verification language that combines:
+\begin{itemize}
+  \item \textbf{Verilog HDL}: For hardware design
+  \item \textbf{Object-Oriented Programming}: Classes, inheritance, polymorphism
+  \item \textbf{Advanced Verification}: Constraints, coverage, assertions
+  \item \textbf{Interface Modeling}: Abstract communication protocols
+\end{itemize}
+
+\subsection{Why Learn SystemVerilog?}
+
+\begin{itemize}
+  \item Industry standard for ASIC and FPGA verification
+  \item Unified language for design and verification
+  \item Required for UVM (Universal Verification Methodology)
+  \item Strong job market demand
+  \item Powerful features for complex systems
+\end{itemize}
+
+% ============================================================================
+\section{Basic Data Types}
+
+\subsection{Two-State vs Four-State}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Type} & \textbf{States} & \textbf{Use Case} \\
+\hline
+\texttt{bit} & 0, 1 & Testbenches, fast simulation \\
+\texttt{byte} & 0, 1 & 8-bit signed integer \\
+\texttt{int} & 0, 1 & 32-bit signed integer \\
+\texttt{logic} & 0, 1, X, Z & Hardware signals \\
+\texttt{reg} & 0, 1, X, Z & Legacy Verilog (use logic) \\
+\hline
+\end{tabular}
+\caption{Common Data Types}
+\end{table}
+
+\begin{lstlisting}[caption={Basic Data Type Examples}]
+module data_types_intro;
+    // Two-state types (faster simulation)
+    bit        single_bit;        // 0 or 1
+    bit [7:0]  byte_val;          // 8-bit vector
+    int        signed_int = -42;  // 32-bit signed
+
+    // Four-state types (hardware modeling)
+    logic      signal;            // Can be 0, 1, X, Z
+    logic [15:0] address;         // 16-bit bus
+
+    // String
+    string     message = "Hello, SystemVerilog!";
+
+    // Real numbers
+    real       voltage = 3.3;
+    shortreal  temperature = 25.5;
+
+    initial begin
+        $display("Int value: %0d", signed_int);
+        $display("Message: %s", message);
+        $display("Voltage: %0.2f V", voltage);
+    end
+endmodule
+\end{lstlisting}
+
+% ============================================================================
+\section{Operators and Expressions}
+
+\subsection{Arithmetic Operators}
+
+\begin{lstlisting}[caption={Arithmetic Operations}]
+module arithmetic_examples;
+    int a = 10, b = 3, result;
+
+    initial begin
+        result = a + b;    // Addition: 13
+        result = a - b;    // Subtraction: 7
+        result = a * b;    // Multiplication: 30
+        result = a / b;    // Integer division: 3
+        result = a % b;    // Modulo: 1
+        result = a ** b;   // Power: 1000
+
+        $display("10 / 3 = %0d", a / b);
+        $display("10 %% 3 = %0d", a % b);
+        $display("10 ** 3 = %0d", a ** b);
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Bitwise and Reduction Operators}
+
+\begin{lstlisting}[caption={Bitwise Operations}]
+module bitwise_examples;
+    bit [7:0] a = 8'b10110010;
+    bit [7:0] b = 8'b11001100;
+    bit [7:0] result;
+    bit parity;
+
+    initial begin
+        // Bitwise operators
+        result = a & b;    // AND: 10000000
+        result = a | b;    // OR:  11111110
+        result = a ^ b;    // XOR: 01111110
+        result = ~a;       // NOT: 01001101
+
+        // Reduction operators
+        parity = ^a;       // XOR of all bits (parity)
+
+        $display("a & b = %b", a & b);
+        $display("a | b = %b", a | b);
+        $display("a ^ b = %b", a ^ b);
+        $display("Parity of a = %b", ^a);
+    end
+endmodule
+\end{lstlisting}
+
+% ============================================================================
+\section{Procedural Blocks}
+
+\subsection{Always Blocks}
+
+SystemVerilog provides three types of always blocks:
+
+\begin{lstlisting}[caption={Always Block Types}]
+module always_block_types(
+    input  logic clk,
+    input  logic rst_n,
+    input  logic [7:0] data_in,
+    output logic [7:0] data_out,
+    output logic [7:0] combo_out
+);
+    // Sequential logic - flip-flops
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            data_out <= 8'h00;
+        else
+            data_out <= data_in;
+    end
+
+    // Combinational logic
+    always_comb begin
+        combo_out = data_in + 8'd1;
+    end
+
+    // Latch (usually avoid these!)
+    logic [7:0] latch_out;
+    always_latch begin
+        if (clk)
+            latch_out = data_in;
+    end
+endmodule
+\end{lstlisting}
+
+% ============================================================================
+\section{Control Flow}
+
+\subsection{If-Else Statements}
+
+\begin{lstlisting}[caption={If-Else Example}]
+module priority_encoder(
+    input  logic [7:0] data,
+    output logic [2:0] encoded,
+    output logic       valid
+);
+    always_comb begin
+        if (data[7]) begin
+            encoded = 3'd7;
+            valid = 1'b1;
+        end else if (data[6]) begin
+            encoded = 3'd6;
+            valid = 1'b1;
+        end else if (data[5]) begin
+            encoded = 3'd5;
+            valid = 1'b1;
+        end else if (data[4]) begin
+            encoded = 3'd4;
+            valid = 1'b1;
+        end else if (data[3]) begin
+            encoded = 3'd3;
+            valid = 1'b1;
+        end else if (data[2]) begin
+            encoded = 3'd2;
+            valid = 1'b1;
+        end else if (data[1]) begin
+            encoded = 3'd1;
+            valid = 1'b1;
+        end else if (data[0]) begin
+            encoded = 3'd0;
+            valid = 1'b1;
+        end else begin
+            encoded = 3'd0;
+            valid = 1'b0;
+        end
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Case Statements}
+
+\begin{lstlisting}[caption={Case Statement Example}]
+module alu(
+    input  logic [3:0] opcode,
+    input  logic [7:0] a, b,
+    output logic [7:0] result
+);
+    always_comb begin
+        case (opcode)
+            4'h0: result = a + b;      // ADD
+            4'h1: result = a - b;      // SUB
+            4'h2: result = a & b;      // AND
+            4'h3: result = a | b;      // OR
+            4'h4: result = a ^ b;      // XOR
+            4'h5: result = ~a;         // NOT
+            4'h6: result = a << 1;     // Shift left
+            4'h7: result = a >> 1;     // Shift right
+            default: result = 8'h00;   // Default case
+        endcase
+    end
+endmodule
+\end{lstlisting}
+
+% ============================================================================
+\section{Loops}
+
+\subsection{For Loops}
+
+\begin{lstlisting}[caption={For Loop Examples}]
+module loop_examples;
+    initial begin
+        // Simple counting
+        for (int i = 0; i < 10; i++) begin
+            $display("Count: %0d", i);
+        end
+
+        // Array initialization
+        int array[8];
+        for (int i = 0; i < 8; i++) begin
+            array[i] = i * 2;
+        end
+
+        // Display array
+        for (int i = 0; i < 8; i++) begin
+            $display("array[%0d] = %0d", i, array[i]);
+        end
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{While and Do-While Loops}
+
+\begin{lstlisting}[caption={While Loop Examples}]
+module while_examples;
+    initial begin
+        int count = 0;
+
+        // While loop
+        while (count < 5) begin
+            $display("While: %0d", count);
+            count++;
+        end
+
+        // Do-while loop
+        count = 0;
+        do begin
+            $display("Do-While: %0d", count);
+            count++;
+        end while (count < 5);
+    end
+endmodule
+\end{lstlisting}
+
+% ============================================================================
+\section{Functions and Tasks - Brief Introduction}
+
+\textit{(Detailed coverage in the Functions \& Tasks guide)}
+
+\subsection{Basic Function}
+
+\begin{lstlisting}[caption={Simple Function}]
+function int add(int a, int b);
+    return a + b;
+endfunction
+
+module function_example;
+    int result;
+
+    initial begin
+        result = add(5, 3);
+        $display("5 + 3 = %0d", result);
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Basic Task}
+
+\begin{lstlisting}[caption={Simple Task}]
+task display_value(input int value);
+    $display("[%0t] Value: %0d", $time, value);
+endtask
+
+module task_example;
+    initial begin
+        display_value(42);
+        #10;
+        display_value(100);
+    end
+endmodule
+\end{lstlisting}
+
+% ============================================================================
+\section{Structures and Unions}
+
+\subsection{Packed vs Unpacked Structures}
+
+\begin{lstlisting}[caption={Structure Examples}]
+module structure_examples;
+    // Unpacked structure (individual fields)
+    typedef struct {
+        int         id;
+        string      name;
+        real        salary;
+    } employee_t;
+
+    // Packed structure (can be treated as vector)
+    typedef struct packed {
+        logic [7:0] opcode;
+        logic [3:0] dest_reg;
+        logic [3:0] src_reg;
+    } instruction_t;
+
+    initial begin
+        employee_t emp;
+        emp.id = 1001;
+        emp.name = "John Doe";
+        emp.salary = 75000.00;
+
+        $display("Employee: %s (ID: %0d) - $%0.2f",
+                 emp.name, emp.id, emp.salary);
+
+        instruction_t instr;
+        instr.opcode = 8'hA5;
+        instr.dest_reg = 4'h3;
+        instr.src_reg = 4'h7;
+
+        $display("Instruction: %h", instr);  // Treated as 16-bit value
+    end
+endmodule
+\end{lstlisting}
+
+% ============================================================================
+\section{Enumerations}
+
+\begin{lstlisting}[caption={Enumeration Examples}]
+module enum_examples;
+    // Basic enumeration
+    typedef enum {
+        IDLE, ACTIVE, WAITING, DONE
+    } state_t;
+
+    // Enumeration with explicit values
+    typedef enum logic [2:0] {
+        RED   = 3'b001,
+        YELLOW = 3'b010,
+        GREEN = 3'b100
+    } traffic_light_t;
+
+    // Enumeration with type
+    typedef enum int {
+        ERROR = -1,
+        SUCCESS = 0,
+        PENDING = 1
+    } status_t;
+
+    state_t current_state;
+    traffic_light_t light;
+    status_t result;
+
+    initial begin
+        current_state = IDLE;
+        light = GREEN;
+        result = SUCCESS;
+
+        $display("State: %s", current_state.name());
+        $display("Light: %s", light.name());
+        $display("Result: %s (%0d)", result.name(), result);
+    end
+endmodule
+\end{lstlisting}
+
+% ============================================================================
+\section{Fixed-Size Arrays}
+
+\begin{lstlisting}[caption={Fixed Array Examples}]
+module fixed_array_examples;
+    // 1D array
+    int numbers[10];          // Array of 10 integers
+
+    // 2D array
+    bit [7:0] matrix[4][8];   // 4x8 matrix of bytes
+
+    // Multidimensional array
+    logic [3:0] cube[2][3][4]; // 3D array
+
+    initial begin
+        // Initialize 1D array
+        for (int i = 0; i < 10; i++) begin
+            numbers[i] = i * i;
+        end
+
+        // Initialize 2D array
+        for (int i = 0; i < 4; i++) begin
+            for (int j = 0; j < 8; j++) begin
+                matrix[i][j] = i * 8 + j;
+            end
+        end
+
+        // Display arrays
+        $display("Numbers: %p", numbers);
+        $display("Matrix[0]: %p", matrix[0]);
+    end
+endmodule
+\end{lstlisting}
+
+\newpage
+% ============================================================================
+% INTERMEDIATE LEVEL - SECTIONS 11-20 (DETAILED)
+% ============================================================================
+
+\part{Intermediate Level (Sections 11-20)}
+
+\textit{This is the main focus of the document. These sections provide comprehensive coverage with extensive examples and exercises.}
+
+% ============================================================================
+\section{Advanced Data Types and Typedef}
+
+\subsection{Understanding Typedef}
+
+The \texttt{typedef} keyword creates user-defined types, improving code readability and maintainability.
+
+\begin{lstlisting}[caption={Typedef Basics}]
+module typedef_examples;
+    // Basic typedef for primitive types
+    typedef bit [31:0] word_t;
+    typedef bit [15:0] halfword_t;
+    typedef bit [7:0]  byte_t;
+
+    // Typedef for arrays
+    typedef byte_t byte_array_t[256];
+
+    // Using typedefs
+    word_t program_counter;
+    halfword_t instruction;
+    byte_array_t memory;
+
+    initial begin
+        program_counter = 32'h0000_1000;
+        instruction = 16'hA5F0;
+        memory[0] = 8'hFF;
+
+        $display("PC: 0x%h", program_counter);
+        $display("Instruction: 0x%h", instruction);
+        $display("Memory[0]: 0x%h", memory[0]);
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Complex Typedef Patterns}
+
+\begin{lstlisting}[caption={Advanced Typedef Usage}]
+module complex_typedef;
+    // Typedef for function signature
+    typedef function int math_func_t(int a, int b);
+
+    // Typedef for structure
+    typedef struct packed {
+        logic        valid;
+        logic [3:0]  id;
+        logic [31:0] data;
+        logic [3:0]  strobe;
+    } axi_data_t;
+
+    // Typedef for enum
+    typedef enum logic [2:0] {
+        RESET   = 3'b000,
+        FETCH   = 3'b001,
+        DECODE  = 3'b010,
+        EXECUTE = 3'b011,
+        WRITEBACK = 3'b100
+    } cpu_state_t;
+
+    // Typedef for parameterized structure
+    parameter int DATA_WIDTH = 32;
+    typedef struct packed {
+        logic                  valid;
+        logic [DATA_WIDTH-1:0] data;
+    } data_packet_t;
+
+    // Using the types
+    axi_data_t axi_transaction;
+    cpu_state_t current_state, next_state;
+    data_packet_t packet;
+
+    initial begin
+        // Initialize AXI transaction
+        axi_transaction.valid = 1'b1;
+        axi_transaction.id = 4'h5;
+        axi_transaction.data = 32'hDEADBEEF;
+        axi_transaction.strobe = 4'hF;
+
+        // State machine
+        current_state = RESET;
+        next_state = FETCH;
+
+        // Packet
+        packet.valid = 1'b1;
+        packet.data = 32'h12345678;
+
+        $display("AXI Transaction: %p", axi_transaction);
+        $display("State: %s -> %s", current_state.name(), next_state.name());
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 24: Create a Register File Type}
+
+Define a typedef for a register file with:
+\begin{itemize}
+  \item 32 registers, each 32 bits wide
+  \item Structure with fields: \texttt{data[32]}, \texttt{valid[32]}, \texttt{dirty[32]}
+  \item Function to read a register
+  \item Function to write a register
+\end{itemize}
+
+Test with reading and writing several registers.
+\end{exercisebox}
+
+\subsection{Advanced Struct Features}
+
+\begin{lstlisting}[caption={Advanced Structures with Methods}]
+module struct_with_defaults;
+    // Structure with default values
+    typedef struct {
+        int         size;
+        string      name;
+        logic [7:0] data[];
+
+        // You cannot define methods in structs (use classes instead)
+    } packet_t;
+
+    // Tagged unions
+    typedef union tagged {
+        int         int_val;
+        real        real_val;
+        string      str_val;
+    } variant_t;
+
+    initial begin
+        packet_t pkt;
+        pkt.size = 4;
+        pkt.name = "Test Packet";
+        pkt.data = new[4];
+        pkt.data = '{8'hAA, 8'hBB, 8'hCC, 8'hDD};
+
+        $display("Packet: %s, Size: %0d", pkt.name, pkt.size);
+        $display("Data: %p", pkt.data);
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 25: Network Packet Typedef}
+
+Create typedefs for:
+\begin{itemize}
+  \item \texttt{mac\_addr\_t} - 48-bit MAC address
+  \item \texttt{ipv4\_addr\_t} - 32-bit IP address
+  \item \texttt{eth\_header\_t} - Ethernet header (dest MAC, src MAC, EtherType)
+  \item \texttt{ipv4\_header\_t} - IPv4 header (version, length, src IP, dest IP, protocol)
+  \item \texttt{network\_packet\_t} - Complete packet with both headers and payload
+\end{itemize}
+
+Create a function that prints all fields of a network packet.
+\end{exercisebox}
+
+\subsection{Quiz: Advanced Data Types}
+
+\begin{quizbox}
+\textbf{Quiz 4: Typedef and Advanced Types}
+
+\begin{enumerate}
+  \item What is the purpose of typedef? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can you use typedef to create a new function type? (Yes/No) \_\_\_\_\_\_
+  \item What's the difference between packed and unpacked structs?
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can structures contain dynamic arrays? (Yes/No) \_\_\_\_\_\_
+  \item What keyword is used for discriminated unions? \_\_\_\_\_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item To create user-defined type aliases for better code readability and maintainability
+  \item Yes
+  \item Packed structs are stored as contiguous bits (can be treated as vectors); unpacked structs have independent fields
+  \item Yes
+  \item \texttt{tagged}
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Dynamic Arrays}
+
+\subsection{Introduction to Dynamic Arrays}
+
+Dynamic arrays can be sized and resized during simulation, making them ideal for testbenches and verification.
+
+\begin{lstlisting}[caption={Dynamic Array Basics}]
+module dynamic_array_intro;
+    int dynamic_arr[];  // Declaration (size unknown)
+
+    initial begin
+        // Allocate memory for 10 elements
+        dynamic_arr = new[10];
+
+        // Initialize array
+        for (int i = 0; i < 10; i++) begin
+            dynamic_arr[i] = i * 10;
+        end
+
+        // Display array
+        $display("Array size: %0d", dynamic_arr.size());
+        $display("Array contents: %p", dynamic_arr);
+
+        // Resize array (preserves existing values)
+        dynamic_arr = new[15](dynamic_arr);
+        $display("After resize: %0d elements", dynamic_arr.size());
+
+        // Initialize new elements
+        for (int i = 10; i < 15; i++) begin
+            dynamic_arr[i] = i * 10;
+        end
+
+        $display("Resized array: %p", dynamic_arr);
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Dynamic Array Methods}
+
+\begin{lstlisting}[caption={Dynamic Array Built-in Methods}]
+module dynamic_array_methods;
+    int numbers[];
+    int sum, product;
+
+    initial begin
+        // Create and initialize
+        numbers = new[5];
+        numbers = '{10, 20, 30, 40, 50};
+
+        // size() - returns number of elements
+        $display("Size: %0d", numbers.size());
+
+        // sum() - sum of all elements (only for integral types)
+        sum = numbers.sum();
+        $display("Sum: %0d", sum);
+
+        // product() - product of all elements
+        product = numbers.product();
+        $display("Product: %0d", product);
+
+        // Array iteration with foreach
+        $display("Elements:");
+        foreach(numbers[i]) begin
+            $display("  numbers[%0d] = %0d", i, numbers[i]);
+        end
+
+        // delete() - deallocate array
+        numbers.delete();
+        $display("After delete, size: %0d", numbers.size());
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Advanced Dynamic Array Operations}
+
+\begin{lstlisting}[caption={Advanced Dynamic Array Usage}]
+module dynamic_array_advanced;
+    // Multidimensional dynamic arrays
+    int matrix[][];
+
+    // Array of structures
+    typedef struct {
+        int id;
+        string name;
+        int score;
+    } student_t;
+
+    student_t students[];
+
+    initial begin
+        // Create 2D dynamic array
+        matrix = new[3];  // 3 rows
+        foreach(matrix[i]) begin
+            matrix[i] = new[4];  // 4 columns per row
+            foreach(matrix[i][j]) begin
+                matrix[i][j] = i * 4 + j;
+            end
+        end
+
+        $display("Matrix:");
+        foreach(matrix[i]) begin
+            $display("  Row %0d: %p", i, matrix[i]);
+        end
+
+        // Array of structures
+        students = new[3];
+        students[0] = '{id: 1001, name: "Alice", score: 95};
+        students[1] = '{id: 1002, name: "Bob", score: 87};
+        students[2] = '{id: 1003, name: "Carol", score: 92};
+
+        $display("\nStudents:");
+        foreach(students[i]) begin
+            $display("  %0d: %s (ID: %0d) - Score: %0d",
+                     i, students[i].name, students[i].id, students[i].score);
+        end
+
+        // Calculate average score
+        int total_score = 0;
+        foreach(students[i]) begin
+            total_score += students[i].score;
+        end
+        $display("Average score: %0.2f", real'(total_score) / students.size());
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 26: Dynamic Array Sorting}
+
+Implement a sorting function for a dynamic array:
+\begin{itemize}
+  \item Function \texttt{sort\_ascending(ref int arr[])} - sorts array in ascending order
+  \item Function \texttt{sort\_descending(ref int arr[])} - sorts in descending order
+  \item Function \texttt{find\_min(int arr[])} - returns minimum value
+  \item Function \texttt{find\_max(int arr[])} - returns maximum value
+\end{itemize}
+
+Test with array: \{64, 34, 25, 12, 22, 11, 90\}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 27: Transaction Buffer}
+
+Create a transaction buffer using dynamic arrays:
+\begin{itemize}
+  \item Structure for transaction: id, address, data, timestamp
+  \item Dynamic array to store transactions
+  \item Function to add transaction
+  \item Function to find transaction by ID
+  \item Function to get all transactions in time range
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Memory Management with Dynamic Arrays}
+
+\begin{lstlisting}[caption={Memory Management Example}]
+module memory_manager;
+    typedef struct {
+        int     address;
+        byte    data[];
+        int     size;
+        realtime timestamp;
+    } memory_block_t;
+
+    memory_block_t memory_blocks[];
+    int num_blocks = 0;
+
+    // Allocate memory block
+    function void allocate_block(int addr, int block_size);
+        memory_blocks = new[num_blocks + 1](memory_blocks);
+        memory_blocks[num_blocks].address = addr;
+        memory_blocks[num_blocks].size = block_size;
+        memory_blocks[num_blocks].data = new[block_size];
+        memory_blocks[num_blocks].timestamp = $realtime;
+
+        // Initialize with zeros
+        for (int i = 0; i < block_size; i++) begin
+            memory_blocks[num_blocks].data[i] = 0;
+        end
+
+        $display("[%0t] Allocated block %0d at address 0x%h, size %0d bytes",
+                 $time, num_blocks, addr, block_size);
+        num_blocks++;
+    endfunction
+
+    // Write to memory block
+    function bit write_block(int block_id, int offset, byte value);
+        if (block_id >= num_blocks) begin
+            $error("Invalid block ID: %0d", block_id);
+            return 0;
+        end
+
+        if (offset >= memory_blocks[block_id].size) begin
+            $error("Offset %0d out of range for block %0d", offset, block_id);
+            return 0;
+        end
+
+        memory_blocks[block_id].data[offset] = value;
+        $display("[%0t] Write: Block %0d[%0d] = 0x%h",
+                 $time, block_id, offset, value);
+        return 1;
+    endfunction
+
+    // Read from memory block
+    function byte read_block(int block_id, int offset);
+        if (block_id >= num_blocks || offset >= memory_blocks[block_id].size) begin
+            $error("Invalid access");
+            return 8'hXX;
+        end
+
+        return memory_blocks[block_id].data[offset];
+    endfunction
+
+    // Display all blocks
+    function void display_blocks();
+        $display("\n=== Memory Blocks ===");
+        for (int i = 0; i < num_blocks; i++) begin
+            $display("Block %0d: Addr=0x%h, Size=%0d, Timestamp=%0t",
+                     i, memory_blocks[i].address, memory_blocks[i].size,
+                     memory_blocks[i].timestamp);
+        end
+    endfunction
+
+    initial begin
+        // Test memory manager
+        allocate_block(32'h1000, 16);
+        allocate_block(32'h2000, 32);
+        allocate_block(32'h3000, 8);
+
+        // Write some data
+        write_block(0, 0, 8'hAA);
+        write_block(0, 1, 8'hBB);
+        write_block(1, 10, 8'hCC);
+
+        // Read back
+        $display("Block 0[0] = 0x%h", read_block(0, 0));
+        $display("Block 0[1] = 0x%h", read_block(0, 1));
+        $display("Block 1[10] = 0x%h", read_block(1, 10));
+
+        display_blocks();
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 28: Dynamic Matrix Operations}
+
+Implement a matrix library using dynamic arrays:
+\begin{itemize}
+  \item Function \texttt{create\_matrix(int rows, cols)} - returns new matrix
+  \item Function \texttt{add\_matrices(int a[][], int b[][])} - matrix addition
+  \item Function \texttt{multiply\_matrices(int a[][], int b[][])} - matrix multiplication
+  \item Function \texttt{transpose(int matrix[][])} - matrix transpose
+  \item Function \texttt{print\_matrix(int matrix[][])} - display matrix
+\end{itemize}
+
+Test with 3x3 matrices.
+\end{exercisebox}
+
+\subsection{Quiz: Dynamic Arrays}
+
+\begin{quizbox}
+\textbf{Quiz 5: Dynamic Arrays}
+
+\begin{enumerate}
+  \item How do you allocate a dynamic array with 20 elements? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What method returns the size of a dynamic array? \_\_\_\_\_\_\_\_\_\_
+  \item How do you resize an array while preserving existing values?
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can dynamic arrays be multidimensional? (Yes/No) \_\_\_\_\_\_
+  \item What happens when you call \texttt{delete()} on a dynamic array? \_\_\_\_\_\_\_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{arr = new[20];}
+  \item \texttt{size()}
+  \item \texttt{arr = new[new\_size](arr);}
+  \item Yes
+  \item The array is deallocated and size becomes 0
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Queues}
+
+\subsection{Introduction to Queues}
+
+Queues are dynamic arrays with powerful insertion and deletion methods at both ends.
+
+\begin{lstlisting}[caption={Queue Basics}]
+module queue_intro;
+    int queue[$];  // Queue declaration ($ means queue)
+
+    initial begin
+        // Push elements to back
+        queue.push_back(10);
+        queue.push_back(20);
+        queue.push_back(30);
+        $display("After push_back: %p", queue);  // {10, 20, 30}
+
+        // Push element to front
+        queue.push_front(5);
+        $display("After push_front(5): %p", queue);  // {5, 10, 20, 30}
+
+        // Pop from front
+        int value = queue.pop_front();
+        $display("Popped from front: %0d", value);  // 5
+        $display("Queue now: %p", queue);  // {10, 20, 30}
+
+        // Pop from back
+        value = queue.pop_back();
+        $display("Popped from back: %0d", value);  // 30
+        $display("Queue now: %p", queue);  // {10, 20}
+
+        // Check size
+        $display("Queue size: %0d", queue.size());
+
+        // Access like array
+        $display("queue[0] = %0d", queue[0]);  // 10
+        $display("queue[1] = %0d", queue[1]);  // 20
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Queue Methods}
+
+\begin{lstlisting}[caption={Comprehensive Queue Operations}]
+module queue_methods;
+    int q[$];
+    int value;
+
+    initial begin
+        // Insert operations
+        q = {1, 2, 3, 4, 5};
+        $display("Initial: %p", q);
+
+        // insert(index, value) - insert at index
+        q.insert(2, 99);  // Insert 99 at index 2
+        $display("After insert(2, 99): %p", q);  // {1, 2, 99, 3, 4, 5}
+
+        // delete(index) - remove element at index
+        q.delete(3);  // Remove element at index 3
+        $display("After delete(3): %p", q);  // {1, 2, 99, 4, 5}
+
+        // Bounded queue (max size)
+        int bounded_q[$:7];  // Max 8 elements (0 to 7)
+        bounded_q = {1, 2, 3};
+        $display("Bounded queue: %p, size: %0d", bounded_q, bounded_q.size());
+
+        // Array slicing
+        q = {10, 20, 30, 40, 50, 60};
+        int slice[$] = q[1:3];  // Elements 1, 2, 3
+        $display("Slice q[1:3]: %p", slice);  // {20, 30, 40}
+
+        // Concatenation
+        int q1[$] = {1, 2, 3};
+        int q2[$] = {4, 5, 6};
+        int q3[$] = {q1, q2};  // Concatenate
+        $display("Concatenated: %p", q3);  // {1, 2, 3, 4, 5, 6}
+
+        // delete() - clear entire queue
+        q.delete();
+        $display("After delete(): %p, size: %0d", q, q.size());
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Queue Use Cases}
+
+\begin{lstlisting}[caption={FIFO and LIFO with Queues}]
+module fifo_lifo_example;
+
+    // FIFO (First In, First Out) - Queue behavior
+    class FIFO;
+        int data[$];
+
+        function void push(int value);
+            data.push_back(value);
+            $display("FIFO Push: %0d", value);
+        endfunction
+
+        function int pop();
+            if (data.size() == 0) begin
+                $error("FIFO is empty!");
+                return -1;
+            end
+            int value = data.pop_front();
+            $display("FIFO Pop: %0d", value);
+            return value;
+        endfunction
+
+        function int size();
+            return data.size();
+        endfunction
+
+        function bit is_empty();
+            return (data.size() == 0);
+        endfunction
+    endclass
+
+    // LIFO (Last In, First Out) - Stack behavior
+    class LIFO;
+        int data[$];
+
+        function void push(int value);
+            data.push_back(value);
+            $display("LIFO Push: %0d", value);
+        endfunction
+
+        function int pop();
+            if (data.size() == 0) begin
+                $error("LIFO is empty!");
+                return -1;
+            end
+            int value = data.pop_back();
+            $display("LIFO Pop: %0d", value);
+            return value;
+        endfunction
+
+        function int peek();
+            if (data.size() == 0) return -1;
+            return data[$];  // $ references last element
+        endfunction
+    endclass
+
+    initial begin
+        FIFO fifo = new();
+        LIFO lifo = new();
+
+        $display("=== Testing FIFO ===");
+        fifo.push(10);
+        fifo.push(20);
+        fifo.push(30);
+        void'(fifo.pop());  // Returns 10
+        void'(fifo.pop());  // Returns 20
+        void'(fifo.pop());  // Returns 30
+
+        $display("\n=== Testing LIFO (Stack) ===");
+        lifo.push(10);
+        lifo.push(20);
+        lifo.push(30);
+        void'(lifo.pop());  // Returns 30
+        void'(lifo.pop());  // Returns 20
+        void'(lifo.pop());  // Returns 10
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 29: Priority Queue}
+
+Implement a priority queue:
+\begin{itemize}
+  \item Structure: \texttt{item\_t} with \texttt{data} and \texttt{priority} fields
+  \item Function \texttt{enqueue(item\_t item)} - insert maintaining priority order
+  \item Function \texttt{dequeue()} - remove highest priority item
+  \item Function \texttt{peek()} - view highest priority without removing
+  \item Function \texttt{display()} - show all items with priorities
+\end{itemize}
+
+Test with items of varying priorities.
+\end{exercisebox}
+
+\subsection{Scoreboard with Queues}
+
+\begin{lstlisting}[caption={Verification Scoreboard Using Queues}]
+module scoreboard_example;
+
+    typedef struct {
+        int         id;
+        bit [31:0]  address;
+        bit [31:0]  data;
+        realtime    timestamp;
+    } transaction_t;
+
+    class Scoreboard;
+        transaction_t expected_q[$];
+        transaction_t actual_q[$];
+        int matches = 0;
+        int mismatches = 0;
+
+        // Add expected transaction
+        function void add_expected(transaction_t trans);
+            expected_q.push_back(trans);
+            $display("[%0t] Expected: ID=%0d, Addr=0x%h, Data=0x%h",
+                     $time, trans.id, trans.address, trans.data);
+        endfunction
+
+        // Add actual transaction and compare
+        function void add_actual(transaction_t trans);
+            actual_q.push_back(trans);
+            $display("[%0t] Actual: ID=%0d, Addr=0x%h, Data=0x%h",
+                     $time, trans.id, trans.address, trans.data);
+
+            // Try to match with expected
+            compare();
+        endfunction
+
+        // Compare transactions
+        function void compare();
+            if (expected_q.size() == 0) begin
+                $error("No expected transaction to compare!");
+                return;
+            end
+
+            if (actual_q.size() == 0) return;
+
+            transaction_t exp = expected_q.pop_front();
+            transaction_t act = actual_q.pop_front();
+
+            if (exp.address == act.address && exp.data == act.data) begin
+                matches++;
+                $display("  [MATCH] ID %0d matched!", exp.id);
+            end else begin
+                mismatches++;
+                $error("  [MISMATCH] Expected: Addr=0x%h Data=0x%h, Got: Addr=0x%h Data=0x%h",
+                       exp.address, exp.data, act.address, act.data);
+            end
+        endfunction
+
+        // Final report
+        function void report();
+            $display("\n=== Scoreboard Report ===");
+            $display("Matches: %0d", matches);
+            $display("Mismatches: %0d", mismatches);
+            $display("Pending Expected: %0d", expected_q.size());
+            $display("Pending Actual: %0d", actual_q.size());
+
+            if (mismatches == 0 && expected_q.size() == 0 && actual_q.size() == 0)
+                $display("TEST PASSED!");
+            else
+                $display("TEST FAILED!");
+        endfunction
+    endclass
+
+    initial begin
+        Scoreboard sb = new();
+        transaction_t trans;
+
+        // Add expected transactions
+        trans = '{id: 1, address: 32'h1000, data: 32'hAAAA, timestamp: 0};
+        sb.add_expected(trans);
+
+        trans = '{id: 2, address: 32'h2000, data: 32'hBBBB, timestamp: 0};
+        sb.add_expected(trans);
+
+        trans = '{id: 3, address: 32'h3000, data: 32'hCCCC, timestamp: 0};
+        sb.add_expected(trans);
+
+        #10;
+
+        // Add actual transactions
+        trans = '{id: 1, address: 32'h1000, data: 32'hAAAA, timestamp: $realtime};
+        sb.add_actual(trans);
+
+        #10;
+        trans = '{id: 2, address: 32'h2000, data: 32'hBBBB, timestamp: $realtime};
+        sb.add_actual(trans);
+
+        #10;
+        trans = '{id: 3, address: 32'h3000, data: 32'hCCCC, timestamp: $realtime};
+        sb.add_actual(trans);
+
+        #10;
+        sb.report();
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 30: Packet Reorder Buffer}
+
+Implement a packet reorder buffer:
+\begin{itemize}
+  \item Packets arrive out of order with sequence numbers
+  \item Store packets in a queue
+  \item Function to insert packet in sequence order
+  \item Function to retrieve next in-sequence packet
+  \item Function to detect missing packets
+  \item Function to display buffer state
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Quiz: Queues}
+
+\begin{quizbox}
+\textbf{Quiz 6: Queues}
+
+\begin{enumerate}
+  \item How is a queue declared in SystemVerilog? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What's the difference between \texttt{push\_front()} and \texttt{push\_back()}?
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can you access queue elements using array indexing? (Yes/No) \_\_\_\_\_\_
+  \item What is a bounded queue? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item How do you clear all elements from a queue? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{type name[\$];}
+  \item \texttt{push\_front()} adds to beginning; \texttt{push\_back()} adds to end
+  \item Yes
+  \item A queue with maximum size limit specified as \texttt{\$:max\_size}
+  \item \texttt{queue.delete();}
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Associative Arrays}
+
+\subsection{Introduction to Associative Arrays}
+
+Associative arrays store data with arbitrary index types, similar to hash maps or dictionaries.
+
+\begin{lstlisting}[caption={Associative Array Basics}]
+module associative_array_intro;
+    // Associative array with int index
+    int aa_int[int];
+
+    // Associative array with string index
+    int aa_string[string];
+
+    // Associative array with custom type
+    typedef struct packed {
+        logic [15:0] addr;
+    } addr_t;
+
+    bit [31:0] memory[addr_t];
+
+    initial begin
+        // Using int indices (sparse)
+        aa_int[5] = 100;
+        aa_int[1000] = 200;
+        aa_int[5000] = 300;
+
+        $display("aa_int[5] = %0d", aa_int[5]);
+        $display("aa_int[1000] = %0d", aa_int[1000]);
+        $display("Number of elements: %0d", aa_int.num());
+
+        // Using string indices
+        aa_string["Alice"] = 95;
+        aa_string["Bob"] = 87;
+        aa_string["Carol"] = 92;
+
+        $display("\nScores:");
+        $display("Alice: %0d", aa_string["Alice"]);
+        $display("Bob: %0d", aa_string["Bob"]);
+        $display("Carol: %0d", aa_string["Carol"]);
+
+        // Using packed struct as index
+        addr_t addr1 = 16'h1000;
+        addr_t addr2 = 16'h2000;
+
+        memory[addr1] = 32'hDEADBEEF;
+        memory[addr2] = 32'hCAFEBABE;
+
+        $display("\nMemory:");
+        $display("memory[0x%h] = 0x%h", addr1, memory[addr1]);
+        $display("memory[0x%h] = 0x%h", addr2, memory[addr2]);
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Associative Array Methods}
+
+\begin{lstlisting}[caption={Associative Array Operations}]
+module associative_array_methods;
+    int scores[string];
+    string key;
+    int value;
+
+    initial begin
+        // Populate associative array
+        scores["Alice"] = 95;
+        scores["Bob"] = 87;
+        scores["Carol"] = 92;
+        scores["Dave"] = 88;
+
+        // num() - returns number of entries
+        $display("Number of students: %0d", scores.num());
+
+        // exists(index) - check if index exists
+        if (scores.exists("Alice")) begin
+            $display("Alice's score exists: %0d", scores["Alice"]);
+        end
+
+        if (!scores.exists("Eve")) begin
+            $display("Eve's score does not exist");
+        end
+
+        // first(ref index) - get first index
+        if (scores.first(key)) begin
+            $display("First: %s = %0d", key, scores[key]);
+        end
+
+        // last(ref index) - get last index
+        if (scores.last(key)) begin
+            $display("Last: %s = %0d", key, scores[key]);
+        end
+
+        // next(ref index) - iterate through all entries
+        $display("\nAll scores (using next):");
+        if (scores.first(key)) begin
+            do begin
+                $display("  %s: %0d", key, scores[key]);
+            end while (scores.next(key));
+        end
+
+        // prev(ref index) - iterate backwards
+        $display("\nAll scores (reverse using prev):");
+        if (scores.last(key)) begin
+            do begin
+                $display("  %s: %0d", key, scores[key]);
+            end while (scores.prev(key));
+        end
+
+        // delete(index) - remove specific entry
+        scores.delete("Bob");
+        $display("\nAfter deleting Bob: %0d entries", scores.num());
+
+        // delete() - remove all entries
+        scores.delete();
+        $display("After delete all: %0d entries", scores.num());
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Practical Associative Array Examples}
+
+\begin{lstlisting}[caption={Cache Memory Model with Associative Array}]
+module cache_model;
+
+    class CacheMemory;
+        typedef bit [31:0] addr_t;
+        typedef bit [31:0] data_t;
+
+        // Associative array for cache storage
+        data_t cache[addr_t];
+
+        // Statistics
+        int hits = 0;
+        int misses = 0;
+        int writes = 0;
+
+        // Write to cache
+        function void write(addr_t address, data_t data);
+            cache[address] = data;
+            writes++;
+            $display("[%0t] WRITE: Addr=0x%h, Data=0x%h",
+                     $time, address, data);
+        endfunction
+
+        // Read from cache
+        function data_t read(addr_t address, output bit hit);
+            if (cache.exists(address)) begin
+                hits++;
+                hit = 1;
+                $display("[%0t] READ HIT: Addr=0x%h, Data=0x%h",
+                         $time, address, cache[address]);
+                return cache[address];
+            end else begin
+                misses++;
+                hit = 0;
+                $display("[%0t] READ MISS: Addr=0x%h",
+                         $time, address);
+                return 32'hXXXXXXXX;
+            end
+        endfunction
+
+        // Invalidate cache line
+        function void invalidate(addr_t address);
+            if (cache.exists(address)) begin
+                cache.delete(address);
+                $display("[%0t] INVALIDATE: Addr=0x%h", $time, address);
+            end
+        endfunction
+
+        // Flush entire cache
+        function void flush();
+            int num_lines = cache.num();
+            cache.delete();
+            $display("[%0t] FLUSH: Cleared %0d cache lines", $time, num_lines);
+        endfunction
+
+        // Display statistics
+        function void display_stats();
+            real hit_rate = (hits + misses > 0) ?
+                            (real'(hits) / (hits + misses)) * 100.0 : 0.0;
+
+            $display("\n=== Cache Statistics ===");
+            $display("Total Lines: %0d", cache.num());
+            $display("Reads - Hits: %0d, Misses: %0d", hits, misses);
+            $display("Hit Rate: %0.2f%%", hit_rate);
+            $display("Writes: %0d", writes);
+        endfunction
+
+        // Display cache contents
+        function void display_contents();
+            addr_t addr;
+            $display("\n=== Cache Contents ===");
+            if (cache.num() == 0) begin
+                $display("  (empty)");
+                return;
+            end
+
+            if (cache.first(addr)) begin
+                do begin
+                    $display("  [0x%h] = 0x%h", addr, cache[addr]);
+                end while (cache.next(addr));
+            end
+        endfunction
+    endclass
+
+    initial begin
+        CacheMemory cache = new();
+        bit hit;
+
+        // Test sequence
+        cache.write(32'h1000, 32'hAAAA);
+        cache.write(32'h2000, 32'hBBBB);
+        cache.write(32'h3000, 32'hCCCC);
+
+        #10;
+        void'(cache.read(32'h1000, hit));  // Hit
+        void'(cache.read(32'h2000, hit));  // Hit
+        void'(cache.read(32'h4000, hit));  // Miss
+
+        cache.write(32'h4000, 32'hDDDD);
+        void'(cache.read(32'h4000, hit));  // Hit now
+
+        cache.display_contents();
+
+        cache.invalidate(32'h2000);
+        void'(cache.read(32'h2000, hit));  // Miss after invalidate
+
+        cache.display_contents();
+        cache.display_stats();
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 31: Symbol Table}
+
+Implement a symbol table using associative arrays:
+\begin{itemize}
+  \item Use string keys for symbol names
+  \item Store: value, type (int/real/string), scope level
+  \item Function \texttt{insert\_symbol(name, value, type, scope)}
+  \item Function \texttt{lookup\_symbol(name)} - returns symbol info
+  \item Function \texttt{delete\_scope(scope\_level)} - remove all symbols at scope
+  \item Function \texttt{display\_table()} - show all symbols
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 32: Register Map}
+
+Create a register map for a peripheral:
+\begin{itemize}
+  \item Associative array: address $\rightarrow$ register info (name, access type, reset value)
+  \item Function \texttt{add\_register(addr, name, access, reset\_val)}
+  \item Function \texttt{read\_register(addr)} - returns current value
+  \item Function \texttt{write\_register(addr, data)} - writes if allowed
+  \item Function \texttt{reset\_all()} - reset to default values
+  \item Function \texttt{dump\_registers()} - display all
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Quiz: Associative Arrays}
+
+\begin{quizbox}
+\textbf{Quiz 7: Associative Arrays}
+
+\begin{enumerate}
+  \item How do you declare an associative array with string indices? \_\_\_\_\_\_\_\_\_\_\_\_
+  \item What method checks if a specific index exists? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item How do you get the number of entries? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What's the advantage of associative arrays over dynamic arrays?
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can you use structures as indices? (Yes/No) \_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{type name[string];}
+  \item \texttt{exists(index)}
+  \item \texttt{num()}
+  \item Sparse storage, arbitrary index types, faster lookup for sparse data
+  \item Yes (if packed)
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Interfaces and Modports}
+
+\subsection{Introduction to Interfaces}
+
+Interfaces encapsulate connectivity and communication protocols, making designs more modular and easier to maintain.
+
+\begin{lstlisting}[caption={Basic Interface Example}]
+// Simple interface definition
+interface simple_bus;
+    logic [7:0] data;
+    logic       valid;
+    logic       ready;
+endinterface
+
+// Module using interface
+module producer(simple_bus bus, input logic clk);
+    always @(posedge clk) begin
+        bus.data <= $random;
+        bus.valid <= 1'b1;
+    end
+endmodule
+
+module consumer(simple_bus bus, input logic clk);
+    always @(posedge clk) begin
+        if (bus.valid && bus.ready) begin
+            $display("[%0t] Received data: 0x%h", $time, bus.data);
+        end
+    end
+endmodule
+
+// Top-level connection
+module top;
+    logic clk;
+
+    // Instantiate interface
+    simple_bus bus();
+
+    // Connect modules through interface
+    producer prod(.bus(bus), .clk(clk));
+    consumer cons(.bus(bus), .clk(clk));
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        bus.ready = 1'b1;
+        #100 $finish;
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Interfaces with Clocking Blocks}
+
+\begin{lstlisting}[caption={Interface with Clocking Block}]
+interface apb_if(input logic pclk);
+    logic [31:0] paddr;
+    logic        psel;
+    logic        penable;
+    logic        pwrite;
+    logic [31:0] pwdata;
+    logic [31:0] prdata;
+    logic        pready;
+    logic        pslverr;
+
+    // Clocking block for master
+    clocking master_cb @(posedge pclk);
+        output paddr;
+        output psel;
+        output penable;
+        output pwrite;
+        output pwdata;
+        input  prdata;
+        input  pready;
+        input  pslverr;
+    endclocking
+
+    // Clocking block for slave
+    clocking slave_cb @(posedge pclk);
+        input  paddr;
+        input  psel;
+        input  penable;
+        input  pwrite;
+        input  pwdata;
+        output prdata;
+        output pready;
+        output pslverr;
+    endclocking
+
+    // Clocking block for monitor
+    clocking monitor_cb @(posedge pclk);
+        input paddr;
+        input psel;
+        input penable;
+        input pwrite;
+        input pwdata;
+        input prdata;
+        input pready;
+        input pslverr;
+    endclocking
+
+endinterface
+\end{lstlisting}
+
+\subsection{Modports}
+
+Modports restrict interface access from different modules, improving encapsulation.
+
+\begin{lstlisting}[caption={Interface with Modports}]
+interface axi_stream_if(input logic clk, input logic rst_n);
+    logic [31:0] tdata;
+    logic [3:0]  tkeep;
+    logic        tvalid;
+    logic        tready;
+    logic        tlast;
+
+    // Master modport - can drive tdata, tvalid, tlast
+    modport master (
+        input  clk,
+        input  rst_n,
+        output tdata,
+        output tkeep,
+        output tvalid,
+        input  tready,
+        output tlast
+    );
+
+    // Slave modport - can drive tready
+    modport slave (
+        input  clk,
+        input  rst_n,
+        input  tdata,
+        input  tkeep,
+        input  tvalid,
+        output tready,
+        input  tlast
+    );
+
+    // Monitor modport - can only read
+    modport monitor (
+        input clk,
+        input rst_n,
+        input tdata,
+        input tkeep,
+        input tvalid,
+        input tready,
+        input tlast
+    );
+
+endinterface
+
+// Master module
+module axi_stream_master(axi_stream_if.master bus);
+    int count = 0;
+
+    always @(posedge bus.clk or negedge bus.rst_n) begin
+        if (!bus.rst_n) begin
+            bus.tdata <= 32'h0;
+            bus.tkeep <= 4'h0;
+            bus.tvalid <= 1'b0;
+            bus.tlast <= 1'b0;
+            count <= 0;
+        end else begin
+            if (bus.tready || !bus.tvalid) begin
+                bus.tdata <= count;
+                bus.tkeep <= 4'hF;
+                bus.tvalid <= 1'b1;
+                bus.tlast <= (count == 15);
+                count <= (count == 15) ? 0 : count + 1;
+            end
+        end
+    end
+endmodule
+
+// Slave module
+module axi_stream_slave(axi_stream_if.slave bus);
+    always @(posedge bus.clk or negedge bus.rst_n) begin
+        if (!bus.rst_n) begin
+            bus.tready <= 1'b0;
+        end else begin
+            bus.tready <= 1'b1;  // Always ready in this simple example
+
+            if (bus.tvalid && bus.tready) begin
+                $display("[%0t] Received: tdata=0x%h, tlast=%b",
+                         $time, bus.tdata, bus.tlast);
+            end
+        end
+    end
+endmodule
+
+// Monitor module
+module axi_stream_monitor(axi_stream_if.monitor bus);
+    int packet_count = 0;
+    int transfer_count = 0;
+
+    always @(posedge bus.clk) begin
+        if (bus.tvalid && bus.tready) begin
+            transfer_count++;
+            $display("[MONITOR] Transfer %0d: Data=0x%h, Last=%b",
+                     transfer_count, bus.tdata, bus.tlast);
+
+            if (bus.tlast) begin
+                packet_count++;
+                $display("[MONITOR] Packet %0d complete (%0d transfers)",
+                         packet_count, transfer_count);
+                transfer_count = 0;
+            end
+        end
+    end
+endmodule
+
+// Top module connecting everything
+module axi_stream_system;
+    logic clk, rst_n;
+
+    // Instantiate interface
+    axi_stream_if axis_if(clk, rst_n);
+
+    // Instantiate modules with modports
+    axi_stream_master master(.bus(axis_if.master));
+    axi_stream_slave  slave(.bus(axis_if.slave));
+    axi_stream_monitor monitor(.bus(axis_if.monitor));
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Reset and simulation control
+    initial begin
+        rst_n = 0;
+        #20 rst_n = 1;
+        #500 $finish;
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 33: UART Interface}
+
+Create a UART interface with:
+\begin{itemize}
+  \item Signals: tx, rx, cts, rts
+  \item Clocking block for synchronous sampling
+  \item Modports: transmitter, receiver, monitor
+  \item Methods: \texttt{task send\_byte(byte data)}, \texttt{task receive\_byte(output byte data)}
+\end{itemize}
+
+Instantiate transmitter and receiver modules using the modports.
+\end{exercisebox}
+
+\subsection{Interface Methods and Tasks}
+
+Interfaces can contain tasks and functions for protocol-specific operations.
+
+\begin{lstlisting}[caption={Interface with Methods}]
+interface wishbone_if(input logic clk, input logic rst);
+    logic [31:0] adr;
+    logic [31:0] dat_o;  // Data output (master to slave)
+    logic [31:0] dat_i;  // Data input (slave to master)
+    logic        we;
+    logic        stb;
+    logic        cyc;
+    logic        ack;
+
+    // Modports
+    modport master (
+        output adr, dat_o, we, stb, cyc,
+        input  dat_i, ack,
+        import write, read
+    );
+
+    modport slave (
+        input  adr, dat_o, we, stb, cyc,
+        output dat_i, ack
+    );
+
+    // Write transaction task
+    task automatic write(input logic [31:0] address, input logic [31:0] data);
+        @(posedge clk);
+        adr <= address;
+        dat_o <= data;
+        we <= 1'b1;
+        stb <= 1'b1;
+        cyc <= 1'b1;
+
+        @(posedge clk);
+        while (!ack) @(posedge clk);
+
+        stb <= 1'b0;
+        cyc <= 1'b0;
+        we <= 1'b0;
+
+        $display("[%0t] WB Write: Addr=0x%h, Data=0x%h", $time, address, data);
+    endtask
+
+    // Read transaction task
+    task automatic read(input logic [31:0] address, output logic [31:0] data);
+        @(posedge clk);
+        adr <= address;
+        we <= 1'b0;
+        stb <= 1'b1;
+        cyc <= 1'b1;
+
+        @(posedge clk);
+        while (!ack) @(posedge clk);
+
+        data = dat_i;
+        stb <= 1'b0;
+        cyc <= 1'b0;
+
+        $display("[%0t] WB Read: Addr=0x%h, Data=0x%h", $time, address, data);
+    endtask
+
+endinterface
+
+// Example usage
+module wishbone_master_example(wishbone_if.master bus);
+    initial begin
+        logic [31:0] read_data;
+
+        // Wait for reset
+        @(posedge bus.clk);
+
+        // Perform write
+        bus.write(32'h1000, 32'hAABBCCDD);
+
+        // Perform read
+        bus.read(32'h1000, read_data);
+
+        $display("Read back: 0x%h", read_data);
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 34: SPI Interface}
+
+Design an SPI interface with:
+\begin{itemize}
+  \item Signals: sclk, mosi, miso, cs\_n
+  \item Modports: master, slave, monitor
+  \item Task \texttt{transfer(input [7:0] tx\_data, output [7:0] rx\_data)} in interface
+  \item Support for CPOL=0, CPHA=0 mode
+  \item Test with master sending data to slave
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Quiz: Interfaces}
+
+\begin{quizbox}
+\textbf{Quiz 8: Interfaces and Modports}
+
+\begin{enumerate}
+  \item What keyword is used to define an interface? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What is the purpose of modports? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can interfaces contain tasks and functions? (Yes/No) \_\_\_\_\_\_
+  \item What keyword creates synchronized sampling in interfaces? \_\_\_\_\_\_\_\_\_\_
+  \item How do you import a task from an interface into a modport? \_\_\_\_\_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{interface}
+  \item To restrict and control access to interface signals from different modules
+  \item Yes
+  \item \texttt{clocking}
+  \item Use \texttt{import task\_name} in the modport declaration
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Virtual Interfaces}
+
+\subsection{Why Virtual Interfaces?}
+
+Virtual interfaces enable polymorphic behavior with interfaces, essential for verification environments.
+
+\begin{lstlisting}[caption={Virtual Interface Basics}]
+interface simple_if;
+    logic [7:0] data;
+    logic       valid;
+endinterface
+
+class Driver;
+    virtual simple_if vif;  // Virtual interface handle
+
+    function new(virtual simple_if vif);
+        this.vif = vif;
+    endfunction
+
+    task drive(logic [7:0] value);
+        vif.data = value;
+        vif.valid = 1'b1;
+        $display("[%0t] Driver: Driving 0x%h", $time, value);
+    endtask
+endclass
+
+module virtual_interface_example;
+    simple_if sif();  // Instantiate interface
+
+    initial begin
+        Driver drv;
+        drv = new(sif);  // Pass interface to class
+
+        #10 drv.drive(8'hAA);
+        #10 drv.drive(8'hBB);
+        #10 drv.drive(8'hCC);
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Practical Verification Example}
+
+\begin{lstlisting}[caption={Complete Verification Environment with Virtual Interfaces}]
+// Interface definition
+interface axi_lite_if(input logic clk);
+    logic [31:0] awaddr;
+    logic        awvalid;
+    logic        awready;
+    logic [31:0] wdata;
+    logic        wvalid;
+    logic        wready;
+    logic [1:0]  bresp;
+    logic        bvalid;
+    logic        bready;
+    logic [31:0] araddr;
+    logic        arvalid;
+    logic        arready;
+    logic [31:0] rdata;
+    logic [1:0]  rresp;
+    logic        rvalid;
+    logic        rready;
+endinterface
+
+// Transaction class
+class axi_transaction;
+    rand logic [31:0] address;
+    rand logic [31:0] data;
+    rand bit          write;  // 1=write, 0=read
+
+    function void display(string prefix = "");
+        $display("%s AXI Transaction: %s Addr=0x%h Data=0x%h",
+                 prefix, write ? "WRITE" : "READ", address, data);
+    endfunction
+endclass
+
+// Driver class
+class axi_driver;
+    virtual axi_lite_if.master vif;
+
+    function new(virtual axi_lite_if.master vif);
+        this.vif = vif;
+    endfunction
+
+    task reset();
+        vif.awvalid <= 0;
+        vif.wvalid <= 0;
+        vif.bready <= 0;
+        vif.arvalid <= 0;
+        vif.rready <= 0;
+    endtask
+
+    task write(axi_transaction trans);
+        // Address phase
+        @(posedge vif.clk);
+        vif.awaddr <= trans.address;
+        vif.awvalid <= 1'b1;
+
+        @(posedge vif.clk);
+        while (!vif.awready) @(posedge vif.clk);
+        vif.awvalid <= 1'b0;
+
+        // Data phase
+        vif.wdata <= trans.data;
+        vif.wvalid <= 1'b1;
+
+        @(posedge vif.clk);
+        while (!vif.wready) @(posedge vif.clk);
+        vif.wvalid <= 1'b0;
+
+        // Response
+        vif.bready <= 1'b1;
+        @(posedge vif.clk);
+        while (!vif.bvalid) @(posedge vif.clk);
+        vif.bready <= 1'b0;
+
+        trans.display("[DRIVER]");
+    endtask
+
+    task read(axi_transaction trans);
+        // Address phase
+        @(posedge vif.clk);
+        vif.araddr <= trans.address;
+        vif.arvalid <= 1'b1;
+
+        @(posedge vif.clk);
+        while (!vif.arready) @(posedge vif.clk);
+        vif.arvalid <= 1'b0;
+
+        // Data phase
+        vif.rready <= 1'b1;
+        @(posedge vif.clk);
+        while (!vif.rvalid) @(posedge vif.clk);
+        trans.data = vif.rdata;
+        vif.rready <= 1'b0;
+
+        trans.display("[DRIVER]");
+    endtask
+endclass
+
+// Monitor class
+class axi_monitor;
+    virtual axi_lite_if.monitor vif;
+    mailbox #(axi_transaction) mon2scb;
+
+    function new(virtual axi_lite_if.monitor vif, mailbox #(axi_transaction) mon2scb);
+        this.vif = vif;
+        this.mon2scb = mon2scb;
+    endfunction
+
+    task run();
+        axi_transaction trans;
+
+        forever begin
+            @(posedge vif.clk);
+
+            // Detect write transaction
+            if (vif.awvalid && vif.awready) begin
+                trans = new();
+                trans.write = 1;
+                trans.address = vif.awaddr;
+
+                // Wait for data
+                @(posedge vif.clk);
+                while (!(vif.wvalid && vif.wready)) @(posedge vif.clk);
+                trans.data = vif.wdata;
+
+                trans.display("[MONITOR]");
+                mon2scb.put(trans);
+            end
+
+            // Detect read transaction
+            if (vif.arvalid && vif.arready) begin
+                trans = new();
+                trans.write = 0;
+                trans.address = vif.araddr;
+
+                // Wait for data
+                @(posedge vif.clk);
+                while (!(vif.rvalid && vif.rready)) @(posedge vif.clk);
+                trans.data = vif.rdata;
+
+                trans.display("[MONITOR]");
+                mon2scb.put(trans);
+            end
+        end
+    endtask
+endclass
+
+// Scoreboard class
+class scoreboard;
+    mailbox #(axi_transaction) mon2scb;
+    axi_transaction expected_q[$];
+    int matches = 0;
+    int mismatches = 0;
+
+    function new(mailbox #(axi_transaction) mon2scb);
+        this.mon2scb = mon2scb;
+    endfunction
+
+    task run();
+        axi_transaction act_trans;
+
+        forever begin
+            mon2scb.get(act_trans);
+
+            if (expected_q.size() > 0) begin
+                axi_transaction exp_trans = expected_q.pop_front();
+
+                if (exp_trans.address == act_trans.address &&
+                    exp_trans.data == act_trans.data &&
+                    exp_trans.write == act_trans.write) begin
+                    matches++;
+                    $display("[SCOREBOARD] MATCH!");
+                end else begin
+                    mismatches++;
+                    $display("[SCOREBOARD] MISMATCH!");
+                    exp_trans.display("  Expected:");
+                    act_trans.display("  Actual:");
+                end
+            end
+        end
+    endtask
+
+    function void add_expected(axi_transaction trans);
+        expected_q.push_back(trans);
+    endfunction
+
+    function void report();
+        $display("\n=== SCOREBOARD REPORT ===");
+        $display("Matches: %0d", matches);
+        $display("Mismatches: %0d", mismatches);
+        if (mismatches == 0)
+            $display("TEST PASSED!");
+        else
+            $display("TEST FAILED!");
+    endfunction
+endclass
+
+// Environment class
+class environment;
+    virtual axi_lite_if.master vif_master;
+    virtual axi_lite_if.monitor vif_monitor;
+
+    axi_driver    driver;
+    axi_monitor   monitor;
+    scoreboard    scb;
+    mailbox #(axi_transaction) mon2scb;
+
+    function new(virtual axi_lite_if.master vif_m, virtual axi_lite_if.monitor vif_mon);
+        this.vif_master = vif_m;
+        this.vif_monitor = vif_mon;
+
+        mon2scb = new();
+        driver = new(vif_master);
+        monitor = new(vif_monitor, mon2scb);
+        scb = new(mon2scb);
+    endfunction
+
+    task run();
+        fork
+            monitor.run();
+            scb.run();
+        join_none
+    endtask
+endclass
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 35: I2C Verification Environment}
+
+Create a verification environment for I2C:
+\begin{itemize}
+  \item Define I2C interface (scl, sda)
+  \item Transaction class (address, data, read/write)
+  \item Driver class with virtual interface
+  \item Monitor class
+  \item Scoreboard
+  \item Environment to integrate all components
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 36: Configurable Driver}
+
+Create a configurable driver using virtual interfaces:
+\begin{itemize}
+  \item Support multiple interface types (APB, AHB, AXI)
+  \item Use base class with virtual interface
+  \item Derived classes for each protocol
+  \item Configuration class to select driver type
+  \item Test with different protocols
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Quiz: Virtual Interfaces}
+
+\begin{quizbox}
+\textbf{Quiz 9: Virtual Interfaces}
+
+\begin{enumerate}
+  \item What keyword makes an interface handle polymorphic? \_\_\_\_\_\_\_\_\_\_\_\_
+  \item Why are virtual interfaces necessary in classes? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can you reassign a virtual interface to point to different interface instances? (Yes/No) \_\_\_\_
+  \item Where are virtual interfaces typically used?\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can virtual interfaces be passed as function/task arguments? (Yes/No) \_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{virtual}
+  \item Classes cannot directly contain interface instances; virtual interfaces provide a handle/pointer to interface instances
+  \item Yes
+  \item Verification environments, testbenches, UVM components
+  \item Yes
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Packages and Import}
+
+\subsection{Creating Packages}
+
+Packages group related declarations for reuse across multiple modules.
+
+\begin{lstlisting}[caption={Basic Package}]
+package math_pkg;
+    // Constants
+    parameter real PI = 3.14159265359;
+    parameter real E = 2.71828182846;
+
+    // Typedef
+    typedef real radians_t;
+    typedef real degrees_t;
+
+    // Functions
+    function radians_t deg_to_rad(degrees_t deg);
+        return deg * PI / 180.0;
+    endfunction
+
+    function degrees_t rad_to_deg(radians_t rad);
+        return rad * 180.0 / PI;
+    endfunction
+
+    function real power(real base, int exp);
+        real result = 1.0;
+        for (int i = 0; i < exp; i++)
+            result *= base;
+        return result;
+    endfunction
+endpackage
+
+// Using the package
+module package_user;
+    import math_pkg::*;  // Import all
+
+    initial begin
+        real angle_deg = 90.0;
+        real angle_rad;
+
+        angle_rad = deg_to_rad(angle_deg);
+        $display("90 degrees = %0.4f radians", angle_rad);
+        $display("PI = %0.10f", PI);
+        $display("2^10 = %0.0f", power(2.0, 10));
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Package Best Practices}
+
+\begin{lstlisting}[caption={Well-Organized Package}]
+package axi_pkg;
+    // Constants
+    parameter int ADDR_WIDTH = 32;
+    parameter int DATA_WIDTH = 32;
+    parameter int ID_WIDTH = 4;
+
+    // Enumerations
+    typedef enum logic [1:0] {
+        RESP_OKAY   = 2'b00,
+        RESP_EXOKAY = 2'b01,
+        RESP_SLVERR = 2'b10,
+        RESP_DECERR = 2'b11
+    } axi_resp_t;
+
+    typedef enum logic [2:0] {
+        BURST_FIXED = 3'b000,
+        BURST_INCR  = 3'b001,
+        BURST_WRAP  = 3'b010
+    } axi_burst_t;
+
+    typedef enum logic [1:0] {
+        SIZE_1BYTE  = 2'b00,
+        SIZE_2BYTES = 2'b01,
+        SIZE_4BYTES = 2'b10,
+        SIZE_8BYTES = 2'b11
+    } axi_size_t;
+
+    // Structures
+    typedef struct packed {
+        logic [ID_WIDTH-1:0]   id;
+        logic [ADDR_WIDTH-1:0] addr;
+        logic [7:0]            len;
+        axi_size_t             size;
+        axi_burst_t            burst;
+    } axi_addr_t;
+
+    typedef struct packed {
+        logic [DATA_WIDTH-1:0]     data;
+        logic [(DATA_WIDTH/8)-1:0] strb;
+        logic                      last;
+    } axi_data_t;
+
+    typedef struct packed {
+        logic [ID_WIDTH-1:0] id;
+        axi_resp_t           resp;
+    } axi_resp_pkt_t;
+
+    // Transaction class
+    class AXI_Transaction;
+        rand logic [ADDR_WIDTH-1:0] address;
+        rand logic [DATA_WIDTH-1:0] data[];
+        rand int                    length;
+        rand bit                    write;
+        axi_resp_t                  response;
+
+        constraint reasonable_length {
+            length inside {[1:16]};
+        }
+
+        constraint valid_data_size {
+            data.size() == length;
+        }
+
+        function new();
+            data = new[1];
+        endfunction
+
+        function void display(string prefix = "");
+            $display("%s %s Transaction:", prefix, write ? "WRITE" : "READ");
+            $display("  Address: 0x%h", address);
+            $display("  Length: %0d", length);
+            $display("  Data: %p", data);
+        endfunction
+
+        function AXI_Transaction copy();
+            AXI_Transaction trans = new();
+            trans.address = this.address;
+            trans.length = this.length;
+            trans.write = this.write;
+            trans.response = this.response;
+            trans.data = new[this.data.size()];
+            foreach(this.data[i])
+                trans.data[i] = this.data[i];
+            return trans;
+        endfunction
+    endclass
+
+    // Utility functions
+    function string resp_to_string(axi_resp_t resp);
+        case (resp)
+            RESP_OKAY:   return "OKAY";
+            RESP_EXOKAY: return "EXOKAY";
+            RESP_SLVERR: return "SLVERR";
+            RESP_DECERR: return "DECERR";
+        endcase
+    endfunction
+
+    function bit is_aligned(logic [ADDR_WIDTH-1:0] addr, axi_size_t size);
+        case (size)
+            SIZE_1BYTE:  return 1'b1;
+            SIZE_2BYTES: return (addr[0] == 0);
+            SIZE_4BYTES: return (addr[1:0] == 0);
+            SIZE_8BYTES: return (addr[2:0] == 0);
+        endcase
+    endfunction
+
+endpackage : axi_pkg
+
+// Using the package
+module axi_test;
+    import axi_pkg::*;
+
+    initial begin
+        AXI_Transaction trans;
+        trans = new();
+
+        assert(trans.randomize()) else $fatal("Randomization failed");
+        trans.display("[TEST]");
+
+        $display("Response: %s", resp_to_string(RESP_OKAY));
+        $display("Is 0x100 aligned for 4-byte access? %b",
+                 is_aligned(32'h100, SIZE_4BYTES));
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Selective Import}
+
+\begin{lstlisting}[caption={Import Specific Items}]
+package utilities_pkg;
+    // Many definitions...
+    function int add(int a, int b);
+        return a + b;
+    endfunction
+
+    function int multiply(int a, int b);
+        return a * b;
+    endfunction
+
+    parameter int MAX_SIZE = 1024;
+    parameter int MIN_SIZE = 1;
+endpackage
+
+module selective_import_example;
+    // Import only specific items
+    import utilities_pkg::add;
+    import utilities_pkg::MAX_SIZE;
+    // multiply and MIN_SIZE are not imported
+
+    initial begin
+        $display("Sum: %0d", add(5, 3));
+        $display("Max size: %0d", MAX_SIZE);
+
+        // This would cause error: multiply not imported
+        // $display("Product: %0d", multiply(5, 3));
+    end
+endmodule
+
+module wildcard_import_example;
+    // Import everything
+    import utilities_pkg::*;
+
+    initial begin
+        $display("Sum: %0d", add(5, 3));
+        $display("Product: %0d", multiply(5, 3));
+        $display("Max: %0d, Min: %0d", MAX_SIZE, MIN_SIZE);
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 37: Protocol Package}
+
+Create a complete protocol package for UART:
+\begin{itemize}
+  \item Constants: baud rates, data bits, parity options
+  \item Enumerations: parity type, stop bits
+  \item Structure: UART frame (data, parity, etc.)
+  \item Transaction class
+  \item Utility functions: calculate parity, encode frame
+  \item Test module using the package
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 38: Verification Component Package}
+
+Create a package for verification components:
+\begin{itemize}
+  \item Base transaction class
+  \item Driver base class
+  \item Monitor base class
+  \item Scoreboard base class
+  \item Common utility functions
+  \item Use in a simple verification environment
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Quiz: Packages}
+
+\begin{quizbox}
+\textbf{Quiz 10: Packages and Import}
+
+\begin{enumerate}
+  \item How do you import all items from a package? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item How do you import only specific items? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can packages contain classes? (Yes/No) \_\_\_\_\_\_
+  \item What happens if two imported packages define the same identifier?
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can packages be nested (package inside package)? (Yes/No) \_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{import package\_name::*;}
+  \item \texttt{import package\_name::item1, package\_name::item2;}
+  \item Yes
+  \item Compilation error (ambiguity); use explicit package::item qualification
+  \item No
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Object-Oriented Programming Basics}
+
+\subsection{Classes and Objects}
+
+\begin{lstlisting}[caption={Basic Class Definition}]
+class Counter;
+    // Properties (member variables)
+    int count;
+    string name;
+
+    // Constructor
+    function new(string n = "Counter", int initial_value = 0);
+        name = n;
+        count = initial_value;
+        $display("Created %s with initial value %0d", name, count);
+    endfunction
+
+    // Methods
+    function void increment();
+        count++;
+        $display("%s: incremented to %0d", name, count);
+    endfunction
+
+    function void decrement();
+        count--;
+        $display("%s: decremented to %0d", name, count);
+    endfunction
+
+    function void reset();
+        count = 0;
+        $display("%s: reset to 0", name);
+    endfunction
+
+    function int get_value();
+        return count;
+    endfunction
+
+    function void display();
+        $display("Counter '%s' = %0d", name, count);
+    endfunction
+endclass
+
+module oop_basics;
+    initial begin
+        Counter c1, c2;
+
+        // Create objects
+        c1 = new("Counter1", 10);
+        c2 = new("Counter2");
+
+        // Use methods
+        c1.increment();
+        c1.increment();
+        c1.display();
+
+        c2.increment();
+        c2.increment();
+        c2.increment();
+        c2.display();
+
+        c1.reset();
+        c1.display();
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Encapsulation with Local and Protected}
+
+\begin{lstlisting}[caption={Data Hiding and Encapsulation}]
+class BankAccount;
+    local real balance;        // Private to this class
+    protected string owner;    // Accessible in derived classes
+    int account_number;        // Public
+
+    function new(string owner_name, int acc_num, real initial_balance = 0);
+        owner = owner_name;
+        account_number = acc_num;
+        balance = initial_balance;
+    endfunction
+
+    // Public interface
+    function bit deposit(real amount);
+        if (amount <= 0) begin
+            $error("Invalid deposit amount: %0.2f", amount);
+            return 0;
+        end
+        balance += amount;
+        $display("Deposited $%0.2f. New balance: $%0.2f", amount, balance);
+        return 1;
+    endfunction
+
+    function bit withdraw(real amount);
+        if (amount <= 0) begin
+            $error("Invalid withdrawal amount");
+            return 0;
+        end
+        if (amount > balance) begin
+            $error("Insufficient funds");
+            return 0;
+        end
+        balance -= amount;
+        $display("Withdrew $%0.2f. New balance: $%0.2f", amount, balance);
+        return 1;
+    endfunction
+
+    function real get_balance();
+        return balance;
+    endfunction
+
+    function void display_info();
+        $display("Account: %0d, Owner: %s, Balance: $%0.2f",
+                 account_number, owner, balance);
+    endfunction
+endclass
+
+module encapsulation_example;
+    initial begin
+        BankAccount acc;
+        acc = new("John Doe", 12345, 1000.0);
+
+        acc.display_info();
+        void'(acc.deposit(500.0));
+        void'(acc.withdraw(200.0));
+        void'(acc.withdraw(2000.0));  // Should fail
+
+        $display("Final balance: $%0.2f", acc.get_balance());
+
+        // This would cause error - balance is local:
+        // acc.balance = 999999.99;
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Static Members}
+
+\begin{lstlisting}[caption={Static Properties and Methods}]
+class Employee;
+    static int employee_count = 0;  // Shared across all instances
+    static real total_salary = 0.0;
+
+    int id;
+    string name;
+    real salary;
+
+    function new(string emp_name, real emp_salary);
+        employee_count++;
+        id = employee_count;
+        name = emp_name;
+        salary = emp_salary;
+        total_salary += salary;
+
+        $display("Employee #%0d created: %s ($%0.2f/year)",
+                 id, name, salary);
+    endfunction
+
+    // Static method
+    static function void display_statistics();
+        $display("\n=== Company Statistics ===");
+        $display("Total Employees: %0d", employee_count);
+        $display("Total Salary Budget: $%0.2f", total_salary);
+        if (employee_count > 0)
+            $display("Average Salary: $%0.2f", total_salary / employee_count);
+    endfunction
+
+    function void display();
+        $display("ID: %0d, Name: %s, Salary: $%0.2f",
+                 id, name, salary);
+    endfunction
+endclass
+
+module static_members_example;
+    initial begin
+        Employee emp1, emp2, emp3;
+
+        emp1 = new("Alice", 75000.0);
+        emp2 = new("Bob", 82000.0);
+        emp3 = new("Carol", 78000.0);
+
+        emp1.display();
+        emp2.display();
+        emp3.display();
+
+        Employee::display_statistics();  // Call static method
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 39: Library Management System}
+
+Create a library management system with classes:
+\begin{itemize}
+  \item \texttt{Book} class: title, author, ISBN, available
+  \item \texttt{Member} class: name, ID, books\_borrowed[]
+  \item \texttt{Library} class: books[], members[], methods to borrow/return
+  \item Static tracking of total books and members
+  \item Methods: add book, register member, borrow, return, display
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Copy and Clone}
+
+\begin{lstlisting}[caption={Deep Copy vs Shallow Copy}]
+class Data;
+    int value;
+    int array[];
+
+    function new(int v = 0, int size = 5);
+        value = v;
+        array = new[size];
+        foreach(array[i]) array[i] = i;
+    endfunction
+
+    // Shallow copy (default assignment)
+    // obj2 = obj1; // Both share same array!
+
+    // Deep copy method
+    function Data copy();
+        Data new_obj = new(this.value, this.array.size());
+        foreach(this.array[i])
+            new_obj.array[i] = this.array[i];
+        return new_obj;
+    endfunction
+
+    function void display(string name);
+        $display("%s: value=%0d, array=%p", name, value, array);
+    endfunction
+endclass
+
+module copy_example;
+    initial begin
+        Data obj1, obj2, obj3;
+
+        obj1 = new(10, 3);
+        obj1.array = '{1, 2, 3};
+        obj1.display("obj1");
+
+        // Shallow copy (handle copy)
+        obj2 = obj1;  // obj2 points to same object as obj1!
+        obj2.value = 20;
+        obj2.array[0] = 100;
+
+        $display("\nAfter shallow copy modification:");
+        obj1.display("obj1");  // Also changed!
+        obj2.display("obj2");
+
+        // Deep copy
+        obj1 = new(10, 3);
+        obj1.array = '{1, 2, 3};
+        obj3 = obj1.copy();  // Create new independent object
+
+        obj3.value = 30;
+        obj3.array[0] = 200;
+
+        $display("\nAfter deep copy modification:");
+        obj1.display("obj1");  // Unchanged
+        obj3.display("obj3");  // Changed
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 40: Configuration Class with Deep Copy}
+
+Create a test configuration class with:
+\begin{itemize}
+  \item Properties: timeout, verbosity, enabled\_tests[]
+  \item Deep copy method
+  \item Compare method to check equality
+  \item Display method
+  \item Test shallow vs deep copy behavior
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Quiz: OOP Basics}
+
+\begin{quizbox}
+\textbf{Quiz 11: Object-Oriented Programming Basics}
+
+\begin{enumerate}
+  \item What keyword defines a class? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What is the name of the class constructor method? \_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What access modifier restricts access to the current class only? \_\_\_\_\_\_\_\_\_\_
+  \item Are static members shared across all instances? (Yes/No) \_\_\_\_\_\_
+  \item What happens when you assign one object to another (obj2 = obj1)?
+
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{class}
+  \item \texttt{new}
+  \item \texttt{local}
+  \item Yes
+  \item Shallow copy - obj2 becomes a handle to the same object as obj1
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Inheritance and Polymorphism}
+
+\subsection{Basic Inheritance}
+
+\begin{lstlisting}[caption={Inheritance Example}]
+// Base class
+class Vehicle;
+    string brand;
+    int year;
+    real price;
+
+    function new(string b, int y, real p);
+        brand = b;
+        year = y;
+        price = p;
+    endfunction
+
+    virtual function void display();
+        $display("Vehicle: %s (%0d) - $%0.2f", brand, year, price);
+    endfunction
+
+    virtual function real calculate_tax();
+        return price * 0.05;  // 5% tax
+    endfunction
+endclass
+
+// Derived class
+class Car extends Vehicle;
+    int num_doors;
+    bit has_sunroof;
+
+    function new(string b, int y, real p, int doors, bit sunroof);
+        super.new(b, y, p);  // Call parent constructor
+        num_doors = doors;
+        has_sunroof = sunroof;
+    endfunction
+
+    // Override parent method
+    virtual function void display();
+        $display("Car: %s (%0d) - $%0.2f, %0d doors, Sunroof: %s",
+                 brand, year, price, num_doors,
+                 has_sunroof ? "Yes" : "No");
+    endfunction
+
+    // Override tax calculation
+    virtual function real calculate_tax();
+        real base_tax = super.calculate_tax();
+        if (has_sunroof) base_tax += 500;  // Luxury tax
+        return base_tax;
+    endfunction
+endclass
+
+class Truck extends Vehicle;
+    real cargo_capacity;  // in tons
+
+    function new(string b, int y, real p, real capacity);
+        super.new(b, y, p);
+        cargo_capacity = capacity;
+    endfunction
+
+    virtual function void display();
+        $display("Truck: %s (%0d) - $%0.2f, Capacity: %0.1f tons",
+                 brand, year, price, cargo_capacity);
+    endfunction
+
+    virtual function real calculate_tax();
+        return super.calculate_tax() + (cargo_capacity * 100);
+    endfunction
+endclass
+
+module inheritance_example;
+    initial begin
+        Vehicle v;
+        Car c;
+        Truck t;
+
+        c = new("Toyota", 2023, 25000.0, 4, 1);
+        t = new("Ford", 2022, 45000.0, 5.0);
+
+        c.display();
+        $display("  Tax: $%0.2f", c.calculate_tax());
+
+        t.display();
+        $display("  Tax: $%0.2f", t.calculate_tax());
+
+        // Polymorphism
+        v = c;  // Base class handle to derived object
+        v.display();  // Calls Car's display() due to virtual
+
+        v = t;
+        v.display();  // Calls Truck's display()
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Polymorphism in Practice}
+
+\begin{lstlisting}[caption={Polymorphism Example}]
+// Abstract base transaction
+virtual class BaseTransaction;
+    int id;
+    realtime timestamp;
+
+    function new(int trans_id);
+        id = trans_id;
+        timestamp = $realtime;
+    endfunction
+
+    pure virtual function void display();
+    pure virtual function string get_type();
+endclass
+
+// Read transaction
+class ReadTransaction extends BaseTransaction;
+    bit [31:0] address;
+    bit [31:0] data;
+
+    function new(int trans_id, bit [31:0] addr);
+        super.new(trans_id);
+        address = addr;
+        data = 0;
+    endfunction
+
+    virtual function void display();
+        $display("[%0t] READ #%0d: Addr=0x%h, Data=0x%h",
+                 timestamp, id, address, data);
+    endfunction
+
+    virtual function string get_type();
+        return "READ";
+    endfunction
+endclass
+
+// Write transaction
+class WriteTransaction extends BaseTransaction;
+    bit [31:0] address;
+    bit [31:0] data;
+
+    function new(int trans_id, bit [31:0] addr, bit [31:0] dat);
+        super.new(trans_id);
+        address = addr;
+        data = dat;
+    endfunction
+
+    virtual function void display();
+        $display("[%0t] WRITE #%0d: Addr=0x%h, Data=0x%h",
+                 timestamp, id, address, data);
+    endfunction
+
+    virtual function string get_type();
+        return "WRITE";
+    endfunction
+endclass
+
+// Transaction processor
+class TransactionProcessor;
+    BaseTransaction trans_queue[$];
+
+    function void add_transaction(BaseTransaction trans);
+        trans_queue.push_back(trans);
+        $display("Added %s transaction #%0d",
+                 trans.get_type(), trans.id);
+    endfunction
+
+    task process_all();
+        $display("\n=== Processing Transactions ===");
+        foreach(trans_queue[i]) begin
+            trans_queue[i].display();  // Polymorphic call
+            #10;
+        end
+    endtask
+endclass
+
+module polymorphism_example;
+    initial begin
+        TransactionProcessor processor;
+        ReadTransaction rd;
+        WriteTransaction wr;
+
+        processor = new();
+
+        // Create and add different transaction types
+        wr = new(1, 32'h1000, 32'hAAAA);
+        processor.add_transaction(wr);
+
+        rd = new(2, 32'h1000);
+        processor.add_transaction(rd);
+
+        wr = new(3, 32'h2000, 32'hBBBB);
+        processor.add_transaction(wr);
+
+        processor.process_all();
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 41: Network Protocol Stack}
+
+Create a protocol hierarchy:
+\begin{itemize}
+  \item Base class \texttt{NetworkPacket}: virtual methods pack(), unpack(), display()
+  \item \texttt{EthernetFrame extends NetworkPacket}: MAC addresses, EtherType
+  \item \texttt{IPv4Packet extends EthernetFrame}: IP addresses, protocol
+  \item \texttt{TCPPacket extends IPv4Packet}: ports, flags
+  \item \texttt{UDPPacket extends IPv4Packet}: ports, checksum
+  \item Test polymorphism with array of NetworkPacket handles
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Quiz: Inheritance and Polymorphism}
+
+\begin{quizbox}
+\textbf{Quiz 12: Inheritance and Polymorphism}
+
+\begin{enumerate}
+  \item What keyword is used to inherit from a class? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item How do you call the parent class constructor? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What keyword makes a method polymorphic? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item What is a pure virtual function? \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+  \item Can you instantiate an abstract class? (Yes/No) \_\_\_\_\_\_
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+  \item \texttt{extends}
+  \item \texttt{super.new()}
+  \item \texttt{virtual}
+  \item A function declared with \texttt{pure virtual} that must be overridden in derived classes
+  \item No
+\end{enumerate}
+\end{quizbox}
+
+\newpage
+% ============================================================================
+\section{Advanced Verification Techniques}
+
+\subsection{Constrained Random Verification}
+
+\begin{lstlisting}[caption={Constrained Random Generation}]
+class Transaction;
+    rand bit [31:0] address;
+    rand bit [31:0] data;
+    rand bit [2:0]  burst_size;
+    rand bit        write;
+
+    // Constraints
+    constraint address_range {
+        address inside {[32'h0000:32'h0FFF], [32'h2000:32'h2FFF]};
+    }
+
+    constraint burst_constraint {
+        burst_size inside {1, 2, 4, 8};
+    }
+
+    constraint write_distribution {
+        write dist {1 := 70, 0 := 30};  // 70% writes, 30% reads
+    end function
+
+    function void display();
+        $display("Trans: %s Addr=0x%h Data=0x%h Burst=%0d",
+                 write ? "WR" : "RD", address, data, burst_size);
+    endfunction
+endclass
+
+module constrained_random_example;
+    initial begin
+        Transaction trans;
+        trans = new();
+
+        $display("=== Generating 10 Random Transactions ===");
+        repeat(10) begin
+            assert(trans.randomize()) else $fatal("Randomization failed");
+            trans.display();
+        end
+    end
+endmodule
+\end{lstlisting}
+
+\subsection{Functional Coverage}
+
+\begin{lstlisting}[caption={Functional Coverage Example}]
+class CoverageCollector;
+    bit [7:0] addr;
+    bit [1:0] burst_type;
+    bit       write;
+
+    covergroup cg @(addr);
+        address_cp: coverpoint addr {
+            bins low    = {[0:63]};
+            bins medium = {[64:127]};
+            bins high   = {[128:255]};
+        }
+
+        burst_cp: coverpoint burst_type {
+            bins single = {0};
+            bins incr   = {1};
+            bins wrap   = {2};
+            illegal_bins illegal = {3};
+        }
+
+        write_cp: coverpoint write {
+            bins read  = {0};
+            bins write = {1};
+        }
+
+        // Cross coverage
+        addr_x_burst: cross address_cp, burst_cp;
+        addr_x_write: cross address_cp, write_cp;
+    endgroup
+
+    function new();
+        cg = new();
+    endfunction
+
+    function void sample(bit [7:0] a, bit [1:0] b, bit w);
+        addr = a;
+        burst_type = b;
+        write = w;
+        // Sampling happens automatically at @(addr) event
+    endfunction
+
+    function void report();
+        $display("Coverage: %0.2f%%", cg.get_coverage());
+    endfunction
+endclass
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 42: Complete Verification Environment}
+
+Create a complete verification environment:
+\begin{itemize}
+  \item Transaction class with constraints
+  \item Generator to create random transactions
+  \item Driver with virtual interface
+  \item Monitor to capture responses
+  \item Scoreboard for checking
+  \item Coverage collector
+  \item Environment class integrating all
+\end{itemize}
+\end{exercisebox}
+
+\subsection{Summary of Intermediate Level}
+
+\begin{itemize}
+    \item \textbf{Section 11}: Advanced data types and typedef
+    \item \textbf{Section 12}: Dynamic arrays for flexible storage
+    \item \textbf{Section 13}: Queues for FIFO/LIFO operations
+    \item \textbf{Section 14}: Associative arrays for sparse data
+    \item \textbf{Section 15}: Interfaces and modports for modular design
+    \item \textbf{Section 16}: Virtual interfaces for verification
+    \item \textbf{Section 17}: Packages for code organization
+    \item \textbf{Section 18}: OOP basics with classes and objects
+    \item \textbf{Section 19}: Inheritance and polymorphism
+    \item \textbf{Section 20}: Verification techniques
+\end{itemize}
+
+\vfill
+\begin{center}
+\rule{0.6\textwidth}{0.4pt}\\
+\Large\textbf{Intermediate Level Complete!}\\
+\normalsize
+\vspace{0.3cm}
+You've mastered dynamic data structures, interfaces, packages,\\
+and object-oriented programming in SystemVerilog.\\
+\vspace{0.5cm}
+\textit{Continue to Advanced Level (Sections 21-30) for:}\\
+\textit{UVM, Advanced Assertions, Design Patterns, and More!}\\
+\end{center}
+
+\end{document}
