@@ -30,27 +30,31 @@ This repository contains comprehensive documentation on SystemVerilog functions 
 
 ## Compiling the LaTeX Documents
 
-### For the Complete Learning Guide (Recommended)
+### Quick Start (Easiest)
 
 ```bash
-# Method 1: Using pdflatex (most compatible)
+# Using the compilation script
+./compile_guide.sh
+
+# Or using Make
+make complete    # Compile learning guide
+make basic       # Compile basic version
+make            # Compile both
+```
+
+### Manual Compilation
+
+```bash
+# For the Complete Learning Guide (Recommended)
 pdflatex SystemVerilog_Functions_Tasks_Complete_Guide.tex
 pdflatex SystemVerilog_Functions_Tasks_Complete_Guide.tex  # Run twice for TOC
 
-# Method 2: Using latexmk (automated, handles multiple runs)
-latexmk -pdf SystemVerilog_Functions_Tasks_Complete_Guide.tex
-
-# Method 3: Using XeLaTeX (for advanced fonts)
-xelatex SystemVerilog_Functions_Tasks_Complete_Guide.tex
-xelatex SystemVerilog_Functions_Tasks_Complete_Guide.tex  # Run twice
-```
-
-### For the Basic Version
-
-```bash
+# For the Basic Version
 pdflatex SystemVerilog_Functions_and_Tasks.tex
 pdflatex SystemVerilog_Functions_and_Tasks.tex  # Run twice for TOC
 ```
+
+**📖 For detailed compilation instructions, troubleshooting, and installation help, see [COMPILATION_GUIDE.md](COMPILATION_GUIDE.md)**
 
 ### Required LaTeX Packages
 
