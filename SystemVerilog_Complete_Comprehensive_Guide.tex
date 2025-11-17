@@ -242,82 +242,287 @@ Complete Expertise & 100+ hours & All sections, all exercises, projects \\
 
 \newpage
 % ============================================================================
-% BEGINNER LEVEL - SECTIONS 1-10 (Brief Overview)
+% BEGINNER LEVEL - SECTIONS 1-10 (COMPREHENSIVE)
 % ============================================================================
 
 \part{Beginner Level (Sections 1-10)}
 
-\textit{Note: Sections 1-10 provide foundational knowledge. The main focus of this document is Intermediate (11-20) and Advanced (21+) topics.}
+\textit{Comprehensive foundational coverage with hands-on examples and exercises to build strong SystemVerilog fundamentals.}
 
 % ============================================================================
 \section{Introduction to SystemVerilog}
 
 \subsection{What is SystemVerilog?}
 
-SystemVerilog is a hardware description and verification language that combines:
+SystemVerilog is a unified hardware description and verification language standardized as IEEE 1800. It combines multiple paradigms:
+
 \begin{itemize}
-  \item \textbf{Verilog HDL}: For hardware design
-  \item \textbf{Object-Oriented Programming}: Classes, inheritance, polymorphism
-  \item \textbf{Advanced Verification}: Constraints, coverage, assertions
-  \item \textbf{Interface Modeling}: Abstract communication protocols
+  \item \textbf{Verilog HDL}: For synthesizable hardware design (RTL)
+  \item \textbf{Object-Oriented Programming}: Classes, inheritance, polymorphism for testbenches
+  \item \textbf{Advanced Verification}: Constraints, coverage, assertions for comprehensive verification
+  \item \textbf{Interface Modeling}: Abstract communication protocols and modular connectivity
+  \item \textbf{Direct Programming Interface (DPI)}: Integration with C/C++ for performance-critical tasks
 \end{itemize}
+
+\subsection{SystemVerilog vs Verilog}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Feature} & \textbf{Verilog} & \textbf{SystemVerilog} \\
+\hline
+Data Types & reg, wire, integer & logic, bit, byte, int, enum, struct, class \\
+Verification & Limited testbench features & Full OOP, constrained random, coverage \\
+Interfaces & Module ports only & Interface construct with modports \\
+Assertions & None & SVA (SystemVerilog Assertions) \\
+Procedural Blocks & always & always\_ff, always\_comb, always\_latch \\
+\hline
+\end{tabular}
+\caption{Verilog vs SystemVerilog Comparison}
+\end{table}
 
 \subsection{Why Learn SystemVerilog?}
 
 \begin{itemize}
-  \item Industry standard for ASIC and FPGA verification
-  \item Unified language for design and verification
-  \item Required for UVM (Universal Verification Methodology)
-  \item Strong job market demand
-  \item Powerful features for complex systems
+  \item \textbf{Industry Standard}: 95\%+ of semiconductor companies use SystemVerilog
+  \item \textbf{Unified Language}: Single language for design and verification
+  \item \textbf{UVM Requirement}: Universal Verification Methodology is built on SystemVerilog
+  \item \textbf{Job Market}: High demand for SystemVerilog skills (ASIC/FPGA/Verification)
+  \item \textbf{Powerful Features}: Advanced language constructs for complex systems
+  \item \textbf{Tool Support}: Supported by all major EDA vendors (Synopsys, Cadence, Mentor/Siemens)
 \end{itemize}
+
+\subsection{First SystemVerilog Program}
+
+\begin{lstlisting}[caption={Hello World in SystemVerilog}]
+// Simple module demonstrating basic SystemVerilog
+module hello_world;
+    // Initial block - executes once at time 0
+    initial begin
+        $display("Hello, SystemVerilog!");
+        $display("Simulation time: %0t", $time);
+
+        // Display system information
+        $display("This is module: %m");
+
+        // Formatted output
+        int value = 42;
+        $display("The answer is %0d (hex: 0x%0h, binary: %0b)",
+                 value, value, value);
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 1: Your First Module}
+
+Create a module named \texttt{introduction} that:
+\begin{itemize}
+    \item Displays your name
+    \item Shows the current simulation time
+    \item Declares an integer variable with value 100
+    \item Displays the variable in decimal, hexadecimal, and binary formats
+\end{itemize}
+\end{exercisebox}
+
+\begin{solutionbox}
+\textbf{Solution to Exercise 1:}
+
+\begin{lstlisting}
+module introduction;
+    initial begin
+        $display("My name is: Student");
+        $display("Simulation time: %0t ns", $time);
+
+        int my_value = 100;
+        $display("Decimal: %0d", my_value);
+        $display("Hexadecimal: 0x%0h", my_value);
+        $display("Binary: %0b", my_value);
+    end
+endmodule
+\end{lstlisting}
+\end{solutionbox}
 
 % ============================================================================
 \section{Basic Data Types}
 
-\subsection{Two-State vs Four-State}
+\subsection{Two-State vs Four-State Types}
+
+SystemVerilog provides two categories of data types:
+
+\textbf{Two-State Types} (0, 1 only):
+\begin{itemize}
+    \item Faster simulation (less memory, simpler logic)
+    \item Used in testbenches where X/Z are not needed
+    \item Types: \texttt{bit}, \texttt{byte}, \texttt{shortint}, \texttt{int}, \texttt{longint}
+\end{itemize}
+
+\textbf{Four-State Types} (0, 1, X, Z):
+\begin{itemize}
+    \item Model hardware reality (unknown/high-impedance states)
+    \item Required for synthesizable RTL design
+    \item Types: \texttt{logic}, \texttt{reg}, \texttt{wire}
+    \item X = unknown/uninitialized, Z = high impedance (tri-state)
+\end{itemize}
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|l|l|l|}
 \hline
-\textbf{Type} & \textbf{States} & \textbf{Use Case} \\
+\textbf{Type} & \textbf{States} & \textbf{Size} & \textbf{Use Case} \\
 \hline
-\texttt{bit} & 0, 1 & Testbenches, fast simulation \\
-\texttt{byte} & 0, 1 & 8-bit signed integer \\
-\texttt{int} & 0, 1 & 32-bit signed integer \\
-\texttt{logic} & 0, 1, X, Z & Hardware signals \\
-\texttt{reg} & 0, 1, X, Z & Legacy Verilog (use logic) \\
+\texttt{bit} & 2 (0, 1) & 1-bit & Single bit, testbench \\
+\texttt{byte} & 2 (0, 1) & 8-bit signed & Small integers \\
+\texttt{shortint} & 2 (0, 1) & 16-bit signed & Medium integers \\
+\texttt{int} & 2 (0, 1) & 32-bit signed & Default integer \\
+\texttt{longint} & 2 (0, 1) & 64-bit signed & Large integers \\
+\texttt{logic} & 4 (0, 1, X, Z) & User-defined & Hardware signals (preferred) \\
+\texttt{reg} & 4 (0, 1, X, Z) & User-defined & Legacy (use logic instead) \\
+\texttt{wire} & 4 (0, 1, X, Z) & User-defined & Continuous assignment \\
 \hline
 \end{tabular}
-\caption{Common Data Types}
+\caption{SystemVerilog Data Types}
 \end{table}
 
-\begin{lstlisting}[caption={Basic Data Type Examples}]
-module data_types_intro;
+\subsection{Comprehensive Data Type Examples}
+
+\begin{lstlisting}[caption={Complete Data Type Demonstration}]
+module data_types_comprehensive;
     // Two-state types (faster simulation)
-    bit        single_bit;        // 0 or 1
-    bit [7:0]  byte_val;          // 8-bit vector
-    int        signed_int = -42;  // 32-bit signed
+    bit        flag;                // Single bit: 0 or 1
+    bit [7:0]  unsigned_byte;       // 8-bit unsigned vector
+    byte       signed_byte = -5;    // 8-bit signed (-128 to 127)
+    shortint   small_int = -1000;   // 16-bit signed
+    int        standard_int = -42;  // 32-bit signed
+    longint    big_int = 64'h123456789ABCDEF; // 64-bit signed
 
     // Four-state types (hardware modeling)
-    logic      signal;            // Can be 0, 1, X, Z
-    logic [15:0] address;         // 16-bit bus
+    logic      signal;              // Can be 0, 1, X, Z
+    logic [15:0] address;           // 16-bit bus
+    logic [31:0] data_bus = 32'hXXXX_XXXX;  // Initialized to X
 
-    // String
+    // String and real types
     string     message = "Hello, SystemVerilog!";
+    real       voltage = 3.3;       // Double precision
+    shortreal  temperature = 25.5;  // Single precision
 
-    // Real numbers
-    real       voltage = 3.3;
-    shortreal  temperature = 25.5;
+    // Signed vs unsigned
+    bit [7:0]  unsigned_val = 8'd200;  // Unsigned: 0 to 255
+    int signed signed_val = -100;      // Signed: -2^31 to 2^31-1
 
     initial begin
-        $display("Int value: %0d", signed_int);
+        $display("=== Two-State Types ===");
+        $display("flag = %b", flag);
+        $display("signed_byte = %0d", signed_byte);
+        $display("small_int = %0d", small_int);
+        $display("standard_int = %0d", standard_int);
+        $display("big_int = 0x%0h", big_int);
+
+        $display("\n=== Four-State Types ===");
+        signal = 1'bX;
+        $display("signal = %b (X state)", signal);
+        signal = 1'bZ;
+        $display("signal = %b (Z state)", signal);
+        $display("data_bus = 0x%h", data_bus);
+
+        $display("\n=== String and Real ===");
         $display("Message: %s", message);
         $display("Voltage: %0.2f V", voltage);
+        $display("Temperature: %0.1f C", temperature);
+
+        $display("\n=== Signed vs Unsigned ===");
+        $display("Unsigned (8'd200) = %0d", unsigned_val);
+        $display("Signed (-100) = %0d", signed_val);
+
+        // Demonstrate overflow
+        unsigned_val = 255;
+        unsigned_val = unsigned_val + 1;  // Wraps to 0
+        $display("255 + 1 (unsigned 8-bit) = %0d", unsigned_val);
     end
 endmodule
 \end{lstlisting}
+
+\subsection{Type Casting}
+
+\begin{lstlisting}[caption={Type Casting Examples}]
+module type_casting;
+    int       int_val = 100;
+    real      real_val = 3.14159;
+    bit [7:0] vector;
+    logic [15:0] wide_bus;
+
+    initial begin
+        // Implicit casting
+        real_val = int_val;  // int -> real: 100.0
+        $display("Int %0d -> Real %0.2f", int_val, real_val);
+
+        // Explicit casting
+        int_val = int'(real_val);  // real -> int: 3
+        $display("Real %0.2f -> Int %0d", real_val, int_val);
+
+        // Vector to integer
+        vector = 8'hAB;
+        int_val = int'(vector);
+        $display("Vector 0x%h -> Int %0d", vector, int_val);
+
+        // Resizing (truncation and extension)
+        wide_bus = 16'h1234;
+        vector = wide_bus[7:0];  // Truncate: takes lower 8 bits
+        $display("Truncate 0x%h -> 0x%h", wide_bus, vector);
+
+        vector = 8'h42;
+        wide_bus = {8'h00, vector};  // Extend with zero padding
+        $display("Extend 0x%h -> 0x%h", vector, wide_bus);
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 2: Data Type Practice}
+
+Create a module that demonstrates:
+\begin{itemize}
+    \item Declaration of at least one variable of each type (bit, byte, int, logic, real)
+    \item Assignment of values to each variable
+    \item Display each variable in appropriate format (decimal, hex, binary)
+    \item Demonstrate casting between int and real
+    \item Show what happens with arithmetic overflow for a byte variable
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 3: Understanding X and Z}
+
+Write a module that:
+\begin{itemize}
+    \item Declares a logic variable and assigns X to it
+    \item Performs arithmetic operations with X (e.g., X + 1)
+    \item Displays the result to understand X propagation
+    \item Demonstrates the difference between bit and logic when uninitialized
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 1: Data Types}
+
+\begin{enumerate}
+    \item What is the difference between \texttt{bit} and \texttt{logic}?
+    \item What is the range of values for \texttt{byte} type?
+    \item When should you use two-state types vs four-state types?
+    \item What happens when you add 1 to a byte variable with value 127?
+    \item What does X represent in four-state logic?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item \texttt{bit}: Two-state (0, 1), faster simulation. \texttt{logic}: Four-state (0, 1, X, Z), models hardware reality
+    \item -128 to +127 (8-bit signed integer)
+    \item Two-state for testbenches/software models; four-state for synthesizable RTL where X/Z states matter
+    \item Result is 128 for byte (signed); it's still within range. 255 + 1 = -128 (wraps around)
+    \item X = unknown or uninitialized value; used to catch design errors in simulation
+\end{enumerate}
+\end{quizbox}
 
 % ============================================================================
 \section{Operators and Expressions}
@@ -370,6 +575,83 @@ module bitwise_examples;
 endmodule
 \end{lstlisting}
 
+\subsection{Logical and Comparison Operators}
+
+\begin{lstlisting}[caption={Logical and Comparison Examples}]
+module comparison_operators;
+    int a = 10, b = 20;
+    logic result;
+
+    initial begin
+        // Comparison operators
+        result = (a == b);  // Equality: 0
+        result = (a != b);  // Inequality: 1
+        result = (a < b);   // Less than: 1
+        result = (a > b);   // Greater than: 0
+        result = (a <= b);  // Less or equal: 1
+        result = (a >= b);  // Greater or equal: 0
+
+        // Logical operators
+        result = (a < 15) && (b > 15);  // AND: 1
+        result = (a < 5) || (b > 15);   // OR: 1
+        result = !(a == b);              // NOT: 1
+
+        // Conditional operator
+        result = (a < b) ? 1'b1 : 1'b0;  // Ternary: 1
+
+        $display("a=%0d, b=%0d", a, b);
+        $display("a == b: %b", a == b);
+        $display("a < b: %b", a < b);
+        $display("(a < b) ? 1 : 0 = %b", (a < b) ? 1'b1 : 1'b0);
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 4: Operator Practice}
+
+Create a calculator module that:
+\begin{itemize}
+    \item Takes two 8-bit inputs and a 3-bit opcode
+    \item Implements arithmetic (+, -, *, /, \%), bitwise (\&, |, \^{}), and shift (<<, >>) operations
+    \item Displays the result in decimal, hex, and binary
+    \item Uses case statement for opcode selection
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 5: Parity Generator}
+
+Design a parity generator that:
+\begin{itemize}
+    \item Takes an 8-bit input
+    \item Computes even parity using reduction XOR
+    \item Computes odd parity
+    \item Displays results showing how XOR reduction works
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 2: Operators}
+
+\begin{enumerate}
+    \item What is the difference between \& and \&\& operators?
+    \item What does the reduction operator \^{} do?
+    \item What is the result of 10 / 3 in SystemVerilog (integer division)?
+    \item How does the ternary operator ?: work?
+    \item What's the difference between = and == ?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item \& is bitwise AND (operates on each bit); \&\& is logical AND (returns boolean)
+    \item XOR reduction: XORs all bits together; commonly used for parity calculation
+    \item Result is 3 (integer division truncates decimal part)
+    \item condition ? true\_value : false\_value - returns true\_value if condition is true, else false\_value
+    \item = is assignment (stores value); == is comparison (returns true/false)
+\end{enumerate}
+\end{quizbox}
+
 % ============================================================================
 \section{Procedural Blocks}
 
@@ -406,6 +688,39 @@ module always_block_types(
     end
 endmodule
 \end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 6: D Flip-Flop with Reset}
+
+Create a parameterized D flip-flop module:
+\begin{itemize}
+    \item Parameter for data width (default 8 bits)
+    \item Asynchronous active-low reset
+    \item Use always\_ff for sequential logic
+    \item Include a testbench that demonstrates reset and normal operation
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 3: Procedural Blocks}
+
+\begin{enumerate}
+    \item What is the difference between always\_ff, always\_comb, and always\_latch?
+    \item Should you use blocking (=) or non-blocking (<=) assignments in always\_ff blocks?
+    \item Why are latches generally avoided in digital design?
+    \item What is the difference between @ and @*?
+    \item Can you have multiple always blocks in one module?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item always\_ff: sequential (flip-flops); always\_comb: combinational; always\_latch: latches (avoid)
+    \item Non-blocking (<=) for sequential logic to avoid race conditions
+    \item Latches are timing-sensitive, harder to test, cause glitches, and are generally not desired in synchronous designs
+    \item @ requires sensitivity list; @* automatically includes all variables read in the block
+    \item Yes, multiple always blocks can exist, each describes separate hardware
+\end{enumerate}
+\end{quizbox}
 
 % ============================================================================
 \section{Control Flow}
@@ -475,6 +790,51 @@ module alu(
 endmodule
 \end{lstlisting}
 
+\begin{exercisebox}
+\textbf{Exercise 7: Priority Encoder vs MUX}
+
+Create two modules:
+\begin{itemize}
+    \item 8-to-3 priority encoder using if-else (as shown above)
+    \item 8-to-1 multiplexer using case statement
+    \item Compare the synthesized hardware (conceptually)
+    \item Testbench that verifies both modules
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 8: State Machine}
+
+Design a simple traffic light controller using case statement:
+\begin{itemize}
+    \item States: GREEN, YELLOW, RED
+    \item Transitions on clock edges
+    \item Timing: GREEN (10 cycles), YELLOW (3 cycles), RED (10 cycles)
+    \item Use enumerated types for states
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 4: Control Flow}
+
+\begin{enumerate}
+    \item When should you use if-else vs case statements?
+    \item What is the purpose of the default clause in a case statement?
+    \item What's the difference between case and casez?
+    \item Can you use if-else in always\_comb blocks?
+    \item What happens if you don't cover all cases in a case statement?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item if-else: priority logic, ranges; case: parallel matching, discrete values, state machines
+    \item default: handles all unspecified cases, prevents latches in combinational logic
+    \item casez treats Z and ? as don't-cares; useful for wildcard matching
+    \item Yes, if-else works in all procedural blocks (always\_comb, always\_ff, always\_latch)
+    \item Without default, may infer latches (in comb logic) or X propagation (simulation)
+\end{enumerate}
+\end{quizbox}
+
 % ============================================================================
 \section{Loops}
 
@@ -525,6 +885,51 @@ module while_examples;
 endmodule
 \end{lstlisting}
 
+\begin{exercisebox}
+\textbf{Exercise 9: Fibonacci Generator}
+
+Create a module that generates the first N Fibonacci numbers:
+\begin{itemize}
+    \item Use a for loop to generate the sequence
+    \item Store results in an array
+    \item Display all values at the end
+    \item Make N a parameter (default 10)
+\end{itemize}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 10: Matrix Multiplication}
+
+Implement 2x2 matrix multiplication:
+\begin{itemize}
+    \item Use nested for loops
+    \item Declare matrices as 2D arrays
+    \item Display input matrices and result
+    \item Verify with known test case
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 5: Loops}
+
+\begin{enumerate}
+    \item What's the difference between for and while loops?
+    \item Can you declare loop variables inside for statements?
+    \item What's the difference between repeat and for loops?
+    \item When would you use a do-while loop instead of a while loop?
+    \item Can loops be used in synthesizable RTL?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item for: known iteration count; while: condition-based, unknown iterations
+    \item Yes, SystemVerilog allows: \texttt{for (int i = 0; ...)} with local scope
+    \item repeat: fixed count, simpler syntax; for: more flexible with counter access
+    \item do-while: guarantees at least one execution before checking condition
+    \item Yes, but must have fixed bounds determinable at synthesis time; used for generate blocks
+\end{enumerate}
+\end{quizbox}
+
 % ============================================================================
 \section{Functions and Tasks - Brief Introduction}
 
@@ -562,6 +967,39 @@ module task_example;
     end
 endmodule
 \end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 11: Function vs Task}
+
+Create a module demonstrating function and task differences:
+\begin{itemize}
+    \item Function that computes factorial (returns value, no timing)
+    \item Task that displays countdown with delays (no return, has timing)
+    \item Call both from initial block
+    \item Explain why factorial can't be a task
+\end{itemize}
+\end{exercisebox}
+
+\begin{quizbox}
+\textbf{Quiz 6: Functions and Tasks}
+
+\begin{enumerate}
+    \item What is the main difference between functions and tasks?
+    \item Can functions have timing controls (\#, @, wait)?
+    \item Can tasks return values?
+    \item When should you use a function vs a task?
+    \item Can functions call other functions?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item Functions: return value, no timing, used in expressions. Tasks: no return, can have timing, procedural
+    \item No, functions execute in zero time (combinational)
+    \item Tasks don't return values directly, but can modify output/inout arguments
+    \item Function: computation/combinational logic. Task: sequences with delays, multiple outputs
+    \item Yes, functions can call other functions
+\end{enumerate}
+\end{quizbox}
 
 % ============================================================================
 \section{Structures and Unions}
@@ -603,6 +1041,170 @@ module structure_examples;
 endmodule
 \end{lstlisting}
 
+\subsection{Unions - Overlapping Memory}
+
+\begin{lstlisting}[caption={Union Examples}]
+module union_examples;
+    // Tagged union for variant types
+    typedef union packed {
+        logic [31:0] as_int;
+        logic [15:0] as_short[2];
+        logic [7:0]  as_bytes[4];
+    } data_view_t;
+
+    initial begin
+        data_view_t value;
+        value.as_int = 32'hDEADBEEF;
+
+        $display("As integer: 0x%h", value.as_int);
+        $display("As shorts: [0x%h, 0x%h]",
+                 value.as_short[0], value.as_short[1]);
+        $display("As bytes: [0x%h, 0x%h, 0x%h, 0x%h]",
+                 value.as_bytes[0], value.as_bytes[1],
+                 value.as_bytes[2], value.as_bytes[3]);
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 12: AXI-Lite Transaction Structure}
+
+Create a packed structure for an AXI-Lite write transaction containing:
+\begin{itemize}
+    \item 32-bit address
+    \item 32-bit data
+    \item 4-bit write strobe (byte enables)
+    \item valid bit
+\end{itemize}
+
+Create a module that initializes the structure and displays it as a hex value.
+\end{exercisebox}
+
+\begin{solutionbox}
+\textbf{Solution to Exercise 12:}
+\begin{lstlisting}
+module axi_lite_transaction;
+    // AXI-Lite write transaction structure
+    typedef struct packed {
+        logic        valid;      // 1 bit
+        logic [3:0]  wstrb;      // 4 bits - byte enables
+        logic [31:0] wdata;      // 32 bits
+        logic [31:0] waddr;      // 32 bits
+    } axi_write_t;  // Total: 69 bits
+
+    initial begin
+        axi_write_t transaction;
+
+        // Initialize transaction
+        transaction.valid = 1'b1;
+        transaction.waddr = 32'h1000_0004;
+        transaction.wdata = 32'hDEAD_BEEF;
+        transaction.wstrb = 4'b1111;  // All bytes enabled
+
+        $display("AXI Write Transaction:");
+        $display("  Address: 0x%h", transaction.waddr);
+        $display("  Data:    0x%h", transaction.wdata);
+        $display("  Strobe:  0b%b", transaction.wstrb);
+        $display("  Valid:   %b", transaction.valid);
+        $display("  As packed value: 0x%h", transaction);
+
+        // Partial write example
+        transaction.waddr = 32'h2000_0008;
+        transaction.wdata = 32'h0000_CAFE;
+        transaction.wstrb = 4'b0011;  // Only lower 2 bytes
+
+        $display("\nPartial Write (lower 2 bytes only):");
+        $display("  Address: 0x%h", transaction.waddr);
+        $display("  Data:    0x%h (strobe: 0b%b)",
+                 transaction.wdata, transaction.wstrb);
+    end
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\begin{exercisebox}
+\textbf{Exercise 13: RGB Pixel Structure}
+
+Create a packed structure for an RGB pixel with:
+\begin{itemize}
+    \item 8-bit red component
+    \item 8-bit green component
+    \item 8-bit blue component
+\end{itemize}
+
+Write a function that takes this structure and returns the grayscale value using the formula: $gray = 0.299R + 0.587G + 0.114B$
+\end{exercisebox}
+
+\begin{solutionbox}
+\textbf{Solution to Exercise 13:}
+\begin{lstlisting}
+module rgb_pixel;
+    typedef struct packed {
+        logic [7:0] red;
+        logic [7:0] green;
+        logic [7:0] blue;
+    } pixel_t;  // 24 bits total
+
+    // Function to convert RGB to grayscale
+    function automatic logic [7:0] to_grayscale(pixel_t pixel);
+        real r_contrib, g_contrib, b_contrib;
+        real gray_real;
+
+        r_contrib = pixel.red * 0.299;
+        g_contrib = pixel.green * 0.587;
+        b_contrib = pixel.blue * 0.114;
+
+        gray_real = r_contrib + g_contrib + b_contrib;
+        to_grayscale = logic [7:0]'(gray_real);
+    endfunction
+
+    initial begin
+        pixel_t pure_red, pure_green, pure_blue, white, black, custom;
+
+        // Test colors
+        pure_red   = '{red: 255, green: 0,   blue: 0};
+        pure_green = '{red: 0,   green: 255, blue: 0};
+        pure_blue  = '{red: 0,   green: 0,   blue: 255};
+        white      = '{red: 255, green: 255, blue: 255};
+        black      = '{red: 0,   green: 0,   blue: 0};
+        custom     = '{red: 128, green: 64,  blue: 200};
+
+        $display("RGB to Grayscale Conversion:");
+        $display("Pure Red   (255,0,0):       %0d", to_grayscale(pure_red));
+        $display("Pure Green (0,255,0):       %0d", to_grayscale(pure_green));
+        $display("Pure Blue  (0,0,255):       %0d", to_grayscale(pure_blue));
+        $display("White      (255,255,255):   %0d", to_grayscale(white));
+        $display("Black      (0,0,0):         %0d", to_grayscale(black));
+        $display("Custom     (128,64,200):    %0d", to_grayscale(custom));
+
+        // Display as packed 24-bit value
+        $display("\nCustom pixel as hex: 0x%h", custom);
+    end
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\begin{quizbox}
+\textbf{Quiz 7: Structures and Unions}
+
+\begin{enumerate}
+    \item What is the main difference between packed and unpacked structures?
+    \item Can you assign a packed structure to a logic vector of the same size?
+    \item What happens when you write to one field of a union and read from another?
+    \item How do you calculate the total bit width of a packed structure?
+    \item When should you use a structure vs. a simple logic vector?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item Packed structures are stored contiguously in memory and can be treated as a single vector. Unpacked structures have fields stored separately with potential padding.
+    \item Yes, packed structures can be directly assigned to/from logic vectors of matching size.
+    \item You read the overlapping memory bits interpreted according to the new field's type - this is called type punning or reinterpretation.
+    \item Sum all the bit widths of individual fields (e.g., 8+8+16=32 bits total).
+    \item Use structures when you have logically related fields that benefit from named access. Use simple vectors for raw data without semantic meaning.
+\end{enumerate}
+\end{quizbox}
+
 % ============================================================================
 \section{Enumerations}
 
@@ -643,6 +1245,261 @@ module enum_examples;
 endmodule
 \end{lstlisting}
 
+\subsection{Enumeration Methods}
+
+\begin{lstlisting}[caption={Enum Methods - next(), prev(), first(), last()}]
+module enum_methods;
+    typedef enum {MON, TUE, WED, THU, FRI, SAT, SUN} day_t;
+
+    initial begin
+        day_t today, tomorrow, yesterday;
+
+        today = WED;
+        tomorrow = today.next();
+        yesterday = today.prev();
+
+        $display("Today: %s", today.name());
+        $display("Tomorrow: %s", tomorrow.name());
+        $display("Yesterday: %s", yesterday.name());
+
+        // Iterate through all days
+        day_t d = d.first();
+        $display("\nAll days:");
+        do begin
+            $display("  %s", d.name());
+            d = d.next();
+        end while (d != d.first());
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 14: Vending Machine State Machine}
+
+Create an enumeration for vending machine states:
+\begin{itemize}
+    \item IDLE - waiting for coins
+    \item COIN\_25 - received 25 cents
+    \item COIN\_50 - received 50 cents
+    \item COIN\_75 - received 75 cents
+    \item DISPENSE - dispensing product
+\end{itemize}
+
+Implement a simple state machine that:
+\begin{enumerate}
+    \item Starts in IDLE
+    \item Accepts 25-cent inputs
+    \item Transitions through states
+    \item Dispenses at 75 cents
+    \item Returns to IDLE after dispensing
+\end{enumerate}
+\end{exercisebox}
+
+\begin{solutionbox}
+\textbf{Solution to Exercise 14:}
+\begin{lstlisting}
+module vending_machine;
+    typedef enum logic [2:0] {
+        IDLE      = 3'b000,
+        COIN_25   = 3'b001,
+        COIN_50   = 3'b010,
+        COIN_75   = 3'b011,
+        DISPENSE  = 3'b100
+    } state_t;
+
+    state_t current_state, next_state;
+    logic insert_coin;  // 1 = insert 25 cents
+
+    // State register
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            current_state <= IDLE;
+        else
+            current_state <= next_state;
+    end
+
+    // Next state logic
+    always_comb begin
+        next_state = current_state;  // Default: stay in current state
+
+        case (current_state)
+            IDLE: begin
+                if (insert_coin)
+                    next_state = COIN_25;
+            end
+
+            COIN_25: begin
+                if (insert_coin)
+                    next_state = COIN_50;
+            end
+
+            COIN_50: begin
+                if (insert_coin)
+                    next_state = COIN_75;
+            end
+
+            COIN_75: begin
+                next_state = DISPENSE;  // Auto-dispense
+            end
+
+            DISPENSE: begin
+                next_state = IDLE;  // Return to idle
+            end
+
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // Output logic
+    logic dispense_product;
+    assign dispense_product = (current_state == DISPENSE);
+
+    // Simulation testbench
+    logic clk, rst_n;
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        $display("Vending Machine Simulation");
+        $display("---------------------------");
+
+        rst_n = 0; insert_coin = 0;
+        #10 rst_n = 1;
+
+        // Insert three coins
+        repeat(3) begin
+            #10 insert_coin = 1;
+            #10 insert_coin = 0;
+            $display("Time %0t: State = %s, Dispense = %b",
+                     $time, current_state.name(), dispense_product);
+        end
+
+        #20 $display("Time %0t: State = %s, Dispense = %b",
+                     $time, current_state.name(), dispense_product);
+
+        #10 $finish;
+    end
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\begin{exercisebox}
+\textbf{Exercise 15: Command Decoder with Enum}
+
+Create a typed enumeration for CPU instructions:
+\begin{itemize}
+    \item ADD = 0x00
+    \item SUB = 0x01
+    \item MUL = 0x02
+    \item DIV = 0x03
+    \item LOAD = 0x10
+    \item STORE = 0x11
+    \item JUMP = 0x20
+    \item HALT = 0xFF
+\end{itemize}
+
+Write a function that takes an 8-bit opcode and returns the instruction name as a string.
+\end{exercisebox}
+
+\begin{solutionbox}
+\textbf{Solution to Exercise 15:}
+\begin{lstlisting}
+module command_decoder;
+    typedef enum logic [7:0] {
+        ADD   = 8'h00,
+        SUB   = 8'h01,
+        MUL   = 8'h02,
+        DIV   = 8'h03,
+        LOAD  = 8'h10,
+        STORE = 8'h11,
+        JUMP  = 8'h20,
+        HALT  = 8'hFF
+    } opcode_t;
+
+    // Function to decode opcode
+    function automatic string decode_instruction(logic [7:0] opcode);
+        if (!$cast(decode_instruction, opcode_t'(opcode))) begin
+            // Cast failed - invalid opcode
+            return $sformatf("UNKNOWN(0x%h)", opcode);
+        end else begin
+            opcode_t op = opcode_t'(opcode);
+            return op.name();
+        end
+    endfunction
+
+    // Alternative implementation using case
+    function automatic string decode_with_case(logic [7:0] opcode);
+        opcode_t op;
+        if ($cast(op, opcode)) begin
+            case (op)
+                ADD:   return "ADD";
+                SUB:   return "SUB";
+                MUL:   return "MUL";
+                DIV:   return "DIV";
+                LOAD:  return "LOAD";
+                STORE: return "STORE";
+                JUMP:  return "JUMP";
+                HALT:  return "HALT";
+                default: return "INVALID";
+            endcase
+        end else begin
+            return $sformatf("UNKNOWN(0x%h)", opcode);
+        end
+    endfunction
+
+    initial begin
+        logic [7:0] test_opcodes[8];
+
+        test_opcodes = '{8'h00, 8'h01, 8'h10, 8'h11,
+                         8'h20, 8'hFF, 8'h99, 8'h05};
+
+        $display("Instruction Decoder Test");
+        $display("========================");
+
+        foreach (test_opcodes[i]) begin
+            $display("Opcode 0x%h: %s (using case: %s)",
+                     test_opcodes[i],
+                     decode_instruction(test_opcodes[i]),
+                     decode_with_case(test_opcodes[i]));
+        end
+
+        // Test enum methods
+        opcode_t instr = ADD;
+        $display("\nEnum traversal from ADD:");
+        $display("  Current: %s (0x%h)", instr.name(), instr);
+        instr = instr.next();
+        $display("  Next:    %s (0x%h)", instr.name(), instr);
+        $display("  First:   %s (0x%h)", instr.first().name(), instr.first());
+        $display("  Last:    %s (0x%h)", instr.last().name(), instr.last());
+    end
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\begin{quizbox}
+\textbf{Quiz 8: Enumerations}
+
+\begin{enumerate}
+    \item What is the difference between a basic enum and a typed enum (e.g., \texttt{enum logic [2:0]})?
+    \item What does the \texttt{.name()} method return for an enumeration value?
+    \item Can you use enumeration values in case statements?
+    \item What happens if you cast an invalid value to an enum type using \texttt{\$cast()}?
+    \item What are the advantages of using enums for state machines instead of parameters or defines?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item A basic enum uses default int type. A typed enum lets you specify the underlying type (e.g., logic [2:0]), which is important for hardware synthesis and bus widths.
+    \item The \texttt{.name()} method returns a string containing the symbolic name (e.g., "IDLE", "ACTIVE").
+    \item Yes, enums work perfectly in case statements and provide type safety and better readability than raw integer values.
+    \item \texttt{\$cast()} returns 0 (failure) if the value is not a valid enum member, allowing runtime validation.
+    \item Enums provide type safety, symbolic names in waveforms, \texttt{.name()} for debugging, \texttt{.next()/.prev()} methods, and prevent invalid state assignments at compile time.
+\end{enumerate}
+\end{quizbox}
+
 % ============================================================================
 \section{Fixed-Size Arrays}
 
@@ -676,6 +1533,271 @@ module fixed_array_examples;
     end
 endmodule
 \end{lstlisting}
+
+\subsection{Array Initialization Patterns}
+
+\begin{lstlisting}[caption={Array Initialization Techniques}]
+module array_initialization;
+    // Pattern initialization
+    int values[5] = '{10, 20, 30, 40, 50};
+
+    // Replicated initialization
+    bit flags[8] = '{8{1'b1}};  // All ones
+
+    // Default initialization
+    int data[4] = '{default: -1};
+
+    // Mixed initialization
+    logic [7:0] bytes[4] = '{0: 8'hAA, 2: 8'hBB, default: 8'h00};
+
+    initial begin
+        $display("Values: %p", values);
+        $display("Flags: %p", flags);
+        $display("Data: %p", data);
+        $display("Bytes: %p", bytes);
+
+        // Array copy
+        int copy[5];
+        copy = values;
+        $display("Copy: %p", copy);
+
+        // Array comparison
+        if (copy == values)
+            $display("Arrays are equal");
+    end
+endmodule
+\end{lstlisting}
+
+\begin{exercisebox}
+\textbf{Exercise 16: Memory Block Implementation}
+
+Implement a simple memory module with:
+\begin{itemize}
+    \item 256 locations
+    \item 32-bit data width
+    \item Write enable signal
+    \item 8-bit address
+    \item Synchronous write, asynchronous read
+\end{itemize}
+
+Initialize the first 4 locations with: 0xDEADBEEF, 0xCAFEBABE, 0x12345678, 0xABCDEF00
+\end{exercisebox}
+
+\begin{solutionbox}
+\textbf{Solution to Exercise 16:}
+\begin{lstlisting}
+module memory_block (
+    input  logic        clk,
+    input  logic        we,           // Write enable
+    input  logic [7:0]  addr,         // Address
+    input  logic [31:0] wdata,        // Write data
+    output logic [31:0] rdata         // Read data
+);
+    // Memory array: 256 locations x 32 bits
+    logic [31:0] mem [256];
+
+    // Initialize first 4 locations
+    initial begin
+        mem[0] = 32'hDEAD_BEEF;
+        mem[1] = 32'hCAFE_BABE;
+        mem[2] = 32'h1234_5678;
+        mem[3] = 32'hABCD_EF00;
+
+        // Initialize rest to zero
+        for (int i = 4; i < 256; i++) begin
+            mem[i] = 32'h0000_0000;
+        end
+    end
+
+    // Synchronous write
+    always_ff @(posedge clk) begin
+        if (we) begin
+            mem[addr] <= wdata;
+            $display("Write: mem[0x%h] = 0x%h", addr, wdata);
+        end
+    end
+
+    // Asynchronous read
+    assign rdata = mem[addr];
+
+endmodule
+
+// Testbench
+module memory_block_tb;
+    logic        clk;
+    logic        we;
+    logic [7:0]  addr;
+    logic [31:0] wdata;
+    logic [31:0] rdata;
+
+    memory_block dut (.*);
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Test sequence
+    initial begin
+        $display("Memory Block Test");
+        $display("=================\n");
+
+        we = 0; addr = 0; wdata = 0;
+        #10;
+
+        // Read initialized values
+        $display("Reading initialized values:");
+        for (int i = 0; i < 4; i++) begin
+            addr = i;
+            #1 $display("  mem[0x%h] = 0x%h", addr, rdata);
+        end
+
+        // Write new values
+        $display("\nWriting new values:");
+        we = 1;
+        addr = 8'h10; wdata = 32'h5555_AAAA; #10;
+        addr = 8'h20; wdata = 32'hFFFF_0000; #10;
+        we = 0;
+
+        // Read back
+        $display("\nReading back written values:");
+        addr = 8'h10; #1 $display("  mem[0x%h] = 0x%h", addr, rdata);
+        addr = 8'h20; #1 $display("  mem[0x%h] = 0x%h", addr, rdata);
+
+        #10 $finish;
+    end
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\begin{exercisebox}
+\textbf{Exercise 17: Image Convolution (3x3 Filter)}
+
+Implement a 3x3 convolution operation on a small image array:
+\begin{itemize}
+    \item Input: 5x5 array of 8-bit grayscale pixels
+    \item Kernel: 3x3 filter (e.g., edge detection or blur)
+    \item Output: 3x3 result (valid region after convolution)
+\end{itemize}
+
+Example edge detection kernel:
+\[
+\begin{bmatrix}
+-1 & -1 & -1 \\
+-1 &  8 & -1 \\
+-1 & -1 & -1
+\end{bmatrix}
+\]
+\end{exercisebox}
+
+\begin{solutionbox}
+\textbf{Solution to Exercise 17:}
+\begin{lstlisting}
+module image_convolution;
+    // Input image (5x5)
+    logic [7:0] image[5][5];
+
+    // 3x3 Edge detection kernel
+    int kernel[3][3] = '{
+        '{-1, -1, -1},
+        '{-1,  8, -1},
+        '{-1, -1, -1}
+    };
+
+    // Output (3x3 - valid convolution region)
+    logic [7:0] output_img[3][3];
+
+    // Function to perform 3x3 convolution at position (i,j)
+    function automatic int convolve(int row, int col);
+        int sum = 0;
+        for (int ki = 0; ki < 3; ki++) begin
+            for (int kj = 0; kj < 3; kj++) begin
+                int img_val = image[row + ki][col + kj];
+                sum += img_val * kernel[ki][kj];
+            end
+        end
+        // Clamp to 0-255 range
+        if (sum < 0) sum = 0;
+        if (sum > 255) sum = 255;
+        return sum;
+    endfunction
+
+    initial begin
+        // Initialize test image (gradient pattern)
+        for (int i = 0; i < 5; i++) begin
+            for (int j = 0; j < 5; j++) begin
+                image[i][j] = 8'(i * 16 + j * 8);
+            end
+        end
+
+        $display("Original Image (5x5):");
+        for (int i = 0; i < 5; i++) begin
+            $write("  ");
+            for (int j = 0; j < 5; j++) begin
+                $write("%3d ", image[i][j]);
+            end
+            $display("");
+        end
+
+        // Apply convolution (valid region: 3x3)
+        for (int i = 0; i < 3; i++) begin
+            for (int j = 0; j < 3; j++) begin
+                output_img[i][j] = convolve(i, j);
+            end
+        end
+
+        $display("\nAfter Edge Detection (3x3):");
+        for (int i = 0; i < 3; i++) begin
+            $write("  ");
+            for (int j = 0; j < 3; j++) begin
+                $write("%3d ", output_img[i][j]);
+            end
+            $display("");
+        end
+
+        // Alternative: Box blur kernel
+        int blur_kernel[3][3] = '{
+            '{1, 1, 1},
+            '{1, 1, 1},
+            '{1, 1, 1}
+        };
+
+        kernel = blur_kernel;
+
+        $display("\nBox Blur Kernel Applied:");
+        for (int i = 0; i < 3; i++) begin
+            for (int j = 0; j < 3; j++) begin
+                int blurred = convolve(i, j) / 9;  // Normalize
+                $write("%3d ", blurred);
+            end
+            $display("");
+        end
+    end
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\begin{quizbox}
+\textbf{Quiz 9: Fixed-Size Arrays}
+
+\begin{enumerate}
+    \item What is the difference between \texttt{int arr[10]} and \texttt{int [9:0] arr}?
+    \item How do you initialize all elements of an array to the same value?
+    \item Can you compare two arrays directly using the \texttt{==} operator in SystemVerilog?
+    \item What is the syntax for a multidimensional array (e.g., 4x8 matrix of bytes)?
+    \item How do array indices work in SystemVerilog - 0-based or arbitrary range?
+\end{enumerate}
+
+\textbf{Answers:}
+\begin{enumerate}
+    \item \texttt{int arr[10]} is an unpacked array of 10 integers (indexed 0-9). \texttt{int [9:0] arr} is a single integer with a 10-bit packed range - NOT an array.
+    \item Use replicated initialization: \texttt{int arr[8] = '\{8\{42\}\}} or default initialization: \texttt{int arr[8] = '\{default: 42\}}
+    \item Yes! SystemVerilog supports direct array comparison: \texttt{if (arr1 == arr2)} compares all elements.
+    \item \texttt{bit [7:0] matrix[4][8]} or \texttt{byte matrix[4][8]} creates a 4x8 array of bytes.
+    \item Unpacked array dimensions use 0-based indexing by default (e.g., \texttt{arr[0]} to \texttt{arr[9]}). Packed dimensions can use arbitrary ranges (e.g., \texttt{[15:0]}, \texttt{[7:0]}).
+\end{enumerate}
+\end{quizbox}
 
 \newpage
 % ============================================================================
