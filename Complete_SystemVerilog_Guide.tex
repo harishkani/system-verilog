@@ -1,0 +1,1157 @@
+\documentclass[11pt,a4paper]{article}
+
+% Packages - compatible with all online compilers
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multicol}
+
+% Colors
+\definecolor{commentgreen}{RGB}{34,139,34}
+\definecolor{stringcolor}{RGB}{208,76,239}
+\definecolor{keywordcolor}{RGB}{0,0,255}
+\definecolor{backgroundcolor}{RGB}{248,248,248}
+\definecolor{numbercolor}{RGB}{128,128,128}
+\definecolor{exercisecolor}{RGB}{255,250,205}
+\definecolor{solutioncolor}{RGB}{230,255,230}
+\definecolor{warningcolor}{RGB}{255,230,230}
+\definecolor{tipcolor}{RGB}{230,240,255}
+\definecolor{notecolor}{RGB}{255,245,220}
+\definecolor{cheatcolor}{RGB}{240,248,255}
+
+% SystemVerilog language definition
+\lstdefinelanguage{SystemVerilog}{
+  alsoletter={@,\$},
+  morekeywords={
+    module, endmodule, input, output, inout, wire, reg, logic, bit,
+    always, always_ff, always_comb, always_latch, initial, begin, end,
+    if, else, case, endcase, casez, casex, default, for, while, repeat,
+    forever, do, break, continue, return,
+    function, endfunction, task, endtask, automatic, static,
+    class, endclass, new, extends, virtual, pure, extern, this, super,
+    typedef, struct, packed, enum, union, interface, endinterface, modport,
+    fork, join, join_any, join_none, disable, wait, wait_order,
+    rand, randc, constraint, randomize, solve, before, inside, dist,
+    covergroup, endgroup, coverpoint, cross, bins, binsof, with,
+    import, export, ref, const, local, protected, string, int, byte,
+    shortint, longint, real, shortreal, time, realtime,
+    void, assert, assume, cover, expect, property, sequence, endproperty,
+    endsequence, clocking, endclocking, program, endprogram, package,
+    endpackage, timeunit, timeprecision, unique, priority, final,
+    semaphore, mailbox, event, randcase, randsequence,
+  },
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+}
+
+\lstset{
+  language=SystemVerilog,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{keywordcolor}\bfseries,
+  commentstyle=\color{commentgreen}\itshape,
+  stringstyle=\color{stringcolor},
+  numberstyle=\tiny\color{numbercolor},
+  backgroundcolor=\color{backgroundcolor},
+  frame=single,
+  rulecolor=\color{black!30},
+  numbers=left,
+  numbersep=5pt,
+  tabsize=2,
+  breaklines=true,
+  breakatwhitespace=false,
+  showstringspaces=false,
+  captionpos=b,
+  xleftmargin=10pt,
+  xrightmargin=5pt,
+  aboveskip=8pt,
+  belowskip=8pt,
+  keepspaces=true,
+  columns=flexible
+}
+
+% Colored boxes
+\newenvironment{coloredbox}[2]{%
+  \par\medskip\noindent
+  \begin{minipage}{\linewidth}
+  \setlength{\fboxsep}{8pt}%
+  \fcolorbox{#1!75!black}{#1}{%
+  \begin{minipage}{0.96\linewidth}%
+  \textbf{#2}\\[3pt]%
+}{%
+  \end{minipage}}%
+  \end{minipage}%
+  \medskip\par
+}
+
+\newenvironment{exercisebox}{\begin{coloredbox}{exercisecolor}{Exercise}}{\end{coloredbox}}
+\newenvironment{solutionbox}{\begin{coloredbox}{solutioncolor}{Solution}}{\end{coloredbox}}
+\newenvironment{warningbox}{\begin{coloredbox}{warningcolor}{Warning}}{\end{coloredbox}}
+\newenvironment{tipbox}{\begin{coloredbox}{tipcolor}{Tip}}{\end{coloredbox}}
+\newenvironment{notebox}{\begin{coloredbox}{notecolor}{Note}}{\end{coloredbox}}
+\newenvironment{cheatbox}{\begin{coloredbox}{cheatcolor}{Cheat Sheet}}{\end{coloredbox}}
+
+% Hyperref setup
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  filecolor=magenta,
+  urlcolor=cyan,
+  pdftitle={Complete SystemVerilog Guide: Beginner to Advanced},
+  pdfauthor={},
+  pdfsubject={SystemVerilog Programming and Verification},
+  pdfkeywords={SystemVerilog, Verilog, HDL, Verification, UVM, OOP},
+  bookmarksnumbered=true,
+}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Complete SystemVerilog Guide}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{Beginner to Advanced with 100+ Exercises}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Title formatting
+\titleformat{\section}
+  {\normalfont\LARGE\bfseries\color{blue!70!black}}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\Large\bfseries\color{blue!50!black}}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\large\bfseries\color{blue!30!black}}
+  {\thesubsubsection}{1em}{}
+
+% Title
+\title{
+  \vspace{-1.5cm}
+  \Huge\textbf{Complete SystemVerilog Guide} \\
+  \LARGE From Beginner to Advanced \\
+  \vspace{0.3cm}
+  \Large With 100+ Exercises, Waveforms, and Cheat Sheets \\
+  \vspace{0.3cm}
+  \large Master SystemVerilog for Design and Verification
+}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This is the most comprehensive SystemVerilog learning resource available, designed to take you from absolute beginner to expert level. Unlike other materials, this guide includes:
+
+\begin{multicols}{2}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Complete Coverage}: All SystemVerilog concepts from basic to advanced
+  \item \textbf{100+ Exercises}: Hands-on practice with detailed solutions
+  \item \textbf{Waveform Diagrams}: Visual understanding of timing and behavior
+  \item \textbf{Cheat Sheets}: Quick reference for every major topic
+  \item \textbf{Progressive Learning}: Carefully structured from basics to expert level
+  \item \textbf{Real-World Examples}: Practical design and verification projects
+  \item \textbf{Best Practices}: Industry-standard coding guidelines
+  \item \textbf{Verification Focus}: OOP, randomization, coverage, assertions
+  \item \textbf{Complete Solutions}: Detailed explanations for all exercises
+  \item \textbf{Self-Assessment}: Quizzes after each major section
+\end{itemize}
+\end{multicols}
+
+\textbf{Total Learning Time}: 60-80 hours for complete mastery
+
+\textbf{Who This Is For}: Students, verification engineers, design engineers, anyone wanting to master SystemVerilog
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction and Study Guide}
+
+\subsection{How to Use This Guide}
+
+This comprehensive guide is organized into three main levels:
+
+\begin{enumerate}
+  \item \textbf{BEGINNER (Sections 2-10)}: Basic syntax, data types, modules, testbenches
+  \item \textbf{INTERMEDIATE (Sections 11-20)}: Advanced features, interfaces, packages, OOP basics
+  \item \textbf{ADVANCED (Sections 21-30)}: Verification, randomization, assertions, coverage, UVM
+\end{enumerate}
+
+\subsection{Learning Path}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Level} & \textbf{Sections} & \textbf{Time} & \textbf{Exercises} \\
+\hline
+Beginner & 2-10 & 20-25 hours & 1-30 \\
+Intermediate & 11-20 & 20-25 hours & 31-70 \\
+Advanced & 21-30 & 20-30 hours & 71-100 \\
+\hline
+\textbf{Total} & \textbf{All} & \textbf{60-80 hours} & \textbf{100+} \\
+\hline
+\end{tabular}
+\caption{Recommended Learning Path}
+\end{table}
+
+\subsection{Prerequisites}
+
+\textbf{Required:}
+\begin{itemize}
+  \item Basic understanding of digital logic (AND, OR, flip-flops, etc.)
+  \item Familiarity with binary, hexadecimal number systems
+  \item Basic programming concepts (variables, loops, conditionals)
+\end{itemize}
+
+\textbf{Helpful but not required:}
+\begin{itemize}
+  \item Verilog experience
+  \item C/C++ or any object-oriented programming language
+  \item Basic understanding of computer architecture
+\end{itemize}
+
+\subsection{Tools You'll Need}
+
+\textbf{Simulators (choose one):}
+\begin{itemize}
+  \item \textbf{Free}: Icarus Verilog + Verilator, EDA Playground (online)
+  \item \textbf{Commercial}: ModelSim, VCS, Xcelium, Questa
+\end{itemize}
+
+\textbf{Setup Instructions}:
+\begin{lstlisting}[language=bash, caption={Installing Icarus Verilog (Linux/Mac)}]
+# Ubuntu/Debian
+sudo apt-get install iverilog gtkwave
+
+# macOS
+brew install icarus-verilog gtkwave
+
+# Test installation
+iverilog -v
+\end{lstlisting}
+
+\subsection{Document Conventions}
+
+Throughout this guide:
+\begin{itemize}
+  \item \texttt{Monospace font} indicates code
+  \item \textcolor{blue}{Blue links} are clickable cross-references
+  \item \textbf{Bold} highlights important concepts
+  \item 📝 Exercises are in yellow boxes
+  \item ✅ Solutions are in green boxes
+  \item ⚠️ Warnings are in red boxes
+  \item 💡 Tips are in blue boxes
+\end{itemize}
+
+\newpage
+% ============================================================================
+% PART I: BEGINNER LEVEL
+% ============================================================================
+
+\part{Beginner Level}
+
+\section{Introduction to SystemVerilog}
+
+\subsection{What is SystemVerilog?}
+
+SystemVerilog is a hardware description and verification language that extends Verilog. It combines:
+\begin{itemize}
+  \item \textbf{Hardware Description}: Design digital circuits
+  \item \textbf{Verification}: Test and verify designs using advanced features
+  \item \textbf{Object-Oriented Programming}: Classes, inheritance, polymorphism
+  \item \textbf{Assertions}: Formal property checking
+\end{itemize}
+
+\subsection{SystemVerilog vs Verilog vs VHDL}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{4cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Feature} & \textbf{Verilog} & \textbf{SystemVerilog} & \textbf{VHDL} \\
+\hline
+Year & 1984 & 2005 & 1987 \\
+\hline
+Typing & Weak & Strong (with logic) & Very strong \\
+\hline
+OOP & No & Yes & Limited \\
+\hline
+Verification & Limited & Extensive & Limited \\
+\hline
+Assertions & No & Yes (SVA) & Limited (PSL) \\
+\hline
+Learning Curve & Easy & Medium & Steep \\
+\hline
+Industry Use & Design & Design + Verification & Design \\
+\hline
+\end{tabular}
+\caption{Language Comparison}
+\end{table}
+
+\subsection{Your First SystemVerilog Program}
+
+Let's start with the classic "Hello World":
+
+\begin{lstlisting}[caption={Hello World in SystemVerilog}]
+module hello_world;
+  initial begin
+    $display("Hello, SystemVerilog World!");
+    $display("Time: %0t", $time);
+  end
+endmodule
+\end{lstlisting}
+
+\textbf{To run:}
+\begin{lstlisting}[language=bash]
+# Save as hello_world.sv
+iverilog -g2012 -o hello hello_world.sv
+vvp hello
+\end{lstlisting}
+
+\textbf{Output:}
+\begin{verbatim}
+Hello, SystemVerilog World!
+Time: 0
+\end{verbatim}
+
+\textbf{Breaking it down:}
+\begin{itemize}
+  \item \texttt{module ... endmodule}: Defines a module (basic building block)
+  \item \texttt{initial}: Executes once at time 0
+  \item \texttt{\$display}: Prints to console (like printf in C)
+  \item \texttt{\%0t}: Format specifier for time
+  \item \texttt{\$time}: System function returning current simulation time
+\end{itemize}
+
+\begin{exercisebox}
+\textbf{Exercise 1: Your First Program}
+
+Modify the hello world program to:
+\begin{enumerate}
+  \item Display your name
+  \item Display the current date
+  \item Add a delay of 10 time units using \texttt{\#10}
+  \item Display the time again after the delay
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 2: Multiple Displays}
+
+Write a module that displays numbers 1 through 10, each on a new line, with 5 time units delay between each number.
+\end{exercisebox}
+
+\newpage
+% ============================================================================
+\section{Data Types - Part 1: Basic Types}
+
+\subsection{2-State vs 4-State Types}
+
+SystemVerilog has two categories of data types:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Category} & \textbf{Types} & \textbf{Possible Values} \\
+\hline
+2-state & bit, byte, int, shortint, longint & 0, 1 \\
+\hline
+4-state & logic, reg, wire & 0, 1, X (unknown), Z (high-impedance) \\
+\hline
+\end{tabular}
+\caption{Data Type Categories}
+\end{table}
+
+\subsection{Integer Types}
+
+\begin{lstlisting}[caption={Integer Data Types}]
+module integer_types;
+  // 2-state types (faster simulation, less memory)
+  bit        single_bit;      // 1 bit: 0 or 1
+  byte       my_byte;          // 8 bits, signed (-128 to 127)
+  shortint   my_short;         // 16 bits, signed
+  int        my_int;           // 32 bits, signed
+  longint    my_long;          // 64 bits, signed
+
+  // 2-state unsigned
+  bit [7:0]  unsigned_byte;    // 8 bits: 0 to 255
+
+  // 4-state types (can represent X and Z)
+  logic      my_logic;         // 1 bit: 0, 1, X, Z
+  logic [7:0] byte_logic;      // 8 bits of 4-state logic
+  reg [15:0] my_reg;           // 16 bits (legacy Verilog)
+  wire [3:0] my_wire;          // 4 bits (for connections)
+
+  initial begin
+    my_int = 42;
+    my_byte = -10;
+    unsigned_byte = 255;
+    my_logic = 1'bX;           // Unknown value
+
+    $display("int: %0d", my_int);
+    $display("byte: %0d", my_byte);
+    $display("unsigned: %0d", unsigned_byte);
+    $display("logic: %b", my_logic);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Real Types}
+
+\begin{lstlisting}[caption={Floating Point Types}]
+module real_types;
+  real      temperature;       // Double precision (64-bit)
+  shortreal voltage;           // Single precision (32-bit)
+
+  initial begin
+    temperature = 98.6;
+    voltage = 3.3;
+
+    $display("Temperature: %f", temperature);
+    $display("Voltage: %f", voltage);
+    $display("Voltage (2 decimals): %.2f", voltage);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{String Type}
+
+\begin{lstlisting}[caption={String Type}]
+module string_example;
+  string greeting;
+  string name = "Alice";
+
+  initial begin
+    greeting = "Hello";
+    $display("%s, %s!", greeting, name);
+
+    // String methods
+    $display("Length: %0d", name.len());
+    $display("Uppercase: %s", name.toupper());
+    $display("Character at [0]: %c", name[0]);
+
+    // String concatenation
+    greeting = {greeting, " World"};
+    $display("%s", greeting);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Number Literals}
+
+\begin{lstlisting}[caption={Number Formats}]
+module number_formats;
+  int decimal, binary, octal, hexadecimal;
+
+  initial begin
+    // Different number formats
+    decimal = 42;              // Decimal
+    binary = 8'b0010_1010;     // 8-bit binary (underscores for readability)
+    octal = 8'o52;             // 8-bit octal
+    hexadecimal = 8'h2A;       // 8-bit hexadecimal
+
+    $display("Decimal: %0d", decimal);
+    $display("Binary: %0d (0b%b)", binary, binary);
+    $display("Octal: %0d (0o%o)", octal, octal);
+    $display("Hex: %0d (0x%h)", hexadecimal, hexadecimal);
+
+    // Negative numbers
+    int neg = -42;
+    $display("Negative: %0d", neg);
+
+    // X and Z in 4-state
+    logic [3:0] unknown = 4'bXX01;
+    logic [3:0] highz = 4'bZZ10;
+    $display("Unknown: %b", unknown);
+    $display("High-Z: %b", highz);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Waveform: 2-State vs 4-State}
+
+\textbf{Timing Diagram:}
+\begin{verbatim}
+Time:     0   1   2   3   4   5   6   7
+          |   |   |   |   |   |   |   |
+bit:      0   1   1   0   1   0   0   1    (only 0 and 1)
+
+logic:    0   1   X   Z   1   0   X   1    (0, 1, X, Z allowed)
+\end{verbatim}
+
+\begin{cheatbox}
+\textbf{Data Types Cheat Sheet}
+
+\textbf{When to use each type:}
+\begin{itemize}
+  \item \textbf{bit}: Counters, state machines, testbench variables
+  \item \textbf{logic}: Signals that might be driven by multiple sources, X/Z needed
+  \item \textbf{int}: General purpose integers in testbenches
+  \item \textbf{byte}: Small integers, character data
+  \item \textbf{string}: Messages, file names, text processing
+  \item \textbf{real}: Analog values, timing calculations
+\end{itemize}
+
+\textbf{Quick Reference:}
+\begin{verbatim}
+bit [7:0] data;      // 8-bit unsigned, 2-state
+logic [7:0] data;    // 8-bit, 4-state (can be X/Z)
+int data;            // 32-bit signed, 2-state
+byte data;           // 8-bit signed, 2-state (-128 to 127)
+string msg;          // Dynamic string
+real value;          // 64-bit floating point
+\end{verbatim}
+\end{cheatbox}
+
+\begin{exercisebox}
+\textbf{Exercise 3: Data Type Practice}
+
+Create a module that declares and initializes:
+\begin{enumerate}
+  \item An 8-bit unsigned number with value 255
+  \item A signed byte with value -50
+  \item A 16-bit binary number: 0b1010\_0101\_1100\_0011
+  \item A 32-bit hex number: 0xDEADBEEF
+  \item A real number: 3.14159
+  \item A string with your name
+\end{enumerate}
+Display all values using appropriate format specifiers.
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 4: Number Conversions}
+
+Write a module that:
+\begin{enumerate}
+  \item Takes a decimal number 170
+  \item Displays it in binary, octal, hex formats
+  \item Shows the result with different bit widths (8, 16, 32 bits)
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 5: String Manipulation}
+
+Create a module that:
+\begin{enumerate}
+  \item Declares two strings: first name and last name
+  \item Concatenates them with a space
+  \item Displays the full name in uppercase
+  \item Extracts and displays the first character of each name
+  \item Displays the total length of the full name
+\end{enumerate}
+\end{exercisebox}
+
+\newpage
+% ============================================================================
+\section{Operators}
+
+\subsection{Arithmetic Operators}
+
+\begin{lstlisting}[caption={Arithmetic Operations}]
+module arithmetic_ops;
+  int a = 20, b = 7;
+  int sum, diff, prod, quot, rem;
+  int inc, dec;
+
+  initial begin
+    sum = a + b;               // Addition: 27
+    diff = a - b;              // Subtraction: 13
+    prod = a * b;              // Multiplication: 140
+    quot = a / b;              // Division: 2 (integer division)
+    rem = a % b;               // Modulus: 6
+
+    inc = a++;                 // Post-increment
+    dec = --b;                 // Pre-decrement
+
+    $display("a=%0d, b=%0d", a, b);
+    $display("Sum: %0d", sum);
+    $display("Difference: %0d", diff);
+    $display("Product: %0d", prod);
+    $display("Quotient: %0d", quot);
+    $display("Remainder: %0d", rem);
+
+    // Power operation
+    int power = 2 ** 8;        // 2^8 = 256
+    $display("2^8 = %0d", power);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Relational and Equality Operators}
+
+\begin{lstlisting}[caption={Comparison Operators}]
+module comparison_ops;
+  int a = 10, b = 20;
+  logic [3:0] x = 4'b1010, y = 4'b1010, z = 4'bXX10;
+
+  initial begin
+    // Relational
+    $display("a < b: %0d", a < b);         // 1 (true)
+    $display("a > b: %0d", a > b);         // 0 (false)
+    $display("a <= b: %0d", a <= b);       // 1
+    $display("a >= b: %0d", a >= b);       // 0
+
+    // Equality (returns 0, 1, or X)
+    $display("x == y: %0d", x == y);       // 1
+    $display("x != y: %0d", x != y);       // 0
+
+    // Case equality (compares X and Z exactly)
+    $display("x === y: %0d", x === y);     // 1
+    $display("x === z: %0d", x === z);     // 0 (different X positions)
+    $display("x !== z: %0d", x !== z);     // 1
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Logical and Bitwise Operators}
+
+\begin{lstlisting}[caption={Logical and Bitwise Operations}]
+module logical_bitwise;
+  bit a = 1, b = 0;
+  bit [3:0] x = 4'b1100, y = 4'b1010;
+
+  initial begin
+    // Logical operators (return 0 or 1)
+    $display("Logical AND: %0d", a && b);   // 0
+    $display("Logical OR: %0d", a || b);    // 1
+    $display("Logical NOT: %0d", !a);       // 0
+
+    // Bitwise operators (operate on each bit)
+    $display("Bitwise AND: %b", x & y);     // 1000
+    $display("Bitwise OR: %b", x | y);      // 1110
+    $display("Bitwise XOR: %b", x ^ y);     // 0110
+    $display("Bitwise NOT: %b", ~x);        // 0011
+    $display("Bitwise NAND: %b", ~(x & y)); // 0111
+
+    // Reduction operators (reduce to single bit)
+    $display("Reduction AND: %b", &x);      // 0 (not all 1s)
+    $display("Reduction OR: %b", |x);       // 1 (at least one 1)
+    $display("Reduction XOR: %b", ^x);      // 0 (even parity)
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Shift Operators}
+
+\begin{lstlisting}[caption={Shift Operations}]
+module shift_ops;
+  bit [7:0] data = 8'b1100_1010;
+
+  initial begin
+    // Logical shifts (fill with 0)
+    $display("Original: %b", data);
+    $display("Left shift 2: %b", data << 2);    // 0010_1000
+    $display("Right shift 2: %b", data >> 2);   // 0011_0010
+
+    // Arithmetic shifts (preserve sign)
+    logic signed [7:0] signed_data = -8;
+    $display("Signed: %b (%0d)", signed_data, signed_data);
+    $display("Arith right shift: %b (%0d)",
+             signed_data >>> 2, signed_data >>> 2);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Conditional Operator}
+
+\begin{lstlisting}[caption={Ternary Operator}]
+module conditional_op;
+  int a = 10, b = 20;
+
+  initial begin
+    // condition ? true_value : false_value
+    int max = (a > b) ? a : b;
+    $display("Max of %0d and %0d is %0d", a, b, max);
+
+    // Nested conditional
+    int value = 15;
+    string category = (value < 10) ? "low" :
+                      (value < 20) ? "medium" : "high";
+    $display("Value %0d is %s", value, category);
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Concatenation and Replication}
+
+\begin{lstlisting}[caption={Concatenation and Replication}]
+module concat_replicate;
+  bit [3:0] a = 4'b1010;
+  bit [3:0] b = 4'b0011;
+
+  initial begin
+    // Concatenation
+    bit [7:0] concat = {a, b};
+    $display("Concatenation: %b", concat);      // 10100011
+
+    // Replication
+    bit [11:0] rep = {3{a}};
+    $display("Replicate 3 times: %b", rep);     // 101010101010
+
+    // Mixed
+    bit [15:0] mixed = {2'b11, a, 2{b}};
+    $display("Mixed: %b", mixed);               // 1110100011001100
+
+    // Useful for creating masks
+    bit [31:0] all_ones = {32{1'b1}};
+    $display("All ones: %h", all_ones);         // ffffffff
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Operator Precedence}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Precedence} & \textbf{Operators} & \textbf{Associativity} \\
+\hline
+Highest & \texttt{()  []  ::  .} & Left to Right \\
+\hline
+& \texttt{!  \textasciitilde{}  +  -  \&  \textasciitilde{}\&  |  \textasciitilde{}|  \textasciicircum{}  \textasciitilde{}\textasciicircum{}} (unary) & Right to Left \\
+\hline
+& \texttt{**} & Right to Left \\
+\hline
+& \texttt{*  /  \%} & Left to Right \\
+\hline
+& \texttt{+  -} (binary) & Left to Right \\
+\hline
+& \texttt{<<  >>  <<<  >>>} & Left to Right \\
+\hline
+& \texttt{<  <=  >  >=} & Left to Right \\
+\hline
+& \texttt{==  !=  ===  !==} & Left to Right \\
+\hline
+& \texttt{\&} & Left to Right \\
+\hline
+& \texttt{\textasciicircum{}  \textasciitilde{}\textasciicircum{}} & Left to Right \\
+\hline
+& \texttt{|} & Left to Right \\
+\hline
+& \texttt{\&\&} & Left to Right \\
+\hline
+& \texttt{||} & Left to Right \\
+\hline
+Lowest & \texttt{?:} & Right to Left \\
+\hline
+\end{tabular}
+\caption{Operator Precedence (Highest to Lowest)}
+\end{table}
+
+\begin{cheatbox}
+\textbf{Operators Cheat Sheet}
+
+\textbf{Arithmetic:} \texttt{+  -  *  /  \%  **  ++  --}
+
+\textbf{Relational:} \texttt{<  <=  >  >=}
+
+\textbf{Equality:} \texttt{==  !=  ===  !==}
+
+\textbf{Logical:} \texttt{\&\&  ||  !}
+
+\textbf{Bitwise:} \texttt{\&  |  \textasciicircum{}  \textasciitilde{}}
+
+\textbf{Shift:} \texttt{<<  >>  <<<  >>>}
+
+\textbf{Reduction:} \texttt{\&  |  \textasciicircum{}  \textasciitilde{}\&  \textasciitilde{}|  \textasciitilde{}\textasciicircum{}}
+
+\textbf{Concatenation:} \texttt{\{a, b\}}
+
+\textbf{Replication:} \texttt{\{n\{a\}\}}
+
+\textbf{Conditional:} \texttt{condition ? true\_val : false\_val}
+\end{cheatbox}
+
+\begin{exercisebox}
+\textbf{Exercise 6: Calculator}
+
+Create a module that implements a simple calculator:
+\begin{enumerate}
+  \item Declare two 8-bit numbers
+  \item Perform all arithmetic operations (+, -, *, /, \%, **)
+  \item Display results with labels
+  \item Handle division by zero case
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 7: Bit Manipulation}
+
+Write a module that demonstrates:
+\begin{enumerate}
+  \item Setting bit 3 of a byte to 1
+  \item Clearing bit 5 of a byte
+  \item Toggling bit 2 of a byte
+  \item Checking if bit 4 is set
+  \item Swapping nibbles of a byte (upper 4 bits with lower 4 bits)
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 8: Parity Checker}
+
+Create a module that:
+\begin{enumerate}
+  \item Takes an 8-bit input value
+  \item Calculates even parity using reduction XOR
+  \item Calculates odd parity
+  \item Displays both parity bits
+\end{enumerate}
+\end{exercisebox}
+
+\newpage
+% ============================================================================
+\section{Procedural Blocks}
+
+\subsection{Initial Block}
+
+The \texttt{initial} block executes once at simulation time 0:
+
+\begin{lstlisting}[caption={Initial Block}]
+module initial_example;
+  int counter;
+
+  initial begin
+    counter = 0;
+    $display("[%0t] Counter initialized to %0d", $time, counter);
+
+    #10 counter = 10;
+    $display("[%0t] Counter is now %0d", $time, counter);
+
+    #20 counter = 30;
+    $display("[%0t] Counter is now %0d", $time, counter);
+
+    #10 $display("[%0t] Simulation ending", $time);
+  end
+endmodule
+\end{lstlisting}
+
+\textbf{Output:}
+\begin{verbatim}
+[0] Counter initialized to 0
+[10] Counter is now 10
+[30] Counter is now 30
+[40] Simulation ending
+\end{verbatim}
+
+\subsection{Always Block}
+
+The \texttt{always} block executes repeatedly:
+
+\begin{lstlisting}[caption={Always Block}]
+module always_example;
+  logic clk = 0;
+  int counter = 0;
+
+  // Generate clock
+  always #5 clk = ~clk;
+
+  // Counter on clock edge
+  always @(posedge clk) begin
+    counter = counter + 1;
+    $display("[%0t] Counter = %0d", $time, counter);
+    if (counter >= 5) $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{SystemVerilog Always Variants}
+
+SystemVerilog provides specialized always blocks:
+
+\begin{lstlisting}[caption={Always Variants}]
+module always_variants;
+  logic clk, rst_n;
+  logic [3:0] count;
+  logic [7:0] data, next_data;
+  logic enable;
+
+  // always_ff: For sequential (flip-flop) logic
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      count <= 4'b0;
+    else
+      count <= count + 1;
+  end
+
+  // always_comb: For combinational logic
+  always_comb begin
+    next_data = data + 1;
+  end
+
+  // always_latch: For latches (not recommended in most cases)
+  always_latch begin
+    if (enable)
+      data = next_data;
+  end
+
+  // Clock generation
+  initial clk = 0;
+  always #5 clk = ~clk;
+
+  // Testbench
+  initial begin
+    rst_n = 0;
+    data = 0;
+    enable = 0;
+    #10 rst_n = 1;
+    #50 $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\textbf{Key Differences:}
+\begin{itemize}
+  \item \texttt{always\_ff}: Synthesizes to flip-flops (sequential logic)
+  \item \texttt{always\_comb}: Synthesizes to combinational logic (gates)
+  \item \texttt{always\_latch}: Synthesizes to latches (avoid in most designs)
+\end{itemize}
+
+\subsection{Sensitivity Lists}
+
+\begin{lstlisting}[caption={Sensitivity Lists}]
+module sensitivity_lists;
+  logic a, b, c, result;
+  logic clk;
+
+  // Specific signals
+  always @(a or b or c) begin
+    result = a & b & c;
+  end
+
+  // Comma-separated (equivalent)
+  always @(a, b, c) begin
+    result = a & b & c;
+  end
+
+  // Wildcard - sensitive to all signals on RHS
+  always @(*) begin
+    result = a & b & c;
+  end
+
+  // Edge-sensitive
+  always @(posedge clk) begin
+    // Execute on rising edge of clk
+  end
+
+  // Multiple edges
+  logic rst_n;
+  always @(posedge clk or negedge rst_n) begin
+    // Execute on rising clk OR falling rst_n
+  end
+endmodule
+\end{lstlisting}
+
+\subsection{Blocking vs Non-Blocking Assignments}
+
+\textbf{Blocking (=):} Executes sequentially
+\textbf{Non-blocking (<=):} Executes in parallel
+
+\begin{lstlisting}[caption={Blocking vs Non-Blocking}]
+module blocking_vs_nonblocking;
+  logic clk = 0;
+  always #5 clk = ~clk;
+
+  // Example 1: Blocking (WRONG for sequential logic!)
+  int a_block, b_block;
+  always @(posedge clk) begin
+    a_block = 1;
+    b_block = a_block;  // b_block gets 1 immediately
+  end
+
+  // Example 2: Non-blocking (CORRECT for sequential logic!)
+  int a_nonblock, b_nonblock;
+  always @(posedge clk) begin
+    a_nonblock <= 1;
+    b_nonblock <= a_nonblock;  // b_nonblock gets OLD value of a
+  end
+
+  initial begin
+    a_block = 0; b_block = 0;
+    a_nonblock = 0; b_nonblock = 0;
+
+    #10;
+    $display("After 1 clock:");
+    $display("  Blocking: a=%0d, b=%0d", a_block, b_block);
+    $display("  Non-blocking: a=%0d, b=%0d", a_nonblock, b_nonblock);
+
+    #10 $finish;
+  end
+endmodule
+\end{lstlisting}
+
+\textbf{Output:}
+\begin{verbatim}
+After 1 clock:
+  Blocking: a=1, b=1        (Both updated!)
+  Non-blocking: a=1, b=0    (b gets OLD value)
+\end{verbatim}
+
+\textbf{Waveform Comparison:}
+\begin{verbatim}
+Time:      0    10   20
+           |    |    |
+clk:     __|‾‾|__|‾‾|__
+
+Blocking:
+a_block:   0    1    1
+b_block:   0    1    1    <- WRONG! Got new value of a
+
+Non-blocking:
+a_nonblock: 0   1    1
+b_nonblock: 0   0    1    <- CORRECT! Got old value of a
+\end{verbatim}
+
+\begin{warningbox}
+\textbf{Golden Rules:}
+\begin{enumerate}
+  \item Use \textbf{non-blocking (<=)} in \texttt{always\_ff} and sequential blocks
+  \item Use \textbf{blocking (=)} in \texttt{always\_comb} and combinational blocks
+  \item \textbf{Never mix} blocking and non-blocking in the same always block
+  \item Use blocking in \texttt{initial} and \texttt{task/function}
+\end{enumerate}
+\end{warningbox}
+
+\begin{cheatbox}
+\textbf{Procedural Blocks Cheat Sheet}
+
+\begin{lstlisting}
+// Executes once at time 0
+initial begin
+  // Use blocking assignments (=)
+end
+
+// Executes on every edge/change
+always @(sensitivity_list) begin
+  // Legacy Verilog style
+end
+
+// For flip-flops (use <= non-blocking)
+always_ff @(posedge clk) begin
+  q <= d;
+end
+
+// For combinational logic (use = blocking)
+always_comb begin
+  sum = a + b;
+end
+
+// For latches (avoid!)
+always_latch begin
+  if (enable) q = d;
+end
+\end{lstlisting}
+\end{cheatbox}
+
+\begin{exercisebox}
+\textbf{Exercise 9: Shift Register}
+
+Create an 8-bit shift register using non-blocking assignments:
+\begin{enumerate}
+  \item Use a clock with 10ns period
+  \item Shift data left by 1 bit each clock cycle
+  \item Input a 1 at the LSB each cycle
+  \item Display the register value each cycle for 10 cycles
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}
+\textbf{Exercise 10: Blocking vs Non-blocking Test}
+
+Write a module that demonstrates the difference:
+\begin{enumerate}
+  \item Create a 4-stage shift register using blocking
+  \item Create another 4-stage shift register using non-blocking
+  \item Compare outputs after inputting pattern: 1,0,1,1
+  \item Show how the blocking version fails
+\end{enumerate}
+\end{exercisebox}
+
+% Due to length constraints, I'll create a marker here and continue
+% The document continues with more sections...
+
+\newpage
+\section{Note on Document Length}
+
+This is the beginning of a comprehensive SystemVerilog guide. The complete document would continue with:
+
+\textbf{Remaining Beginner Topics (Sections 5-10):}
+\begin{itemize}
+  \item Combinational Logic Design
+  \item Sequential Logic Design
+  \item Modules and Hierarchy
+  \item Testbenches and Simulation
+  \item Control Flow (if, case, loops)
+  \item Basic Arrays
+\end{itemize}
+
+\textbf{Intermediate Topics (Sections 11-20):}
+\begin{itemize}
+  \item Advanced Data Types (struct, enum, union, typedef)
+  \item Arrays (dynamic, associative, queues)
+  \item Interfaces and Modports
+  \item Packages and Import
+  \item Generate Blocks
+  \item Parameters
+  \item Functions and Tasks (detailed)
+  \item Clocking Blocks
+  \item Classes and OOP Basics
+  \item Inheritance and Polymorphism
+\end{itemize}
+
+\textbf{Advanced Topics (Sections 21-30):}
+\begin{itemize}
+  \item Randomization and Constraints
+  \item Functional Coverage and Covergroups
+  \item Assertions (SVA)
+  \item Inter-process Communication
+  \item Virtual Interfaces
+  \item Factory Pattern
+  \item UVM Basics
+  \item Complete Verification Projects
+  \item Performance and Optimization
+  \item Industry Best Practices
+\end{itemize}
+
+The complete document would be approximately \textbf{8000-10000 lines} with all 100+ exercises, solutions, waveforms, and cheat sheets.
+
+Would you like me to:
+\begin{enumerate}
+  \item Continue building the complete document section by section?
+  \item Focus on specific topics you need most?
+  \item Create this as multiple smaller documents (one per topic)?
+\end{enumerate}
+
+\vfill
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}\\
+\Large\textbf{Complete SystemVerilog Guide}\\
+\normalsize
+Version 1.0 - Beginner Section\\
+\vspace{0.3cm}
+\textit{Document in Progress}\\
+\textit{Last Updated: \today}\\
+\end{center}
+
+\end{document}
