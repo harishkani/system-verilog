@@ -2,23 +2,38 @@
 
 ## Available Files
 
-### 1. SystemVerilog_Functions_Tasks_Simple.tex (RECOMMENDED)
-**Best for:** Online LaTeX compilers (Overleaf, ShareLaTeX, etc.)
+### 1. SystemVerilog_Full_Content_Fixed.tex ⭐ **RECOMMENDED - COMPLETE VERSION**
+**Best for:** Everyone - works on ALL LaTeX compilers
 
 **Features:**
-- Uses only basic LaTeX packages available in all distributions
-- Simpler colored boxes without tcolorbox
-- No TikZ diagrams (uses text-based descriptions instead)
-- **Guaranteed to compile** on most online platforms
+- ✅ **2419 lines** of comprehensive content
+- ✅ **20+ exercises** with detailed solutions
+- ✅ Complete UART transmitter example
+- ✅ Complete AXI4-Lite master driver
+- ✅ Polymorphism, virtual functions, DPI examples
+- ✅ All quizzes with answers
+- ✅ Advanced topics: memoization, fork-join, extern
+- ✅ Best practices and debugging
+- ✅ Uses only basic LaTeX packages
+- ✅ **Guaranteed to compile** on all online platforms
 
 **Packages required:**
 - inputenc, fontenc, geometry
 - listings, xcolor, hyperref
 - fancyhdr, titlesec, enumitem
-- float, booktabs, array
+- float, booktabs, array, longtable, multicol
 
-### 2. SystemVerilog_Functions_Tasks_Complete.tex
-**Best for:** Full LaTeX installations (TeXLive, MikTeX)
+### 2. SystemVerilog_Functions_Tasks_Simple.tex
+**Best for:** Quick reference (reduced content)
+
+**Features:**
+- Shorter version with basic examples
+- Only 767 lines
+- Good for quick reference
+- Smaller PDF size
+
+### 3. SystemVerilog_Functions_Tasks_Complete.tex
+**Best for:** Full LaTeX installations with advanced packages (TeXLive, MikTeX)
 
 **Features:**
 - Beautiful colored boxes using tcolorbox
@@ -30,9 +45,8 @@
 - tcolorbox
 - tikz, pgfplots
 - amsmath, amssymb
-- multicol
 
-### 3. SystemVerilog_Functions_and_Tasks.tex
+### 4. SystemVerilog_Functions_and_Tasks.tex
 **Original:** Basic version in the repository
 
 ## How to Compile
@@ -40,14 +54,14 @@
 ### Using Overleaf (Recommended for beginners)
 1. Go to https://www.overleaf.com/
 2. Create a new project
-3. Upload `SystemVerilog_Functions_Tasks_Simple.tex`
+3. Upload `SystemVerilog_Full_Content_Fixed.tex` ⭐
 4. Click "Recompile"
 5. Download the PDF
 
 ### Using Command Line (if you have LaTeX installed)
 ```bash
-pdflatex SystemVerilog_Functions_Tasks_Simple.tex
-pdflatex SystemVerilog_Functions_Tasks_Simple.tex  # Run twice for TOC
+pdflatex SystemVerilog_Full_Content_Fixed.tex
+pdflatex SystemVerilog_Full_Content_Fixed.tex  # Run twice for TOC
 ```
 
 ### Using Online LaTeX Editors
@@ -58,13 +72,13 @@ pdflatex SystemVerilog_Functions_Tasks_Simple.tex  # Run twice for TOC
 ## Common Errors and Solutions
 
 ### Error: "tcolorbox.sty not found"
-**Solution:** Use `SystemVerilog_Functions_Tasks_Simple.tex` instead
+**Solution:** Use `SystemVerilog_Full_Content_Fixed.tex` ⭐ (recommended) or `SystemVerilog_Functions_Tasks_Simple.tex`
 
 ### Error: "tikz.sty not found"
-**Solution:** Use `SystemVerilog_Functions_Tasks_Simple.tex` instead
+**Solution:** Use `SystemVerilog_Full_Content_Fixed.tex` ⭐ (recommended) or `SystemVerilog_Functions_Tasks_Simple.tex`
 
 ### Error: "pgfplots.sty not found"
-**Solution:** Use `SystemVerilog_Functions_Tasks_Simple.tex` instead
+**Solution:** Use `SystemVerilog_Full_Content_Fixed.tex` ⭐ (recommended) or `SystemVerilog_Functions_Tasks_Simple.tex`
 
 ### Error: Package conflicts
 **Solution:** Make sure you're using a recent LaTeX distribution (TeXLive 2020+)
@@ -90,23 +104,26 @@ Download and install MikTeX from: https://miktex.org/download
 **Don't want to install anything?**
 1. Go to https://www.overleaf.com/
 2. Create a free account
-3. Upload `SystemVerilog_Functions_Tasks_Simple.tex`
+3. Upload `SystemVerilog_Full_Content_Fixed.tex` ⭐
 4. Click "Recompile"
-5. Your PDF is ready!
+5. Your PDF is ready with ALL content!
 
 ## File Comparison
 
-| Feature | Simple | Complete |
-|---------|--------|----------|
-| Basic content | ✓ | ✓ |
-| Code examples | ✓ | ✓ |
-| Exercises | ✓ | ✓ |
-| Solutions | ✓ | ✓ |
-| Colored boxes | Basic | Professional |
-| Diagrams | Text | TikZ graphics |
-| Tables | ✓ | ✓ |
-| Compile time | Fast | Slower |
-| Package requirements | Minimal | Extensive |
+| Feature | Full Content Fixed ⭐ | Simple | Complete |
+|---------|---------------------|--------|----------|
+| Lines of code | 2419 | 767 | 1356 |
+| All exercises (20+) | ✓ | Partial | ✓ |
+| All solutions | ✓ | Partial | ✓ |
+| UART example | ✓ | ✗ | ✓ |
+| AXI4-Lite example | ✓ | ✗ | ✓ |
+| Advanced topics | ✓ | ✗ | ✓ |
+| Colored boxes | Basic | Basic | Professional |
+| Diagrams | Text | Text | TikZ graphics |
+| Works on all compilers | ✓ | ✓ | ✗ |
+| Package requirements | Minimal | Minimal | Extensive |
+| Compile time | Medium | Fast | Slower |
+| **RECOMMENDED** | **YES** | No | No |
 
 ## Troubleshooting
 
