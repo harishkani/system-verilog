@@ -105,6 +105,25 @@ The Complete Learning Guide requires these LaTeX packages:
 
 All these are included in `texlive-full` (Linux) or MacTeX/MiKTeX.
 
+## Recent Fixes for Online Compilers
+
+**Version 2.1 Update**: The document has been updated to fix compilation issues on online LaTeX compilers:
+
+✅ **Fixed Issues:**
+- Added `upquote` package for proper apostrophe handling in code
+- Replaced Unicode arrow symbols (→) with `$\rightarrow$`
+- Replaced degree symbols (°) with `$^\circ$`
+- Replaced multiplication symbols (×) with `$\times$`
+- Enhanced listings configuration for better code display
+
+The document now compiles successfully on:
+- ✅ Overleaf
+- ✅ ShareLaTeX
+- ✅ Papeeria
+- ✅ Local LaTeX installations
+- ✅ TeX Live
+- ✅ MiKTeX
+
 ## Troubleshooting
 
 ### Issue: "pdflatex: command not found"
@@ -146,6 +165,14 @@ sudo apt-get install texlive-latex-extra
 - Close other applications
 - Compile one document at a time
 - Increase TeX memory limits (advanced)
+
+### Issue: Still getting errors after fixes
+**Solution**:
+1. Make sure you have the latest version from the repository
+2. Clear all auxiliary files: `make clean` or `rm *.aux *.toc *.out *.log`
+3. Try compiling twice: `pdflatex file.tex && pdflatex file.tex`
+4. Check you have the `upquote` package: `tlmgr install upquote` (if using TeX Live)
+5. If using Overleaf, make sure compiler is set to "pdfLaTeX" not "LaTeX"
 
 ## Verifying Successful Compilation
 
