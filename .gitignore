@@ -1,0 +1,13 @@
+# Simulation output files
+*.vcd
+*.out
+*.vvp
+
+# Editor backup files
+*~
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
