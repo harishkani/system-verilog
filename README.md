@@ -1,213 +1,232 @@
-# SystemVerilog Functions and Tasks - Comprehensive Guide
+# SystemVerilog Comprehensive Learning Repository
 
-This repository contains comprehensive documentation on SystemVerilog functions and tasks, from beginner to advanced levels.
+A comprehensive collection of SystemVerilog documentation, guides, and resources covering everything from basic concepts to advanced topics.
 
-## Available Formats
+## Repository Structure
 
-### 1. Markdown Version
-**File**: `SystemVerilog_Functions_and_Tasks.md`
-- Easy to read in any text editor or on GitHub
-- Contains all examples and explanations
-- Great for quick reference
+```
+system-verilog/
+├── docs/                   # Documentation and guides
+│   ├── Communication_Protocols_Complete_Guide.md
+│   ├── COMPILATION_GUIDE.md
+│   ├── LATEX_COMPILATION_GUIDE.md
+│   └── SystemVerilog_Functions_and_Tasks.md
+├── latex/                  # LaTeX source files
+│   ├── SystemVerilog_Complete_Comprehensive_Guide.tex
+│   └── SystemVerilog_Advanced_Sections_21_30.tex
+├── scripts/                # Utility scripts
+│   └── compile_guide.sh
+├── Makefile               # Build automation
+└── README.md              # This file
+```
 
-### 2. Basic LaTeX Version
-**File**: `SystemVerilog_Functions_and_Tasks.tex`
+## What's Inside
+
+### Documentation (`docs/`)
+
+#### Communication Protocols Guide
+**File**: `docs/Communication_Protocols_Complete_Guide.md`
+- Complete guide to communication protocols in SystemVerilog
+- Covers UART, SPI, I2C, AXI, APB, and more
+- Includes practical implementation examples
+- Testbench examples and best practices
+
+#### SystemVerilog Functions and Tasks
+**File**: `docs/SystemVerilog_Functions_and_Tasks.md`
+- Comprehensive coverage from beginner to advanced
+- Functions vs tasks comparison
+- Parameter passing, return types, and timing
+- Object-oriented programming concepts
+- DPI and external functions
+
+#### Compilation Guides
+- **COMPILATION_GUIDE.md**: General compilation instructions
+- **LATEX_COMPILATION_GUIDE.md**: Detailed LaTeX compilation help
+
+### LaTeX Documents (`latex/`)
+
+#### Complete Comprehensive Guide (Recommended)
+**File**: `latex/SystemVerilog_Complete_Comprehensive_Guide.tex`
+- Most comprehensive SystemVerilog guide (7800+ lines)
+- Covers all topics from basics to advanced
 - Professional typeset document
-- Includes syntax-highlighted code examples
-- Ready for printing or academic use
-- Reference-style documentation
+- Includes all sections 1-30
 
-### 3. **Complete Learning Guide (RECOMMENDED)** ⭐
-**File**: `SystemVerilog_Functions_Tasks_Complete_Guide.tex`
-- **50+ hands-on exercises with detailed solutions**
-- **Real-world examples**: Complete UART transmitter, AXI4-Lite master driver
-- **Visual learning aids**: Timing diagrams, memory layouts, flowcharts (using TikZ)
-- **Self-assessment quizzes** after each major section
-- **Troubleshooting guide** with common errors and solutions
-- **Quick reference guide** with decision flowcharts
-- **Progressive learning path** from beginner to expert
-- **160+ pages** of comprehensive content
+#### Advanced Sections 21-30
+**File**: `latex/SystemVerilog_Advanced_Sections_21_30.tex`
+- Detailed coverage of advanced topics
+- Sections 21-30 in depth
+- 3500+ lines of content
 
-## Compiling the LaTeX Documents
+### Scripts (`scripts/`)
 
-### Quick Start (Easiest)
+**compile_guide.sh**: Automated compilation script for LaTeX documents
 
-```bash
-# Using the compilation script
-./compile_guide.sh
+## Quick Start
 
-# Or using Make
-make complete    # Compile learning guide
-make basic       # Compile basic version
-make            # Compile both
-```
+### Viewing Documentation
 
-### Manual Compilation
+All markdown documentation can be read directly on GitHub or in any text editor:
 
 ```bash
-# For the Complete Learning Guide (Recommended)
-pdflatex SystemVerilog_Functions_Tasks_Complete_Guide.tex
-pdflatex SystemVerilog_Functions_Tasks_Complete_Guide.tex  # Run twice for TOC
+# View function and task guide
+cat docs/SystemVerilog_Functions_and_Tasks.md
 
-# For the Basic Version
-pdflatex SystemVerilog_Functions_and_Tasks.tex
-pdflatex SystemVerilog_Functions_and_Tasks.tex  # Run twice for TOC
+# View communication protocols guide
+cat docs/Communication_Protocols_Complete_Guide.md
 ```
 
-**📖 For detailed compilation instructions, troubleshooting, and installation help, see [COMPILATION_GUIDE.md](COMPILATION_GUIDE.md)**
+### Compiling LaTeX Documents
 
-### Required LaTeX Packages
+#### Using Make (Recommended)
 
-#### For Basic Version:
-- inputenc, fontenc, geometry
-- listings, xcolor, hyperref
-- graphicx, fancyhdr, tocloft
-- titlesec, enumitem, float
-- booktabs, array, longtable
+```bash
+# Compile all documents
+make
 
-#### Additional for Complete Guide:
-- **tikz** (for diagrams)
-- **tikz-timing** (for timing diagrams)
-- **pgfplots** (for plots)
-- **amsmath, amssymb** (for math)
-- **mdframed, tcolorbox** (for colored boxes)
-- **multicol** (for multi-column layout)
+# Compile comprehensive guide only
+make comprehensive
 
-These are typically included in standard TeX distributions like:
-- **TeX Live** (Linux/Mac) - Full installation recommended
-- **MiKTeX** (Windows) - Will auto-install missing packages
-- **MacTeX** (macOS) - Full installation recommended
+# Compile advanced sections only
+make advanced
 
-**Note**: For the Complete Guide, install the **full** TeX distribution to ensure all TikZ libraries are available.
+# Clean auxiliary files
+make clean
 
-## Document Contents
+# Remove all generated files
+make distclean
 
-### Beginner Level
-- Basic functions and tasks
-- Parameter passing modes (input, output, inout)
-- Void functions
-- Tasks with timing control
-- Simple practical examples
+# Show help
+make help
+```
 
-### Intermediate Level
-- Default arguments
-- Output and reference (ref) parameters
-- Automatic vs static storage
-- Reentrant tasks
-- Class methods
-- Functions returning complex types
+#### Using the Compilation Script
 
-### Advanced Level
+```bash
+# Make script executable (if needed)
+chmod +x scripts/compile_guide.sh
+
+# Run compilation script
+./scripts/compile_guide.sh
+```
+
+#### Manual Compilation
+
+```bash
+# Compile comprehensive guide
+cd latex
+pdflatex SystemVerilog_Complete_Comprehensive_Guide.tex
+pdflatex SystemVerilog_Complete_Comprehensive_Guide.tex  # Run twice for TOC
+
+# Compile advanced sections
+pdflatex SystemVerilog_Advanced_Sections_21_30.tex
+pdflatex SystemVerilog_Advanced_Sections_21_30.tex
+```
+
+For detailed compilation instructions and troubleshooting, see:
+- `docs/COMPILATION_GUIDE.md` - General compilation help
+- `docs/LATEX_COMPILATION_GUIDE.md` - LaTeX-specific help
+
+## Topics Covered
+
+### Beginner Level (Sections 1-10)
+- Data types and operators
+- Procedural blocks (always, initial)
+- Conditional statements and loops
+- Arrays and memories
+- Sequential logic
+- Modules and hierarchy
+- Testbenches and simulation
+
+### Intermediate Level (Sections 11-20)
+- Functions and tasks
+- Interfaces and modports
+- Packages and imports
+- Classes and objects
+- Randomization and constraints
+- Coverage and assertions
+- Mailboxes and semaphores
+
+### Advanced Level (Sections 21-30)
+- Advanced OOP concepts
 - Virtual functions and polymorphism
-- Pure virtual functions (abstract classes)
-- Function chaining and fluent interfaces
-- Parameterized functions
-- Fork-join parallelism
-- Extern declarations
-- Recursive functions with memoization
-- DPI (C/C++ integration)
-- Constraint and coverage functions
-- Protocol driver implementations
+- UVM fundamentals
+- Communication protocols
+- Advanced testbench architectures
+- Performance optimization
+- Industry best practices
 
-### Additional Sections
-- Best practices for writing functions and tasks
-- Common pitfalls and how to avoid them
-- Performance optimization tips
-- When to use functions vs tasks
+## Requirements
 
-## Features
+### For Markdown Files
+- Any text editor or web browser
+- No special requirements
 
-### Basic Documents
-- **30+ Complete Examples**: All examples are runnable SystemVerilog code
-- **Comprehensive Coverage**: From basic syntax to advanced OOP concepts
-- **Practical Focus**: Real-world patterns and use cases
-- **Professional Quality**: Publication-ready LaTeX formatting
+### For LaTeX Compilation
+- **TeX Distribution** (one of):
+  - TeX Live (Linux/Mac) - Full installation recommended
+  - MiKTeX (Windows) - Auto-installs missing packages
+  - MacTeX (macOS) - Full installation recommended
 
-### Complete Learning Guide (NEW! ⭐)
-- **50+ Hands-on Exercises**: Progressive difficulty with detailed solutions
-- **Real-World Examples**:
-  - Complete UART transmitter with testbench
-  - AXI4-Lite master bus driver
-  - Ethernet packet hierarchy (polymorphism example)
-  - Bank account system (OOP example)
-- **Visual Learning Aids**:
-  - Function vs Task execution diagrams
-  - Call stack visualization for recursion
-  - UART frame timing diagrams
-  - AXI4-Lite transaction timing
-  - Class hierarchy diagrams
-  - Memory layout comparisons (automatic vs static)
-  - Decision flowcharts for choosing functions/tasks
-- **Interactive Learning**:
-  - Quizzes after each major section
-  - Self-check questions with answers
-  - Progressive exercises building on previous concepts
-- **Troubleshooting Section**:
-  - Common errors with solutions
-  - Debugging techniques
-  - Best practices and anti-patterns
-- **Quick Reference**:
-  - Syntax reference table
-  - Decision flowcharts
-  - Feature comparison charts
+- **Required Packages**:
+  - Standard packages: inputenc, fontenc, geometry, hyperref
+  - Code formatting: listings, xcolor
+  - Graphics: graphicx, tikz, pgfplots
+  - Tables: booktabs, array, longtable
+  - And more (see compilation guides for full list)
 
-## Usage
+## Learning Path
 
-### For Self-Study (Recommended Path)
-1. **Start with the Complete Learning Guide** (`SystemVerilog_Functions_Tasks_Complete_Guide.tex`)
-2. Follow the recommended study plan (4-6 hours for beginner, 6-8 for intermediate, 8-10 for advanced)
-3. Complete exercises as you go
-4. Take quizzes to verify understanding
-5. Study real-world examples in detail
-6. Use the quick reference guide for review
-
-### As a Reference
-- **Quick lookups**: Use the markdown version (`SystemVerilog_Functions_and_Tasks.md`)
-- **Detailed reference**: Use the basic LaTeX version
-- **Complete reference**: Use the Complete Guide with its quick reference section
+### For Self-Study
+1. Start with markdown guides in `docs/` for quick reference
+2. Compile and study the comprehensive LaTeX guide
+3. Follow the progression: Beginner → Intermediate → Advanced
+4. Practice with examples provided
+5. Review communication protocols guide for practical applications
 
 ### For Teaching
-- **Complete Learning Guide** is perfect for:
-  - Classroom instruction (can be taught over 3-5 sessions)
-  - Lab assignments (50+ exercises ready to assign)
-  - Self-paced learning modules
-  - University courses on HDL/verification
-  - Professional training programs
+- Use markdown files for quick classroom reference
+- Compile LaTeX documents for professional handouts
+- Assign sections based on course level
+- Use protocol examples for lab assignments
 
-### For Job Interview Preparation
-- Review the quick reference guide
-- Practice all exercises
-- Study real-world examples (UART, AXI)
-- Understand polymorphism and OOP concepts
-
-## License
-
-This documentation is provided for educational purposes.
+### For Interview Preparation
+- Review all markdown guides
+- Focus on functions, tasks, and OOP concepts
+- Study communication protocol implementations
+- Understand testbench and verification concepts
 
 ## Contributing
 
 Suggestions and improvements are welcome! Please submit issues or pull requests.
 
+## License
+
+This documentation is provided for educational purposes.
+
 ## Additional Resources
 
-- IEEE 1800-2017 SystemVerilog Standard
+- [IEEE 1800-2017 SystemVerilog Standard](https://ieeexplore.ieee.org/document/8299595)
 - *SystemVerilog for Verification* (3rd Edition) by Chris Spear
 - *Writing Testbenches using SystemVerilog* by Janick Bergeron
+- [Verification Academy](https://verificationacademy.com)
+
+## Version History
+
+- **v3.0** (2025-11-18): Repository reorganization
+  - Organized into logical directory structure
+  - Consolidated duplicate files
+  - Updated build system
+  - Improved documentation
+
+- **v2.0** (2025): Complete learning edition
+  - Added comprehensive guides
+  - Added communication protocols
+  - Expanded to 30 sections
+
+- **v1.0** (2024): Initial release
+  - Basic function and task documentation
 
 ---
 
-## What's New in Version 2.0
-
-- 🎓 **Complete Learning Guide** with 160+ pages of content
-- 💪 **50+ Exercises** with detailed step-by-step solutions
-- 🏗️ **Real-World Examples**: UART transmitter, AXI4-Lite driver
-- 📊 **Visual Aids**: TikZ diagrams, timing charts, flowcharts
-- ✅ **Self-Assessment Quizzes** after each major section
-- 🔧 **Troubleshooting Guide** with common errors
-- 📖 **Quick Reference** with decision flowcharts
-- 🎯 **Progressive Learning Path** from beginner to expert
-
----
-
-**Document Version**: 2.0 (Complete Learning Edition)
-**Last Updated**: 2025
+**Last Updated**: 2025-11-18

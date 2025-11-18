@@ -1,45 +1,49 @@
 # Makefile for compiling SystemVerilog documentation
 
+# Directories
+LATEX_DIR = latex
+OUTPUT_DIR = $(LATEX_DIR)
+
 # Files
-COMPLETE_GUIDE = SystemVerilog_Functions_Tasks_Complete_Guide
-BASIC_VERSION = SystemVerilog_Functions_and_Tasks
+COMPREHENSIVE_GUIDE = SystemVerilog_Complete_Comprehensive_Guide
+ADVANCED_SECTIONS = SystemVerilog_Advanced_Sections_21_30
 
 # Default target
-all: complete basic
+all: comprehensive advanced
 
-# Compile complete learning guide
-complete: $(COMPLETE_GUIDE).pdf
+# Compile comprehensive guide
+comprehensive: $(OUTPUT_DIR)/$(COMPREHENSIVE_GUIDE).pdf
 
-# Compile basic version
-basic: $(BASIC_VERSION).pdf
+# Compile advanced sections
+advanced: $(OUTPUT_DIR)/$(ADVANCED_SECTIONS).pdf
 
 # Pattern rule for PDF compilation
-%.pdf: %.tex
+$(OUTPUT_DIR)/%.pdf: $(LATEX_DIR)/%.tex
 	@echo "Compiling $<..."
-	@pdflatex -interaction=nonstopmode $< > /dev/null
-	@pdflatex -interaction=nonstopmode $< > /dev/null
+	@cd $(LATEX_DIR) && pdflatex -interaction=nonstopmode $(notdir $<) > /dev/null
+	@cd $(LATEX_DIR) && pdflatex -interaction=nonstopmode $(notdir $<) > /dev/null
 	@echo "Created $@"
 
 # Clean auxiliary files
 clean:
 	@echo "Cleaning auxiliary files..."
-	@rm -f *.aux *.log *.out *.toc *.lof *.lot
+	@rm -f $(LATEX_DIR)/*.aux $(LATEX_DIR)/*.log $(LATEX_DIR)/*.out $(LATEX_DIR)/*.toc $(LATEX_DIR)/*.lof $(LATEX_DIR)/*.lot
 	@echo "Done"
 
 # Clean everything including PDFs
 distclean: clean
 	@echo "Removing PDFs..."
-	@rm -f *.pdf
+	@rm -f $(LATEX_DIR)/*.pdf
 	@echo "Done"
 
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  make           - Compile both documents"
-	@echo "  make complete  - Compile complete learning guide"
-	@echo "  make basic     - Compile basic version"
-	@echo "  make clean     - Remove auxiliary files"
-	@echo "  make distclean - Remove all generated files"
-	@echo "  make help      - Show this help"
+	@echo "  make                - Compile all documents"
+	@echo "  make comprehensive  - Compile comprehensive SystemVerilog guide"
+	@echo "  make advanced       - Compile advanced sections (21-30)"
+	@echo "  make clean          - Remove auxiliary files"
+	@echo "  make distclean      - Remove all generated files"
+	@echo "  make help           - Show this help"
 
-.PHONY: all complete basic clean distclean help
+.PHONY: all comprehensive advanced clean distclean help
