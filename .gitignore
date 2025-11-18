@@ -1,0 +1,25 @@
+# Simulation outputs
+*.vcd
+
+# Compiled simulation executables
+*_test
+uart_test
+spi_test
+fifo_test
+i2c_test
+i2c_simple_test
+i2c_basic_test
+
+# Icarus Verilog outputs
+*.vvp
+*.lxt
+*.lxt2
+
+# Waveform viewer files
+*.gtkw
+
+# Editor/IDE files
+*.swp
+*.swo
+*~
+.DS_Store
