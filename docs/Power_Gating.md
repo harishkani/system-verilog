@@ -167,6 +167,115 @@ Where P_overhead includes:
 | Footer | Smaller area (NMOS) | Ground bounce risk |
 | Both | Best performance | 2x area overhead |
 
+**Detailed Waveform - Power Switch Operation:**
+```
+Header Switch (PMOS) - Power-On Sequence
+──────────────────────────────────────────────────────────────────
+
+power_en_n   ────────────────────┐       ┌───────────────────────
+(active low)                     └───────┘
+                                 ↑ Enable power switch
+
+VDD (1.0V)   ─────────────────────────────────────────────────────
+(always on)                      1.0V
+
+VDDG         ────────────────┌─────────┐─────────────────────────
+(virtual)            0V      │  Ramp   │  1.0V
+                             │   Up    │
+                             │         │
+                    t0       t1        t2
+
+Stages:
+t0: Power switch disabled, VDDG = 0V (domain off)
+t1: Power switch enabled, VDDG begins ramping
+t2: VDDG reaches full voltage (1.0V), domain operational
+
+Ramp time: 100ns - 10µs (depends on:
+- Switch size
+- Domain capacitance
+- Staged power-up
+- Current limit)
+
+
+Footer Switch (NMOS) - Power-On Sequence
+──────────────────────────────────────────────────────────────────
+
+power_en     ────────────────────┐───────────────────────────────
+(active high)                    └───────────────────────────────
+                                 ↑ Enable power switch
+
+VSSG         ─────────────────────┌──────┐─────────────────────
+(virtual GND)           Floating  │ Ramp │  0V
+                                  │ Down │
+                                  │      │
+                         t0       t1     t2
+
+VSS (0V)     ──────────────────────────────────────────────────
+(always 0V)                       0V
+
+
+Rush Current During Power-On:
+──────────────────────────────────────────────────────────────────
+
+VDDG (V)     ──────┌─────────────────────────────────────────
+                   │ Ramp up
+             0V    │     1.0V
+                   └────────────
+
+I_rush (A)   ────────┐╲
+             0A      │ ╲  ← Peak rush current
+                     │  ╲    (C × dV/dt)
+                     │   ╲
+                     └────╲___________ Steady state
+                          ↑
+                     t1   t2    t3
+
+Phases:
+t1: Initial inrush (charging domain capacitance)
+t2: Peak current (highest current draw)
+t3: Steady-state operational current
+
+I_rush = C_domain × (dVDD/dt) + I_operational
+
+Typical: 10-100x steady-state current!
+Solution: Staged power-up to limit rush current
+
+
+Staged Power-Up (Reducing Rush Current):
+──────────────────────────────────────────────────────────────────
+
+stage_en[0]  ────────┐───────────────────────────────────────────
+                     └───────────────────────────────────────────
+                     ↑ Enable first switches
+
+stage_en[1]  ──────────────┐─────────────────────────────────────
+                           └─────────────────────────────────────
+                           ↑ Enable more switches (delayed)
+
+stage_en[2]  ────────────────────┐───────────────────────────────
+                                 └───────────────────────────────
+                                 ↑ Enable remaining switches
+
+stage_en[3]  ──────────────────────────┐─────────────────────────
+                                       └─────────────────────────
+
+VDDG (V)     ───────┌╱  ┌╱  ┌╱  ┌╱────────────────────────────
+                    ││  ││  ││  ││  ← Gradual ramp (staged)
+                    ││  ││  ││  ││
+             0V     └┘  └┘  └┘  └┘  1.0V
+
+I_rush (A)   ───────┐ ┌─┐ ┌─┐ ┌─────────
+                    └─┘ └─┘ └─┘     ← Multiple smaller peaks
+                    ↑   ↑   ↑   ↑
+                    Much lower than single-stage!
+
+Benefits:
+✓ Reduced peak current (10-50% of single-stage)
+✓ Lower voltage droop
+✓ Reduced electromagnetic interference
+✓ Better IR drop management
+```
+
 ---
 
 ## Power Switch Design
@@ -487,6 +596,188 @@ module iso_with_timing (
     end
 
 endmodule
+```
+
+**Critical Waveform - Isolation Timing:**
+```
+POWER-DOWN SEQUENCE (Correct Order)
+──────────────────────────────────────────────────────────────────────────────
+
+clk          ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
+
+power_req    ────────────────────┐───────────────────────────────────────────
+(shutdown)                       └───────────────────────────────────────────
+                                 ↑ Request power down
+
+State        ──ACTIVE──────────ISOLATING──POWERED_DOWN──────────────────────
+                                │← 4 clk →│
+
+iso_en       ────────────────────────┐─────────────────────────────────────
+(isolation)                          └─────────────────────────────────────
+                                     ↑ Step 1: ASSERT ISOLATION FIRST!
+                                     (Prevents X propagation)
+
+power_sw_en  ─────────────────────────────────┐───────────────────────────
+                                              └───────────────────────────
+                                              ↑ Step 2: THEN power down
+                                              (After isolation active)
+
+VDDG (V)     ──────────────────────────────────┐╲──────────────────────────
+                                    1.0V        │ ╲ Ramp down
+                                                │  ╲
+                                                └───╲─────── 0V
+
+data_from    ──────< VALID >───────────────────────XXXX──────────────────
+gated_domain                                       ↑ Goes to X when off
+
+data_to      ──────< VALID >────────────────────< 0 >────────────────────
+always_on                                        ↑ Clamped by isolation!
+                                                 ✓ No X propagation!
+
+
+WRONG Power-Down (Isolation Too Late):
+──────────────────────────────────────────────────────────────────────────────
+
+power_sw_en  ─────────────────────────┐───────────────────────────────────
+                                      └───────────────────────────────────
+                                      ↑ Power down FIRST (WRONG!)
+
+VDDG (V)     ───────────────────────────┐╲────────────────────────────────
+                            1.0V         │ ╲
+                                         └──╲──── 0V
+
+data_from    ──────< VALID >────────────────XXXX──────────────────────────
+gated_domain                                ↑ Goes to X
+
+iso_en       ────────────────────────────────────┐────────────────────────
+(TOO LATE!)                                      └────────────────────────
+                                                 ↑ Too late!
+
+data_to      ──────< VALID >────────────────XXXX< 0 >─────────────────────
+always_on                                   ↑ X PROPAGATED! ⚠ DANGER!
+                                            (Power consumption ++)
+                                            (Logic malfunction)
+
+
+POWER-UP SEQUENCE (Correct Order)
+──────────────────────────────────────────────────────────────────────────────
+
+clk          ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
+
+power_req    ──────────────────────────────┐───────────────────────────────
+(wake up)                                  └───────────────────────────────
+                                           ↑ Request power up
+
+State        ──POWERED_DOWN────────POWERING_UP─────ACTIVE────────────────
+                                   │←─ 8 clk ─→│
+
+power_sw_en  ──────────────────────────────────┐───────────────────────────
+                                               └───────────────────────────
+                                               ↑ Step 1: POWER UP FIRST!
+
+VDDG (V)     ──────────────────────────────────┌╱──────────────────────────
+                            0V                 │╱ Ramp up
+                                               └────────── 1.0V
+
+power_stable ──────────────────────────────────────────┐───────────────────
+(from sensor)                                          └───────────────────
+                                                       ↑ Power good signal
+
+iso_en       ────────────────────────────────────────────────────┐─────────
+(isolation)                                                      └─────────
+                                                                 ↑ Step 2:
+                                                                 DE-ASSERT
+                                                                 ISOLATION
+                                                                 LAST!
+
+data_from    ────XXXX─────────────────────────────────────< VALID >────────
+gated_domain     ↑ Was X when off                        ↑ Now valid
+
+data_to      ────< 0 >────────────────────────────────────< VALID >────────
+always_on        ↑ Clamped during off                    ↑ Real data flows
+                 (Protected by isolation)
+
+
+Complete Power Cycle with State Transitions:
+──────────────────────────────────────────────────────────────────────────────
+
+Time (µs)    0    5    10   15   20   25   30   35   40   45   50
+             │    │    │    │    │    │    │    │    │    │    │
+State        │ ACTIVE │ISOL│ OFF      │ POWERING_UP │ ACTIVE
+             │        │    │          │             │
+
+iso_en       ────────────────┐────────────────────────────┐────────────────
+                             └────────────────────────────┘
+                             │← Isolated duration      →│
+
+power_sw_en  ──────────────────────┐────────────┐───────────────────────────
+                                   └────────────┘
+                                   │←  OFF   →│
+
+VDDG (V)     ───────────────────────────╲  ╱─────────────────────────────
+                            1.0V         ╲╱ 0V        1.0V
+
+I_leak (µA)  ─────────100µA──────────────────1µA─────────100µA────────────
+                                              ↑ 99% savings!
+
+P_total (mW) ─────────50mW─────────────────<1mW──────────50mW─────────────
+                                            ↑ Power gated!
+
+
+Timing Requirements:
+──────────────────────────────────────────────────────────────────────────────
+
+Power-Down:
+1. iso_en must assert ≥ 2 cycles BEFORE power_sw_en de-asserts
+2. Isolation setup time: ~10-100ns
+3. Power ramp-down time: ~100ns-1µs
+
+Power-Up:
+1. power_sw_en must assert FIRST
+2. VDDG must stabilize (monitored by power_good sensor)
+3. Wait ≥ 8 cycles after power_good
+4. Then de-assert iso_en
+
+Violations cause:
+⚠ X-propagation to always-on domain
+⚠ Increased power consumption
+⚠ Logic errors in always-on circuits
+⚠ Metastability in downstream flops
+⚠ System malfunction
+
+
+Multi-Domain Isolation Example:
+──────────────────────────────────────────────────────────────────────────────
+
+                Always-On Domain
+      ┌─────────────────────────────────────┐
+      │         [Logic]                     │
+      │           ↑                         │
+      │     ┌─────┴─────┐                  │
+      │     │    ISO    │ ← Isolation Cell │
+      │     │   (AND)   │                  │
+      │     └─────↑─────┘                  │
+      │           │ data_out               │
+      └───────────┼─────────────────────────┘
+                  │
+      ═══════════════════ Power Domain Boundary
+                  │
+      ┌───────────┼─────────────────────────┐
+      │     ┌─────┴─────┐                  │
+      │     │  [Logic]  │                  │
+      │     └───────────┘                  │
+      │    Gated Domain                    │
+      │    (can be powered off)            │
+      └─────────────────────────────────────┘
+                VDDG (gated supply)
+
+When domain is OFF:
+  • Logic output → X (unknown)
+  • ISO cell clamps to 0 (or 1)
+  • Always-on domain sees defined value
+  • No X propagation ✓
 ```
 
 ---

@@ -128,16 +128,95 @@ endmodule
 - No timing issues with enable signal
 - Industry standard approach
 
-**Waveform**:
+**Detailed Waveform - Latch-Based ICG:**
 ```
-clk          : ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
-               └───┘   └───┘   └───┘   └───┘
-enable       : ────┐       ┌───────────────
-                   └───────┘
-enable_latched:────┐           ┌───────────
-                   └───────────┘
-gated_clk    : ┐   ┌   ┐   ┌           ┌
-               └───┘   └───┘           └───┘
+Scenario 1: Enable changes during CLK LOW (Safe)
+──────────────────────────────────────────────────────────────────
+
+clk          ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘   └───┘
+
+enable       ────┐           ┌───────────────────────────────
+                 └───────────┘
+                 ↑ Changes when clk=0 (safe)
+
+enable_latch ─────────┐               ┌───────────────────────
+(transparent)         └───────────────┘
+when clk=0            ↑ Latched       ↑ Latched
+
+gated_clk    ┐   ┌   ┐   ┌   ┐       ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘
+             ↑ Glitch-free!  ↑ Stopped    ↑ Resumes
+
+
+Scenario 2: Enable changes during CLK HIGH (Safe with Latch)
+──────────────────────────────────────────────────────────────────
+
+clk          ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘   └───┘
+                     ↓ enable changes here (clk=1)
+
+enable       ────────┐       ┌───────────────────────────────
+                     └───────┘
+                     ↑ Changes when clk=1
+
+enable_latch ─────────────────┐           ┌───────────────────
+(holding)                     └───────────┘
+                              ↑ Updated only when clk=0
+
+gated_clk    ┐   ┌   ┐   ┌   ┐   ┌       ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘
+             ↑ Enable change during HIGH is ignored
+             ↑ No glitch! Applied at next clk LOW
+
+
+Timing Diagram with Detailed Transitions:
+──────────────────────────────────────────────────────────────────
+
+        t0  t1  t2  t3  t4  t5  t6  t7  t8  t9  t10 t11 t12
+        │   │   │   │   │   │   │   │   │   │   │   │   │
+clk     ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐
+        └───┘   └───┘   └───┘   └───┘   └───┘   └───┘   └───
+
+enable  ────┐           ┌─────────────────┐           ┌───────
+            └───────────┘                 └───────────┘
+            A           B                 C           D
+
+Latch   ────────┐           ┌─────────────────┐           ┌───
+        (Opaque)└───────────┘                 └───────────┘
+                ↑ t2        ↑ t6              ↑ t10       ↑ t14
+                Latched at  Latched at        Latched at  Latched
+                negedge     negedge           negedge     at negedge
+
+gated   ┐   ┌   ┐   ┌   ┐       ┐   ┌   ┐   ┐       ┐   ┌
+clk     └───┘   └───┘   └───┘   └───┘   └───┘   └───┘   └───
+
+Key Points:
+- Latch is transparent when clk = 0
+- Latch holds value when clk = 1
+- Enable changes take effect on negative edge of clk
+- No glitches regardless of enable timing
+
+
+Power Savings Visualization:
+──────────────────────────────────────────────────────────────────
+
+Without Clock Gating:
+clk to FFs   ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
+             ↑ Power consumed every cycle
+
+enable       ──────────┐           ┌─────────
+                       └───────────┘
+             ↑ FFs don't update, but still toggle!
+
+With Clock Gating:
+gated_clk    ┐ ┐ ┐ ┐ ┐             ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘             └─┘ └─┘
+             ↑ Active    ↑ Gated    ↑ Active
+                         (No power!)
+
+Power Saved: ~40-50% during gated period
 ```
 
 ### 2. AND-Based Clock Gating
@@ -158,6 +237,110 @@ endmodule
 - ⚠️ Glitches if enable changes during high clock
 - ⚠️ Timing issues
 - ⚠️ NOT recommended for use
+
+**Waveform - AND-Based Clock Gating (DANGEROUS):**
+```
+Problem 1: Glitch when enable de-asserts during CLK HIGH
+──────────────────────────────────────────────────────────────────
+
+clk          ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘   └───┘
+                     ↓ enable goes low here (clk=1)
+
+enable       ────────┐       ┌───────────────────────────────
+                     └───────┘
+                     ↑ DANGER: Changes during high clock
+
+gated_clk    ┐   ┌   ┐   ┌ ┐ ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘ └─┘   └───┘   └───┘
+                         ↑ GLITCH! Narrow pulse
+                         ⚠ Can cause metastability!
+                         ⚠ False clock edge!
+
+
+Problem 2: Glitch when enable asserts during CLK HIGH
+──────────────────────────────────────────────────────────────────
+
+clk          ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘   └───┘
+                     ↓ enable goes high here (clk=1)
+
+enable       ────────┐───────────────────────────────────────
+                     └────────────────────────────────────────
+
+gated_clk    ┐   ┌   ┐ ┌─┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐
+             └───┘   └─┘ └───┘   └───┘   └───┘   └───┘   └─
+                       ↑ GLITCH! Partial pulse
+                       ⚠ Setup/hold violation risk!
+
+
+Problem 3: Hazard with combinational enable logic
+──────────────────────────────────────────────────────────────────
+
+ctrl_a       ────┐       ┌───────────────────────────────────
+                 └───────┘
+
+ctrl_b       ────────────┐───────────────────────────────────
+                         └────────────────────────────────────
+
+enable       ────┐   ╱╲  ┐───────────────────────────────────
+(=ctrl_a|b)      └───╳╳──┘
+                     ↑↑ Glitch from combinational hazard!
+
+clk          ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘
+
+gated_clk    ┐   ┌ ┐ ┌───────────────────────────────
+             └───┘ └─┘
+                   ↑ Runt pulse from enable glitch!
+
+
+Comparison: AND-based vs Latch-based
+──────────────────────────────────────────────────────────────────
+
+clk          ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘
+
+enable       ────┐     ┌ ┐ ┌───────────────────────
+                 └─────┘ └─┘
+                       ↑ Glitchy enable signal
+
+AND-based    ┐   ┌ ┐ ┌─┐ └─┐   ┌   ┐   ┌
+gated_clk    └───┘ └─┘ └───┘   └───┘   └───
+             ⚠ Glitches propagated! DANGEROUS!
+
+Latch-based  ┐   ┌   ┐       ┐   ┌   ┐   ┐   ┌
+gated_clk    └───┘   └───────┘   └───┘   └───┘
+             ✓ Glitch-free! SAFE!
+
+
+Why Glitches are Dangerous:
+──────────────────────────────────────────────────────────────────
+
+         ┌────────────────┐
+         │   Flip-Flop    │
+data ────┤D            Q  ├──── output
+         │                │
+gated────┤CLK             │
+clk      └────────────────┘
+
+Glitch on gated_clk:
+
+gated_clk:   ──┐ ┌──┐ ┌────────
+               └─┘  └─┘
+               ↑    ↑
+            False   True
+            edge    edge
+
+Result:
+- Flip-flop may capture wrong data
+- Multiple sampling in one cycle
+- Metastability if data not stable
+- Unpredictable behavior
+- Functional failures
+
+⚠️ NEVER USE AND-based clock gating in production designs!
+```
 
 ### 3. Latch-Free Clock Gating
 

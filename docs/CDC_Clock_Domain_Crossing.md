@@ -47,6 +47,50 @@ When a flip-flop's setup or hold time is violated, the output can enter a metast
 - Output oscillates
 - Resolution time is unpredictable
 
+**Metastability Visualization:**
+```
+Voltage Levels:
+                VDD ─────────────────────────────────────
+
+                              Metastable Region
+                     ╔═══════════════════════════╗
+                     ║  ≈≈≈≈≈  Oscillation  ≈≈≈≈≈║
+                     ╚═══════════════════════════╝
+
+                VSS ─────────────────────────────────────
+
+                     |←  Tsu  →|← Th →|
+                clk  ────┐      |      |──────
+                         └──────┘
+
+                data ─────────X─────────────  (X = uncertainty)
+```
+
+**Setup/Hold Violation Timing:**
+```
+Case 1: Setup Violation
+                     |← Tsu →|
+clk_a        ───┐    ↓    ┌───────
+                └─────────┘
+
+data_a       ────────╱╲────────── (changes too close to clock)
+                    ↑ violation!
+
+clk_b        ──┐       ┌──────
+               └───────┘    ← Samples during violation
+
+data_b       ─────────XXXX─────── (metastable!)
+
+
+Case 2: Hold Violation
+                         |← Th →|
+clk_a        ───┐        ↓    ┌───
+                └─────────────┘
+
+data_a       ────────────╱╲────── (changes too soon after clock)
+                        ↑ violation!
+```
+
 ```systemverilog
 // Unsafe CDC - Direct connection
 module unsafe_cdc (
@@ -66,6 +110,27 @@ module unsafe_cdc (
         data_out <= data_a;  // Metastability risk!
 
 endmodule
+```
+
+**Waveform - Unsafe CDC:**
+```
+clk_a (100MHz)   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+                 └───┘   └───┘   └───┘   └───┘   └───┘
+
+data_in          ─────┐           ┌─────────────────────
+                      └───────────┘
+
+data_a           ─────────┐           ┌─────────────────
+                          └───────────┘ (registered on clk_a)
+
+clk_b (75MHz)    ┐     ┌     ┐     ┌     ┐     ┌     ┐
+                 └─────┘     └─────┘     └─────┘     └─
+
+                            ↓ clk_b samples here
+data_out         ─────────XXXX??????????────────────────
+                          ↑ Metastability!
+
+Risk: data_a changes at unpredictable time relative to clk_b
 ```
 
 ### Mean Time Between Failures (MTBF)
@@ -141,6 +206,18 @@ Static timing analysis cannot fully detect CDC issues because:
 
 Most common CDC synchronizer for single-bit signals.
 
+**Architecture Diagram:**
+```
+Source Domain          |  Destination Domain
+                      |
+data_in ──►[FF]───────┼─────►[FF1]────►[FF2]────► data_out
+           clk_a      |      clk_b     clk_b
+                      |       ↑         ↑
+                      |       └─────────┘
+                      |    May go      Resolution
+                      |    metastable   stage
+```
+
 ```systemverilog
 module two_flop_sync (
     input  clk_dst,      // Destination clock
@@ -167,11 +244,84 @@ module two_flop_sync (
 endmodule
 ```
 
+**Detailed Waveform - Two-Flop Synchronizer:**
+```
+clk_src      ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘   └───┘
+
+data_in      ─────┐                   ┌─────────────────────
+                  └───────────────────┘
+
+clk_dst      ┐     ┌     ┐     ┐     ┐     ┐     ┐     ┐
+             └─────┘     └─────┘     └─────┘     └─────┘
+
+                   ↓     ↓     ↓     ↓     ↓
+             Sample points in destination domain
+
+sync_ff1     ─────XXXX??┐                   ┌─────────────
+                        └───────────────────┘
+                   ↑ May be metastable for short time
+
+data_out     ─────────────────┐                   ┌─────────
+(stable)                      └───────────────────┘
+                              ↑ Stable output (2 cycles latency)
+
+Timing:
+T0: data_in changes in source domain
+T1: clk_dst samples → sync_ff1 may go metastable
+T2: Metastability resolves (typically < 1ns)
+T3: clk_dst samples sync_ff1 → data_out stable
+```
+
+**MTBF Improvement with Stages:**
+```
+Single Stage:                Two Stage:                Three Stage:
+
+  MTBF = e^(T/τ)             MTBF = e^(2T/τ)         MTBF = e^(3T/τ)
+  ─────────────              ────────────────         ────────────────
+   Fc × Fd × T0              Fc × Fd × T0             Fc × Fd × T0
+
+Example @ 100MHz, T=10ns, τ=150ps:
+  1 stage:  ~10 years
+  2 stages: ~10^28 years ← Industry standard
+  3 stages: ~10^56 years ← Safety-critical
+```
+
+**Synchronization Delay:**
+```
+Best Case:  2 clock cycles (clk_dst)
+Worst Case: 3 clock cycles (clk_dst)
+
+Depends on when data_in changes relative to clk_dst edges
+
+Case 1 - Data changes just after clk_dst:
+clk_dst      ┐     ┌     ┐     ┐     ┐
+             └─────┘     └─────┘     └─────┘
+                ↑ data changes here
+data_in      ──┐
+               └────────────────────────────
+
+data_out     ────────────────┐              (2 cycles)
+                             └───────────────
+
+Case 2 - Data changes just before clk_dst:
+clk_dst      ┐     ┌     ┐     ┐     ┐
+             └─────┘     └─────┘     └─────┘
+             ↑ data changes here
+data_in      ┐
+             └────────────────────────────
+
+data_out     ──────────────────────┐        (3 cycles)
+                                   └─────────
+```
+
 #### Key Points:
 - First flip-flop may go metastable
 - Second flip-flop provides time for resolution
 - MTBF improves exponentially with more stages
 - 2-3 stages are typical
+- Adds 2-3 cycle latency
+- Only for slowly changing signals (not pulses!)
 
 ### Three-Flop Synchronizer
 
@@ -201,6 +351,35 @@ endmodule
 ### Edge Detector Synchronizer
 
 For detecting edges/pulses crossing clock domains:
+
+**Problem with Direct Pulse Synchronization:**
+```
+Fast to Slow Domain - Pulse Lost:
+
+clk_src(fast) ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐   (100 MHz)
+              └─┘ └─┘ └─┘ └─┘ └─
+
+pulse_in      ──┐ ┌─────────────   (1 cycle pulse)
+                └─┘
+
+clk_dst(slow) ┐     ┌     ┐     ┐  (25 MHz)
+              └─────┘     └─────┘
+
+pulse_out     ──────────────────   (MISSED! Too short)
+
+Solution: Convert pulse to level (toggle)
+```
+
+**Toggle-Based Edge Detection Architecture:**
+```
+Source Domain              Destination Domain
+
+pulse_in ─►[Toggle]───────►[Sync]────►[Edge    ]──► pulse_out
+           Generator   |    2-FF       Detector
+           (clk_src)   |   (clk_dst)   (clk_dst)
+                      CDC
+                   Boundary
+```
 
 ```systemverilog
 module edge_detect_sync (
@@ -239,6 +418,68 @@ module edge_detect_sync (
     end
 
 endmodule
+```
+
+**Complete Waveform - Edge Detection:**
+```
+Source Domain (100 MHz)
+─────────────────────────────────────────────────────────
+
+clk_src      ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
+
+pulse_in     ────┐ ┌────────────┐ ┌──────────────────
+                 └─┘            └─┘
+                 P1             P2  (short pulses)
+
+toggle_src   ────────┐                   ┌───────────
+                     └───────────────────┘
+                     ↑ toggles on P1     ↑ toggles on P2
+
+
+Destination Domain (25 MHz)
+─────────────────────────────────────────────────────────
+
+clk_dst      ┐     ┌     ┐     ┐     ┐     ┐     ┐
+             └─────┘     └─────┘     └─────┘     └─────┘
+
+sync_toggle[0]  ──────────┐                 ┌───────────
+(stage 1)                 └─────────────────┘
+
+sync_toggle[1]  ────────────────┐                 ┌─────
+(stage 2)                       └─────────────────┘
+
+sync_toggle[2]  ──────────────────────┐                 ┌
+(stage 3)                             └─────────────────┘
+
+pulse_out    ────────────────┐ ┌─────────────┐ ┌────────
+(XOR detect)                 └─┘             └─┘
+                             ↑ Rising edge   ↑ Falling edge
+                             detected        detected
+
+Key Benefits:
+1. Pulses cannot be missed (converted to level)
+2. Works across any clock ratio
+3. Both rising and falling edges detected
+4. 2-3 cycle latency in destination domain
+```
+
+**Multiple Pulse Handling:**
+```
+Problem - Pulses too close together:
+
+clk_src      ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
+
+pulse_in     ──┐ ┌─┐ ┌───────────   (2 pulses, 2 cycles apart)
+               └─┘ └─┘
+
+toggle_src   ────┐ ┌─┐ ┌───────────  ⚠ Toggles cancel out!
+                 └─┘ └─┘
+
+Solution: Space pulses by ≥ 3 destination clock cycles
+OR use separate toggle for each pulse
+OR use FIFO for pulse buffering
 ```
 
 ### Level Synchronizer with Enable
@@ -287,6 +528,69 @@ always_ff @(posedge clk_dst)
 ### Gray Code Synchronizer
 
 For counters and addresses (only 1 bit changes at a time):
+
+**Why Gray Code?**
+```
+Problem with Binary Counter Crossing CDC:
+
+Binary: 3→4 transition (0011 → 0100)
+        ║ ║ ║ ║
+        ║ ║ ║ ╚═ bit 0: 1→0
+        ║ ║ ╚═══ bit 1: 1→0
+        ║ ╚═════ bit 2: 0→1
+        ╚═══════ bit 3: 0→0
+
+ALL 3 bits change simultaneously!
+
+Sampling during transition can give ANY value:
+0011 (3) ──→ 0100 (4)
+         ↓ Possible samples:
+    0000 (0), 0001 (1), 0010 (2), 0011 (3),
+    0100 (4), 0101 (5), 0110 (6), 0111 (7)
+
+Gray Code Solution:
+
+Gray: 3→4 transition (0010 → 0110)
+      ║ ║ ║ ║
+      ║ ║ ║ ╚═ bit 0: 0→0 (no change)
+      ║ ║ ╚═══ bit 1: 1→1 (no change)
+      ║ ╚═════ bit 2: 0→1 (ONLY THIS BIT CHANGES!)
+      ╚═══════ bit 3: 0→0 (no change)
+
+Only 1 bit changes per increment!
+Sampling gives either correct value or previous value - no random values!
+```
+
+**Gray Code Conversion:**
+```
+Binary to Gray:           Gray to Binary:
+G[n] = B[n] ^ B[n+1]     B[MSB] = G[MSB]
+                         B[i] = B[i+1] ^ G[i]
+
+Decimal  Binary  Gray    Decimal  Binary  Gray
+───────────────────────  ───────────────────────
+   0     0000   0000        8     1000   1100
+   1     0001   0001        9     1001   1101
+   2     0010   0011       10     1010   1111
+   3     0011   0010       11     1011   1110
+   4     0100   0110       12     1100   1010
+   5     0101   0111       13     1101   1011
+   6     0110   0101       14     1110   1001
+   7     0111   0100       15     1111   1000
+
+Notice: Only 1 bit changes between consecutive values!
+```
+
+**Gray Code CDC Architecture:**
+```
+Source Domain          |     Destination Domain
+                      |
+Binary ─►[Bin→Gray]───┼───►[2-FF  ]──►[Gray→Bin]──► Binary
+Counter   Convert     |     Sync       Convert      Output
+        (clk_src)     |   (clk_dst)   (clk_dst)
+                     CDC
+                  Boundary
+```
 
 ```systemverilog
 module gray_sync #(
@@ -339,6 +643,96 @@ module gray_sync #(
     end
 
 endmodule
+```
+
+**Detailed Waveform - Gray Code Counter CDC:**
+```
+Source Domain (clk_src = 100 MHz)
+──────────────────────────────────────────────────────────────────
+
+clk_src      ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
+
+binary_in    ──0───1───2───3───4───5───6───7───8───9──
+             (0000)(0001)(0010)(0011)(0100)(0101)(0110)(0111)(1000)(1001)
+
+gray_src     ──0───1───3───2───6───7───5───4───12──13─
+             (0000)(0001)(0011)(0010)(0110)(0111)(0101)(0100)(1100)(1101)
+                       ↑ Only 1 bit changes each time!
+
+
+Destination Domain (clk_dst = 60 MHz)
+──────────────────────────────────────────────────────────────────
+
+clk_dst      ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘   └───┘
+
+gray_sync1   ──────0───1───3───2───6───7───5───4──12──13──
+             (delayed by 1 clk_dst cycle)
+
+gray_sync2   ────────0───1───3───2───6───7───5───4──12──
+             (delayed by 2 clk_dst cycles)
+
+binary_out   ────────0───1───3───2───6───7───5───4──12──
+             (converted back to binary)
+
+
+Bit-level View of 3→4 Transition:
+──────────────────────────────────────────────────────────────────
+
+Binary:  0011 (3) ──→ 0100 (4)
+         ║║║╚══════════════════ bit[0]: 1→0 ⚠
+         ║║╚═══════════════════ bit[1]: 1→0 ⚠
+         ║╚════════════════════ bit[2]: 0→1 ⚠
+         ╚═════════════════════ bit[3]: 0→0
+
+Gray:    0010 (3) ──→ 0110 (4)
+         ║║║╚══════════════════ bit[0]: 0→0 ✓
+         ║║╚═══════════════════ bit[1]: 1→1 ✓
+         ║╚════════════════════ bit[2]: 0→1 ← ONLY THIS CHANGES
+         ╚═════════════════════ bit[3]: 0→0 ✓
+
+If sampled during transition:
+  Binary: Could read 0000,0001,0010,0011,0100,0101,0110,0111 ⚠ DANGEROUS
+  Gray:   Can only read 0010 or 0110 ✓ SAFE (old or new value)
+
+
+FIFO Pointer Application:
+──────────────────────────────────────────────────────────────────
+
+Write Domain                   |  Read Domain
+                              |
+wr_ptr (binary) ─►[Bin→Gray]──┼──►[Sync]──►[Gray→Bin]──► wr_ptr_sync
+                              |   (2-FF)
+                             CDC
+                          Boundary
+
+Empty/Full Calculation:
+  empty = (rd_ptr_gray == wr_ptr_gray_sync)
+  full  = (wr_ptr_gray_next == {~rd_ptr_gray_sync[MSB:MSB-1],
+                                 rd_ptr_gray_sync[MSB-2:0]})
+
+Gray code ensures pointer comparisons are glitch-free!
+```
+
+**When to Use Gray Code:**
+```
+✓ USE Gray Code for:
+  • Counter/pointer synchronization
+  • FIFO read/write pointers
+  • Sequential address crossing
+  • Any incrementing/decrementing value
+
+✗ DON'T USE Gray Code for:
+  • Random data values
+  • Non-sequential changes
+  • Multi-bit buses with arbitrary data
+  • Values that can change by >1 at a time
+
+For arbitrary multi-bit data, use:
+  • Handshaking protocols
+  • MUX recirculation
+  • Asynchronous FIFO
 ```
 
 ### MUX Recirculation Synchronizer
@@ -606,7 +1000,103 @@ module two_phase_handshake #(
 endmodule
 ```
 
+**Detailed Waveform - 2-Phase Handshake:**
+```
+Two-Phase Protocol Phases:
+  Phase 1: REQ toggle → ACK toggle
+  Phase 2: Data transfer complete
+
+Source Domain (clk_src = 100 MHz)
+──────────────────────────────────────────────────────────────────────
+
+clk_src      ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
+
+valid_in     ────┐               ┌───────────────┐
+                 └───────────────┘               └───────────────────
+
+data_in      ────< D1 >───────────< D2 >────────────────────────────
+
+data_hold    ────────< D1 >───────────────< D2 >────────────────────
+                    ↑ Captured             ↑ Captured
+
+req_toggle   ────────┐                           ┌───────────────────
+                     └───────────────────────────┘
+                     ↑ Phase 1: REQ toggles
+
+ready_out    ────┐           ┌───────────┐           ┌───────────────
+                 └───────────┘           └───────────┘
+                 ↑ Busy      ↑ Ready     ↑ Busy      ↑ Ready
+
+ack_sync[2]  ──────────────────────┐                           ┌─────
+(synced ACK)                       └───────────────────────────┘
+                                   ↑ ACK arrives (3-4 cycles later)
+
+
+Destination Domain (clk_dst = 80 MHz)
+──────────────────────────────────────────────────────────────────────
+
+clk_dst      ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘   └───┘   └───┘
+
+req_sync[2]  ────────────┐                                   ┌───────
+(synced REQ)             └───────────────────────────────────┘
+                         ↑ REQ arrives (2-3 cycles latency)
+
+valid_out    ────────────┐ ┌─────────────────────────────┐ ┌────────
+                         └─┘                             └─┘
+                         ↑ Pulse on REQ toggle           ↑ Pulse on toggle
+
+data_out     ────────────< D1 >─────────────────────────< D2 >──────
+                         ↑ Sampled                       ↑ Sampled
+
+ack_toggle   ────────────────┐                                   ┌───
+                             └───────────────────────────────────┘
+                             ↑ Phase 2: ACK toggles back
+
+
+Timing Diagram - Complete Transaction:
+──────────────────────────────────────────────────────────────────────
+
+Event Sequence:
+T0:  Source: valid_in asserted, data_in = D1
+T1:  Source: data captured in data_hold, req_toggle flips
+T2:  Source: ready_out de-asserted (busy)
+T3-T5: CDC: req_toggle synchronizes to destination (2-3 cycles)
+T5:  Dest: req_sync[2] detects toggle, valid_out pulses
+T6:  Dest: data_out = data_hold (D1), ack_toggle flips
+T7-T9: CDC: ack_toggle synchronizes back to source (2-3 cycles)
+T9:  Source: ack_sync[2] matches req_toggle, ready_out asserted
+T10: Source: Ready for next transaction
+
+Total Latency: 6-8 clock cycles (destination clock)
+Throughput: Limited by round-trip handshake time
+
+
+Advantages of 2-Phase:
+  ✓ Only one synchronization per direction per transaction
+  ✓ Faster than 4-phase (no return-to-zero)
+  ✓ Good for moderate data rates
+  ✓ Toggle tracks transfer count
+
+Disadvantages:
+  ✓ More complex edge detection logic
+  ✓ Requires XOR for edge detection
+  ✓ Must ensure toggles don't cancel
+```
+
 ### 4-Phase (REQ/ACK) Handshake
+
+**Protocol Description:**
+```
+Four-Phase Protocol States:
+  Phase 1: REQ asserted → Wait for ACK asserted
+  Phase 2: REQ de-asserted → Wait for ACK de-asserted
+  Phase 3: Return to idle
+  Phase 4: Ready for next transfer
+
+Also called "Return-to-Zero" protocol
+```
 
 ```systemverilog
 module four_phase_handshake #(
@@ -735,6 +1225,163 @@ module four_phase_handshake #(
     end
 
 endmodule
+```
+
+**Detailed Waveform - 4-Phase Handshake:**
+```
+Four-Phase Protocol State Machine:
+  Source: IDLE → WAIT_ACK → WAIT_ACK_LOW → IDLE
+  Dest:   IDLE → ACK → WAIT_REQ_LOW → IDLE
+
+Source Domain (clk_src = 100 MHz)
+──────────────────────────────────────────────────────────────────────────────
+
+clk_src      ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐ ┐
+             └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
+
+valid_in     ────┐                               ┌───
+                 └───────────────────────────────┘
+
+data_in      ────< D1 >─────────────────────────────< D2 >─────────────────
+
+data_hold    ────────< D1 >───────────────────────────────< D2 >───────────
+                    ↑ Latched                             ↑ Latched
+
+req          ────────┐                           ┌───────────┐
+                     └───────────────────────────┘           └───────────────
+                     │←─ Phase 1: Asserted ─────→│←─ Phase 2: De-asserted ─→│
+
+ready_out    ────┐       ┌───────────────────────────────────┐
+                 └───────┘                                   └───────────────
+                 IDLE  WAIT_ACK      WAIT_ACK_LOW            IDLE
+
+ack_sync[2]  ──────────────────┐                   ┌───────────────────────
+(synced ACK)                   └───────────────────┘
+                               ↑ Phase 1: ACK high ↑ Phase 2: ACK low
+                               (2-3 cycle delay)    (2-3 cycle delay)
+
+
+Destination Domain (clk_dst = 80 MHz)
+──────────────────────────────────────────────────────────────────────────────
+
+clk_dst      ┐   ┌   ┐   ┌   ┐   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌   ┐   ┌
+             └───┘   └───┘   └───┘   └───┘   └───┘   └───┘   └───┘   └───┘
+
+req_sync[2]  ────────────┐                                   ┌───────────────
+(synced REQ)             └───────────────────────────────────┘
+                         ↑ REQ synchronized                   ↑ REQ cleared
+
+valid_out    ────────────┐ ┌─────────────────────────────────────────────────
+                         └─┘
+                         ↑ Pulse when data valid
+
+data_out     ────────────< D1 >─────────────────────────────< D2 >─────────
+                         ↑ Data captured                     ↑ New data
+
+ack          ────────────────┐                   ┌───────────────┐
+                             └───────────────────┘               └───────────
+                             │←─ ACK asserted ──→│←─ ACK cleared ─→│
+
+dst_state    ──IDLE──────────ACK─WAIT_REQ_LOW────IDLE────────ACK──WAIT───
+
+
+Complete Transaction Timeline:
+──────────────────────────────────────────────────────────────────────────────
+
+T0:  Source IDLE: valid_in=1, latch data, assert REQ, go to WAIT_ACK
+T1-3:  CDC: REQ synchronizing to destination (2-3 cycles)
+T3:  Dest IDLE: req_sync[2]=1, output data, assert ACK, go to DST_ACK
+T4:  Dest DST_ACK: go to WAIT_REQ_LOW
+T5-7:  CDC: ACK synchronizing back to source (2-3 cycles)
+T7:  Source WAIT_ACK: ack_sync[2]=1, de-assert REQ, go to WAIT_ACK_LOW
+T8-10: CDC: REQ falling edge synchronizing (2-3 cycles)
+T10: Dest WAIT_REQ_LOW: req_sync[2]=0, de-assert ACK, go to IDLE
+T11-13: CDC: ACK falling edge synchronizing (2-3 cycles)
+T13: Source WAIT_ACK_LOW: ack_sync[2]=0, go to IDLE, ready for next
+
+Total Latency: ~13-16 clock cycles (destination clock)
+Throughput: Lower than 2-phase due to return-to-zero
+
+
+State Transitions Diagram:
+──────────────────────────────────────────────────────────────────────────────
+
+Source FSM:
+
+       ┌─────────────────────┐
+       │       IDLE          │ ready_out = 1
+       │  (ready for data)   │
+       └──────────┬──────────┘
+                  │ valid_in=1
+                  ↓ req=1
+       ┌──────────────────────┐
+       │      WAIT_ACK        │ ready_out = 0
+       │  (waiting for ACK)   │
+       └──────────┬───────────┘
+                  │ ack_sync[2]=1
+                  ↓ req=0
+       ┌──────────────────────┐
+       │   WAIT_ACK_LOW       │ ready_out = 0
+       │ (waiting ACK clear)  │
+       └──────────┬───────────┘
+                  │ ack_sync[2]=0
+                  ↓
+       ┌──────────────────────┐
+       │       IDLE           │ ready_out = 1
+       └──────────────────────┘
+
+
+Destination FSM:
+
+       ┌─────────────────────┐
+       │     DST_IDLE        │
+       │  (waiting for REQ)  │
+       └──────────┬──────────┘
+                  │ req_sync[2]=1
+                  ↓ ack=1, valid_out=1
+       ┌──────────────────────┐
+       │      DST_ACK         │
+       │   (ACK asserted)     │
+       └──────────┬───────────┘
+                  │ (1 cycle)
+                  ↓
+       ┌──────────────────────┐
+       │  DST_WAIT_REQ_LOW    │
+       │ (waiting REQ clear)  │
+       └──────────┬───────────┘
+                  │ req_sync[2]=0
+                  ↓ ack=0
+       ┌──────────────────────┐
+       │     DST_IDLE         │
+       └──────────────────────┘
+
+
+Comparison: 2-Phase vs 4-Phase
+──────────────────────────────────────────────────────────────────────────────
+
+Characteristic         │  2-Phase (Toggle)  │  4-Phase (REQ/ACK)
+───────────────────────┼────────────────────┼─────────────────────
+Signal transitions     │  2 per transfer    │  4 per transfer
+Latency               │  6-8 cycles        │  13-16 cycles
+Throughput            │  Higher            │  Lower
+Protocol complexity    │  Medium            │  Simple
+State machine         │  Edge detection    │  Level detection
+Metastability risk    │  Lower             │  Lower
+Power consumption     │  Lower             │  Higher (more toggles)
+Common usage          │  Moderate speed    │  Slow, reliable
+
+Advantages of 4-Phase:
+  ✓ Simple level-based detection (no edge logic)
+  ✓ Very robust and reliable
+  ✓ Clear handshake states
+  ✓ Easy to debug (levels visible)
+  ✓ Industry standard for reliable CDC
+
+Disadvantages:
+  ✗ Slower (4 transitions vs 2)
+  ✗ More power (more signal transitions)
+  ✗ Lower throughput
+  ✗ More CDC cycles per transaction
 ```
 
 ---
