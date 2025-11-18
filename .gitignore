@@ -1,0 +1,39 @@
+# Verilog simulation artifacts
+*.vcd
+*.vvp
+*.out
+*.log
+
+# Extracted code directory (generated from LaTeX)
+extracted_code/
+
+# EDA Playground tests directory (generated)
+eda_playground_tests/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.pdf
+*.synctex.gz
+*.toc
+*.out
+*.fdb_latexmk
+*.fls
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
