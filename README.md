@@ -9,6 +9,7 @@ system-verilog/
 ├── docs/                   # Documentation and guides
 │   ├── Communication_Protocols_Complete_Guide.md
 │   ├── COMPILATION_GUIDE.md
+│   ├── Industry_Tools_Learning_Guide.md
 │   ├── LATEX_COMPILATION_GUIDE.md
 │   └── SystemVerilog_Functions_and_Tasks.md
 ├── latex/                  # LaTeX source files
@@ -38,6 +39,18 @@ system-verilog/
 - Parameter passing, return types, and timing
 - Object-oriented programming concepts
 - DPI and external functions
+
+#### Industry EDA Tools Learning Guide (4-6 Weeks)
+**File**: `docs/Industry_Tools_Learning_Guide.md`
+- Complete learning curriculum for industry-standard EDA tools
+- **VCS** (Synopsys Verilog Compiler Simulator) - Weeks 1-2
+- **Verdi** (Synopsys Debug Platform) - Weeks 2-3
+- **Questa** (Siemens Advanced Simulator) - Weeks 3-4
+- **Formal Verification Tools** (JasperGold, VC Formal, Questa Formal) - Weeks 5-6
+- Hands-on exercises and practical examples
+- Integrated verification workflows
+- Best practices and troubleshooting
+- Career guidance and certifications
 
 #### Compilation Guides
 - **COMPILATION_GUIDE.md**: General compilation instructions
@@ -74,6 +87,9 @@ cat docs/SystemVerilog_Functions_and_Tasks.md
 
 # View communication protocols guide
 cat docs/Communication_Protocols_Complete_Guide.md
+
+# View industry tools learning guide
+cat docs/Industry_Tools_Learning_Guide.md
 ```
 
 ### Compiling LaTeX Documents
@@ -183,6 +199,7 @@ For detailed compilation instructions and troubleshooting, see:
 3. Follow the progression: Beginner → Intermediate → Advanced
 4. Practice with examples provided
 5. Review communication protocols guide for practical applications
+6. Learn industry EDA tools (VCS, Verdi, Questa, Formal) with the 4-6 week curriculum
 
 ### For Teaching
 - Use markdown files for quick classroom reference
@@ -195,6 +212,8 @@ For detailed compilation instructions and troubleshooting, see:
 - Focus on functions, tasks, and OOP concepts
 - Study communication protocol implementations
 - Understand testbench and verification concepts
+- Master industry tools (VCS, Verdi, Questa) for practical verification
+- Learn formal verification fundamentals
 
 ## Contributing
 
@@ -212,6 +231,11 @@ This documentation is provided for educational purposes.
 - [Verification Academy](https://verificationacademy.com)
 
 ## Version History
+
+- **v3.1** (2025-11-18): Industry tools documentation
+  - Added comprehensive Industry EDA Tools Learning Guide
+  - Covers VCS, Verdi, Questa, and Formal Verification tools
+  - 4-6 week structured curriculum with hands-on exercises
 
 - **v3.0** (2025-11-18): Repository reorganization
   - Organized into logical directory structure
