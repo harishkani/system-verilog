@@ -1,0 +1,1596 @@
+\documentclass[12pt,a4paper]{book}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{circuitikz}
+
+% Configure hyperref
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={HDLBits Workbook},
+    pdfpagemode=FullScreen,
+}
+
+% Configure listings for Verilog
+\lstdefinestyle{verilog}{
+    language=Verilog,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black}\itshape,
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=10pt,
+    backgroundcolor=\color{gray!10},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={\%*}{*)},
+    morekeywords={always_comb, always_ff, always_latch, logic}
+}
+
+% Custom boxes
+\newtcolorbox{problembox}{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    title=Problem,
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{explanationbox}{
+    colback=green!5!white,
+    colframe=green!75!black,
+    title=Explanation,
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{solutionbox}{
+    colback=yellow!5!white,
+    colframe=orange!75!black,
+    title=Solution,
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{hintbox}{
+    colback=purple!5!white,
+    colframe=purple!75!black,
+    title=Hint,
+    fonttitle=\bfseries
+}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{HDLBits Workbook}
+\fancyfoot[C]{\thepage}
+
+% Title page information
+\title{\Huge\bfseries HDLBits Workbook\\[0.5cm]
+       \Large Digital Design with Verilog\\[0.5cm]
+       \large Problems, Explanations, and Solutions}
+\author{A Comprehensive Guide}
+\date{\today}
+
+\begin{document}
+
+% Title page
+\maketitle
+
+% Table of contents
+\tableofcontents
+
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+
+This workbook is designed as a comprehensive guide to learning digital design through HDLBits problem sets. Each problem includes:
+
+\begin{itemize}
+    \item \textbf{Problem Statement:} Clear description of what needs to be implemented
+    \item \textbf{Explanation:} Theoretical background and key concepts
+    \item \textbf{Hints:} Guidance to help you solve the problem independently
+    \item \textbf{Solution:} Complete working Verilog code with detailed comments
+\end{itemize}
+
+The problems are organized by difficulty and topic, progressing from basic gates to complex sequential circuits.
+
+\chapter{Getting Started}
+
+\section{Introduction to Verilog}
+
+\subsection{Simple Wire}
+
+\begin{problembox}
+Create a module with one input and one output that acts as a wire connecting them.
+
+\textbf{Module Declaration:}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input in,
+    output out
+);
+\end{lstlisting}
+\end{problembox}
+
+\begin{explanationbox}
+In Verilog, an \texttt{assign} statement creates a continuous assignment. It's used for combinational logic where the output is always equal to the value of the right-hand side expression. This is the simplest form of combinational logic - a direct connection.
+
+\textbf{Key Concepts:}
+\begin{itemize}
+    \item Continuous assignment using \texttt{assign}
+    \item Module ports (input/output)
+    \item Wire connections
+\end{itemize}
+\end{explanationbox}
+
+\begin{hintbox}
+Use a continuous assignment statement: \texttt{assign output\_signal = input\_signal;}
+\end{hintbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input in,
+    output out
+);
+    // Direct connection using continuous assignment
+    assign out = in;
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{Four Wires}
+
+\begin{problembox}
+Create a module with 3 inputs and 4 outputs that connects them as follows:
+\begin{itemize}
+    \item a connects to w
+    \item b connects to x
+    \item b also connects to y
+    \item c connects to z
+\end{itemize}
+
+\textbf{Module Declaration:}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b, c,
+    output w, x, y, z
+);
+\end{lstlisting}
+\end{problembox}
+
+\begin{explanationbox}
+This problem demonstrates that:
+\begin{itemize}
+    \item Multiple outputs can be driven by different inputs
+    \item The same input can drive multiple outputs
+    \item Each \texttt{assign} statement operates independently
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b, c,
+    output w, x, y, z
+);
+    assign w = a;
+    assign x = b;
+    assign y = b;  // b drives both x and y
+    assign z = c;
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{Inverter (NOT Gate)}
+
+\begin{problembox}
+Create a module that implements a NOT gate (inverter).
+
+\textbf{Module Declaration:}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input in,
+    output out
+);
+\end{lstlisting}
+\end{problembox}
+
+\begin{explanationbox}
+The NOT gate inverts its input. In Verilog:
+\begin{itemize}
+    \item \texttt{!} is the logical NOT operator
+    \item \texttt{\~{}} is the bitwise NOT operator
+    \item For single-bit signals, both operators give the same result
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input in,
+    output out
+);
+    assign out = ~in;  // Bitwise NOT
+    // OR: assign out = !in;  // Logical NOT
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\section{Basic Gates}
+
+\subsection{AND Gate}
+
+\begin{problembox}
+Create a module that implements a 2-input AND gate.
+
+\textbf{Module Declaration:}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b,
+    output out
+);
+\end{lstlisting}
+\end{problembox}
+
+\begin{explanationbox}
+The AND gate outputs 1 only when both inputs are 1.
+
+\textbf{Truth Table:}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+a & b & out \\
+\hline
+0 & 0 & 0 \\
+0 & 1 & 0 \\
+1 & 0 & 0 \\
+1 & 1 & 1 \\
+\hline
+\end{tabular}
+\end{center}
+
+In Verilog: \texttt{\&} is bitwise AND, \texttt{\&\&} is logical AND.
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b,
+    output out
+);
+    assign out = a & b;
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{NOR Gate}
+
+\begin{problembox}
+Create a module that implements a 2-input NOR gate.
+\end{problembox}
+
+\begin{explanationbox}
+NOR = NOT OR. The output is 1 only when both inputs are 0.
+
+\textbf{Truth Table:}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+a & b & out \\
+\hline
+0 & 0 & 1 \\
+0 & 1 & 0 \\
+1 & 0 & 0 \\
+1 & 1 & 0 \\
+\hline
+\end{tabular}
+\end{center}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b,
+    output out
+);
+    assign out = ~(a | b);  // NOT of OR
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{XNOR Gate}
+
+\begin{problembox}
+Create a module that implements a 2-input XNOR gate (equivalence gate).
+\end{problembox}
+
+\begin{explanationbox}
+XNOR outputs 1 when both inputs are equal (both 0 or both 1).
+
+\textbf{Truth Table:}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+a & b & out \\
+\hline
+0 & 0 & 1 \\
+0 & 1 & 0 \\
+1 & 0 & 0 \\
+1 & 1 & 1 \\
+\hline
+\end{tabular}
+\end{center}
+
+This is also called the equality operator.
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b,
+    output out
+);
+    assign out = ~(a ^ b);  // NOT of XOR
+    // OR: assign out = a ~^ b;  // XNOR operator
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\chapter{Verilog Language}
+
+\section{Vectors}
+
+\subsection{Vector Basics}
+
+\begin{problembox}
+Build a circuit with one 3-bit input and four outputs:
+\begin{itemize}
+    \item \texttt{out\_vec}: Output the input vector
+    \item \texttt{out\_bit0}: Output bit 0 of the input
+    \item \texttt{out\_bit1}: Output bit 1 of the input
+    \item \texttt{out\_bit2}: Output bit 2 of the input
+\end{itemize}
+
+\textbf{Module Declaration:}
+\begin{lstlisting}[style=verilog]
+module top_module (
+    input wire [2:0] vec,
+    output wire [2:0] out_vec,
+    output wire out_bit0,
+    output wire out_bit1,
+    output wire out_bit2
+);
+\end{lstlisting}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Vector Notation in Verilog:}
+\begin{itemize}
+    \item \texttt{[2:0]} declares a 3-bit vector (bits 2, 1, 0)
+    \item \texttt{[0:2]} would also be 3 bits, but with reversed indexing
+    \item Bit selection: \texttt{vec[0]} accesses the least significant bit
+    \item Range selection: \texttt{vec[2:1]} selects bits 2 and 1
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module (
+    input wire [2:0] vec,
+    output wire [2:0] out_vec,
+    output wire out_bit0,
+    output wire out_bit1,
+    output wire out_bit2
+);
+    assign out_vec = vec;
+    assign out_bit0 = vec[0];
+    assign out_bit1 = vec[1];
+    assign out_bit2 = vec[2];
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{Vector Part Select}
+
+\begin{problembox}
+A 32-bit vector can be viewed as containing 4 bytes (bits [31:24], [23:16], [15:8], [7:0]).
+Build a circuit that reverses the byte ordering of the 4-byte word.
+
+\textbf{Example:}
+\begin{itemize}
+    \item Input: \texttt{AaBbCcDd}
+    \item Output: \texttt{DdCcBbAa}
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Byte Reversal (Endianness Conversion):}
+
+This is commonly needed when converting between:
+\begin{itemize}
+    \item Big-endian: Most significant byte at lowest address
+    \item Little-endian: Least significant byte at lowest address
+\end{itemize}
+
+Use part-select to extract each byte and concatenate in reverse order.
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input [31:0] in,
+    output [31:0] out
+);
+    // Reverse byte ordering using concatenation
+    assign out = {in[7:0], in[15:8], in[23:16], in[31:24]};
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{Bitwise Operators}
+
+\begin{problembox}
+Build a circuit that has two 3-bit inputs and produces four 3-bit outputs:
+\begin{itemize}
+    \item \texttt{out\_or}: Bitwise OR of inputs
+    \item \texttt{out\_and}: Bitwise AND of inputs
+    \item \texttt{out\_xor}: Bitwise XOR of inputs
+    \item \texttt{out\_not}: Bitwise NOT of input a
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Bitwise vs. Logical Operators:}
+
+\begin{itemize}
+    \item Bitwise: \texttt{\&}, \texttt{|}, \texttt{\~{}}, \texttt{\^{}} - operate bit-by-bit
+    \item Logical: \texttt{\&\&}, \texttt{||}, \texttt{!} - treat operands as boolean
+\end{itemize}
+
+Example: \texttt{3'b101 \& 3'b011 = 3'b001}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input [2:0] a,
+    input [2:0] b,
+    output [2:0] out_or,
+    output [2:0] out_and,
+    output [2:0] out_xor,
+    output [2:0] out_not
+);
+    assign out_or = a | b;
+    assign out_and = a & b;
+    assign out_xor = a ^ b;
+    assign out_not = ~a;
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{Reduction Operators}
+
+\begin{problembox}
+Build a circuit that computes the parity bit of an 8-bit input vector.
+The parity bit should be 1 if there's an odd number of 1s in the input.
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Reduction Operators:}
+
+Reduction operators perform operation on all bits of a vector:
+\begin{itemize}
+    \item \texttt{\&vec} - AND all bits (all bits are 1?)
+    \item \texttt{|vec} - OR all bits (any bit is 1?)
+    \item \texttt{\^{}vec} - XOR all bits (odd number of 1s?)
+\end{itemize}
+
+Parity is computed using XOR reduction: \texttt{\^{}in}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input [7:0] in,
+    output parity
+);
+    // XOR reduction - results in 1 for odd number of 1s
+    assign parity = ^in;
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\section{Modules and Hierarchy}
+
+\subsection{Module Instantiation}
+
+\begin{problembox}
+You are given a module \texttt{mod\_a} with 2 outputs and 4 inputs:
+
+\begin{lstlisting}[style=verilog]
+module mod_a (
+    output out1, output out2,
+    input in1, input in2, input in3, input in4
+);
+\end{lstlisting}
+
+Instantiate this module to connect:
+\begin{itemize}
+    \item Inputs: a, b, c, d (from top module)
+    \item Outputs: out1, out2 (to top module)
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Module Instantiation Methods:}
+
+\textbf{1. By Position (order matters):}
+\begin{lstlisting}[style=verilog]
+mod_a instance1 ( out1, out2, in1, in2, in3, in4 );
+\end{lstlisting}
+
+\textbf{2. By Name (explicit, preferred):}
+\begin{lstlisting}[style=verilog]
+mod_a instance1 (
+    .out1(wire1),
+    .in1(wire2)
+);
+\end{lstlisting}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module (
+    input a, b, c, d,
+    output out1, out2
+);
+    // Named port connection (recommended)
+    mod_a instance1 (
+        .out1(out1),
+        .out2(out2),
+        .in1(a),
+        .in2(b),
+        .in3(c),
+        .in4(d)
+    );
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\chapter{Combinational Logic}
+
+\section{Basic Combinational Circuits}
+
+\subsection{Half Adder}
+
+\begin{problembox}
+Create a half adder. A half adder adds two 1-bit numbers and produces:
+\begin{itemize}
+    \item \texttt{sum}: The sum bit (XOR)
+    \item \texttt{cout}: The carry-out bit (AND)
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Half Adder Truth Table:}
+
+\begin{center}
+\begin{tabular}{|c|c||c|c|}
+\hline
+a & b & sum & cout \\
+\hline
+0 & 0 & 0 & 0 \\
+0 & 1 & 1 & 0 \\
+1 & 0 & 1 & 0 \\
+1 & 1 & 0 & 1 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Logic:}
+\begin{itemize}
+    \item Sum = a XOR b (different inputs produce 1)
+    \item Carry = a AND b (both inputs are 1)
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b,
+    output cout, sum
+);
+    assign sum = a ^ b;   // XOR for sum
+    assign cout = a & b;  // AND for carry
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{Full Adder}
+
+\begin{problembox}
+Create a full adder. A full adder adds three 1-bit numbers (a, b, cin) and produces:
+\begin{itemize}
+    \item \texttt{sum}: The sum bit
+    \item \texttt{cout}: The carry-out bit
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Full Adder:}
+
+A full adder extends the half adder by including a carry-in (\texttt{cin}).
+
+\textbf{Boolean Equations:}
+\begin{itemize}
+    \item sum = a ⊕ b ⊕ cin
+    \item cout = (a \& b) | (a \& cin) | (b \& cin)
+\end{itemize}
+
+Can be built from two half adders and an OR gate.
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b, cin,
+    output cout, sum
+);
+    // Full adder logic
+    assign sum = a ^ b ^ cin;
+    assign cout = (a & b) | (a & cin) | (b & cin);
+
+    // Alternative using intermediate signals:
+    // wire sum_ab, cout_ab, cout_sum;
+    // assign sum_ab = a ^ b;
+    // assign sum = sum_ab ^ cin;
+    // assign cout_ab = a & b;
+    // assign cout_sum = sum_ab & cin;
+    // assign cout = cout_ab | cout_sum;
+
+endmodule
+\end{lstlisting>
+\end{solutionbox}
+
+\subsection{3-Bit Binary Adder}
+
+\begin{problembox}
+Create a 3-bit binary adder by instantiating three full adders. Chain the carry output of each adder to the carry input of the next.
+
+\textbf{Given:}
+\begin{lstlisting}[style=verilog]
+module full_adder(
+    input a, b, cin,
+    output cout, sum
+);
+\end{lstlisting}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Ripple Carry Adder:}
+
+A ripple carry adder chains multiple full adders together:
+\begin{itemize}
+    \item Carry propagates from LSB to MSB
+    \item Simple but slower for large bit widths
+    \item Alternative: Carry lookahead adder (faster)
+\end{itemize}
+
+For n-bit addition: connect cout[i] to cin[i+1]
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input [2:0] a, b,
+    input cin,
+    output [2:0] sum,
+    output cout
+);
+    wire cout0, cout1;  // Intermediate carry signals
+
+    // Instantiate three full adders
+    full_adder fa0 (
+        .a(a[0]),
+        .b(b[0]),
+        .cin(cin),
+        .sum(sum[0]),
+        .cout(cout0)
+    );
+
+    full_adder fa1 (
+        .a(a[1]),
+        .b(b[1]),
+        .cin(cout0),
+        .sum(sum[1]),
+        .cout(cout1)
+    );
+
+    full_adder fa2 (
+        .a(a[2]),
+        .b(b[2]),
+        .cin(cout1),
+        .sum(sum[2]),
+        .cout(cout)
+    );
+
+endmodule
+\end{lstlisting}
+\end{solutionbox>
+
+\section{Multiplexers}
+
+\subsection{2-to-1 Multiplexer}
+
+\begin{problembox}
+Create a 2-to-1 multiplexer. When \texttt{sel=0}, output \texttt{a}. When \texttt{sel=1}, output \texttt{b}.
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Multiplexer (MUX):}
+
+A multiplexer selects one of multiple inputs based on a select signal.
+
+\textbf{2-to-1 MUX:}
+\begin{itemize}
+    \item 2 data inputs
+    \item 1 select signal
+    \item 1 output
+\end{itemize}
+
+\textbf{Boolean equation:} out = (sel' · a) + (sel · b)
+
+Verilog: Use conditional operator \texttt{?:}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b, sel,
+    output out
+);
+    // Ternary operator: condition ? true_value : false_value
+    assign out = sel ? b : a;
+
+    // Alternative using case statement:
+    // always @(*) begin
+    //     case(sel)
+    //         1'b0: out = a;
+    //         1'b1: out = b;
+    //     endcase
+    // end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox>
+
+\subsection{4-to-1 Multiplexer}
+
+\begin{problembox}
+Create a 4-to-1 multiplexer with:
+\begin{itemize}
+    \item 4 data inputs: a, b, c, d
+    \item 2-bit select: sel[1:0]
+    \item 1 output: out
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{n-to-1 MUX requires ⌈log₂(n)⌉ select bits}
+
+For 4 inputs: need 2 select bits
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+sel[1:0] & out \\
+\hline
+00 & a \\
+01 & b \\
+10 & c \\
+11 & d \\
+\hline
+\end{tabular}
+\end{center}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input a, b, c, d,
+    input [1:0] sel,
+    output out
+);
+    // Using case statement
+    always @(*) begin
+        case(sel)
+            2'b00: out = a;
+            2'b01: out = b;
+            2'b10: out = c;
+            2'b11: out = d;
+        endcase
+    end
+
+    // Alternative: nested ternary operators
+    // assign out = sel[1] ? (sel[0] ? d : c) :
+    //                       (sel[0] ? b : a);
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\chapter{Sequential Logic}
+
+\section{Flip-Flops and Latches}
+
+\subsection{D Flip-Flop}
+
+\begin{problembox}
+Create a D flip-flop that:
+\begin{itemize}
+    \item Captures input \texttt{d} on the positive edge of \texttt{clk}
+    \item Outputs the captured value on \texttt{q}
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{D Flip-Flop:}
+
+The D (Data) flip-flop is the most common flip-flop type:
+\begin{itemize}
+    \item Stores one bit of data
+    \item Updates on clock edge (typically positive edge)
+    \item Output follows input after clock edge
+\end{itemize}
+
+\textbf{Verilog Coding:}
+\begin{itemize}
+    \item Use \texttt{always @(posedge clk)} for positive edge
+    \item Use non-blocking assignment \texttt{<=} in sequential blocks
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, d,
+    output reg q
+);
+    // D flip-flop: capture d on positive clock edge
+    always @(posedge clk) begin
+        q <= d;
+    end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{D Flip-Flop with Reset}
+
+\begin{problembox}
+Create a D flip-flop with synchronous reset:
+\begin{itemize}
+    \item When \texttt{reset=1}, output should be 0 on next clock edge
+    \item Otherwise, capture input \texttt{d}
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Synchronous vs. Asynchronous Reset:}
+
+\textbf{Synchronous Reset:}
+\begin{itemize}
+    \item Reset occurs on clock edge
+    \item Included in sensitivity list as a data signal
+    \item Better for FPGA designs
+\end{itemize}
+
+\textbf{Asynchronous Reset:}
+\begin{itemize}
+    \item Reset occurs immediately
+    \item Added to sensitivity list: \texttt{@(posedge clk or posedge reset)}
+    \item Can cause timing issues
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, d, reset,
+    output reg q
+);
+    // Synchronous reset D flip-flop
+    always @(posedge clk) begin
+        if (reset)
+            q <= 1'b0;
+        else
+            q <= d;
+    end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{D Flip-Flop with Asynchronous Reset}
+
+\begin{problembox}
+Create a D flip-flop with asynchronous active-high reset.
+\end{problembox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, d, areset,
+    output reg q
+);
+    // Asynchronous reset D flip-flop
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            q <= 1'b0;  // Reset immediately
+        else
+            q <= d;     // Capture on clock edge
+    end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{8-bit Register}
+
+\begin{problembox}
+Create an 8-bit register with:
+\begin{itemize}
+    \item Asynchronous reset (active high)
+    \item 8-bit data input and output
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Register:}
+
+A register is a group of flip-flops that store multiple bits:
+\begin{itemize}
+    \item All flip-flops share the same clock and control signals
+    \item Can be implemented as a vector in Verilog
+    \item Forms the basis of CPU registers, pipeline stages, etc.
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, areset,
+    input [7:0] d,
+    output reg [7:0] q
+);
+    // 8-bit register with asynchronous reset
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            q <= 8'b0;
+        else
+            q <= d;
+    end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\section{Counters}
+
+\subsection{4-bit Binary Counter}
+
+\begin{problembox}
+Create a 4-bit binary counter with:
+\begin{itemize}
+    \item Asynchronous reset (active high) to 0
+    \item Counts from 0 to 15, then wraps around
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Binary Counter:}
+
+A counter increments its value on each clock cycle:
+\begin{itemize}
+    \item n-bit counter: counts from 0 to 2ⁿ-1
+    \item Overflow: automatically wraps using arithmetic overflow
+    \item Used for: timing, addressing, sequencing
+\end{itemize}
+
+\textbf{Implementation:} Use \texttt{count <= count + 1}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, areset,
+    output reg [3:0] q
+);
+    // 4-bit binary counter
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            q <= 4'b0;
+        else
+            q <= q + 1;  // Increment (wraps automatically)
+    end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{Decade Counter (BCD)}
+
+\begin{problembox}
+Create a decade counter that:
+\begin{itemize}
+    \item Counts from 0 to 9
+    \item Resets to 0 after 9
+    \item Has asynchronous reset
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Decade Counter (BCD Counter):}
+
+Counts in decimal (0-9) using binary representation:
+\begin{itemize}
+    \item Requires explicit check for maximum value
+    \item Used in BCD arithmetic, decimal displays
+    \item 4 bits can represent 0-15, but we use only 0-9
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, areset,
+    output reg [3:0] q
+);
+    // Decade counter (0-9)
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            q <= 4'b0;
+        else if (q == 4'd9)
+            q <= 4'b0;  // Reset to 0 after 9
+        else
+            q <= q + 1;
+    end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox>
+
+\section{Finite State Machines}
+
+\subsection{Simple FSM - Moore Machine}
+
+\begin{problembox}
+Implement a 2-state Moore FSM with:
+\begin{itemize}
+    \item States: A, B
+    \item Input: \texttt{in}
+    \item Output: \texttt{out} (1 in state B, 0 in state A)
+    \item Transitions: A→B when in=1, B→A when in=0
+    \item Reset to state A
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Moore vs. Mealy FSM:}
+
+\textbf{Moore Machine:}
+\begin{itemize}
+    \item Output depends only on current state
+    \item Outputs are registered (synchronized with clock)
+    \item More stable, glitch-free
+\end{itemize}
+
+\textbf{Mealy Machine:}
+\begin{itemize}
+    \item Output depends on current state and inputs
+    \item Can have fewer states
+    \item Outputs may have glitches
+\end{itemize}
+
+\textbf{FSM Coding Style:}
+Use separate always blocks for:
+\begin{enumerate}
+    \item State register (sequential)
+    \item Next state logic (combinational)
+    \item Output logic (combinational for Mealy, can be either for Moore)
+\end{enumerate}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, areset, in,
+    output out
+);
+    // State encoding
+    parameter A = 1'b0, B = 1'b1;
+
+    reg state, next_state;
+
+    // State register (sequential logic)
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            state <= A;
+        else
+            state <= next_state;
+    end
+
+    // Next state logic (combinational)
+    always @(*) begin
+        case (state)
+            A: next_state = in ? B : A;
+            B: next_state = in ? B : A;
+            default: next_state = A;
+        endcase
+    end
+
+    // Output logic (Moore: depends only on state)
+    assign out = (state == B);
+
+endmodule
+\end{lstlisting}
+\end{solutionbox}
+
+\subsection{Sequence Detector (Mealy)}
+
+\begin{problembox}
+Implement a Mealy machine that detects the sequence "101":
+\begin{itemize}
+    \item Input: serial bit stream \texttt{in}
+    \item Output: \texttt{out} = 1 when "101" detected
+    \item Overlapping sequences allowed
+\end{itemize}
+\end{problembox}
+
+\begin{explanationbox}
+\textbf{Sequence Detector FSM:}
+
+States represent "how much of the sequence we've seen":
+\begin{itemize}
+    \item S0: Initial / no match
+    \item S1: Seen "1"
+    \item S2: Seen "10"
+    \item S3: Seen "101" (output 1)
+\end{itemize}
+
+For overlapping: after "101", "01" is already seen for next match.
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, areset, in,
+    output reg out
+);
+    // State encoding
+    parameter S0=2'b00, S1=2'b01, S2=2'b10;
+
+    reg [1:0] state, next_state;
+
+    // State register
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            state <= S0;
+        else
+            state <= next_state;
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (state)
+            S0: next_state = in ? S1 : S0;
+            S1: next_state = in ? S1 : S2;
+            S2: next_state = in ? S1 : S0;
+            default: next_state = S0;
+        endcase
+    end
+
+    // Output logic (Mealy: depends on state and input)
+    always @(*) begin
+        case (state)
+            S2: out = in;  // Output 1 when in S2 and in=1
+            default: out = 0;
+        endcase
+    end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox>
+
+\chapter{Building Larger Circuits}
+
+\section{Shift Registers}
+
+\subsection{4-bit Shift Register}
+
+\begin{problembox}
+Build a 4-bit shift register with:
+\begin{itemize}
+    \item Serial input \texttt{in}
+    \item Parallel output \texttt{q[3:0]}
+    \item Shifts left (q[3] gets new data, q[0] is shifted out)
+    \item Asynchronous reset
+\end{itemize}
+\end{problembox>
+
+\begin{explanationbox}
+\textbf{Shift Register:}
+
+A shift register moves data one position on each clock:
+\begin{itemize}
+    \item Serial-in, Parallel-out (SIPO)
+    \item Parallel-in, Serial-out (PISO)
+    \item Universal shift register (both directions)
+\end{itemize}
+
+\textbf{Applications:}
+\begin{itemize}
+    \item Serial communication
+    \item Delay lines
+    \item Pseudo-random number generation (LFSR)
+\end{itemize}
+\end{explanationbox>
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, areset, in,
+    output reg [3:0] q
+);
+    // 4-bit left shift register
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            q <= 4'b0;
+        else
+            q <= {q[2:0], in};  // Shift left, insert new bit
+    end
+
+endmodule
+\end{lstlisting}
+\end{solutionbox>
+
+\subsection{LFSR (Linear Feedback Shift Register)}
+
+\begin{problembox}
+Build a 5-bit Galois LFSR with taps at positions 5 and 3:
+\begin{itemize}
+    \item Generates pseudo-random sequence
+    \item Feedback polynomial: x⁵ + x³ + 1
+    \item Reset to \texttt{5'h1}
+\end{itemize}
+\end{problembox>
+
+\begin{explanationbox}
+\textbf{LFSR (Linear Feedback Shift Register):}
+
+An LFSR generates pseudo-random numbers using XOR feedback:
+
+\textbf{Types:}
+\begin{itemize}
+    \item \textbf{Fibonacci:} XORs happen before the register
+    \item \textbf{Galois:} XORs happen along the shift path
+\end{itemize}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Maximum sequence length: 2ⁿ-1 (with proper taps)
+    \item Deterministic but appears random
+    \item Used in: CRC, scrambling, testing
+\end{itemize}
+\end{explanationbox}
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input clk, areset,
+    output reg [4:0] q
+);
+    // 5-bit Galois LFSR with taps at 5 and 3
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            q <= 5'h1;
+        else begin
+            q[4] <= q[0];           // Shift from LSB
+            q[3] <= q[4];
+            q[2] <= q[3] ^ q[0];    // XOR tap at position 3
+            q[1] <= q[2];
+            q[0] <= q[1] ^ q[0];    // XOR tap at position 1
+        end
+    end
+
+endmodule
+\end{lstlisting>
+\end{solutionbox>
+
+\chapter{Practice Problems}
+
+\section{Challenge Problems}
+
+\subsection{7-Segment Display Decoder}
+
+\begin{problembox}
+Create a BCD to 7-segment display decoder:
+\begin{itemize}
+    \item Input: 4-bit BCD (0-9)
+    \item Output: 7 segments [6:0] (a-g)
+    \item Active high outputs
+    \item Segment order: gfedcba
+\end{itemize}
+
+\textbf{Segment Layout:}
+\begin{verbatim}
+  aaa
+ f   b
+  ggg
+ e   c
+  ddd
+\end{verbatim}
+\end{problembox>
+
+\begin{explanationbox}
+\textbf{7-Segment Display:}
+
+Each digit requires a specific pattern:
+\begin{itemize}
+    \item 0: segments a,b,c,d,e,f
+    \item 1: segments b,c
+    \item 8: all segments
+\end{itemize}
+
+Implementation options:
+\begin{itemize}
+    \item Case statement (clear and maintainable)
+    \item Truth table with assign statements
+    \item ROM/LUT
+\end{itemize}
+\end{explanationbox>
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input [3:0] bcd,
+    output reg [6:0] seg  // seg[6]=g, seg[0]=a
+);
+    always @(*) begin
+        case(bcd)
+            4'd0: seg = 7'b0111111;  // 0
+            4'd1: seg = 7'b0000110;  // 1
+            4'd2: seg = 7'b1011011;  // 2
+            4'd3: seg = 7'b1001111;  // 3
+            4'd4: seg = 7'b1100110;  // 4
+            4'd5: seg = 7'b1101101;  // 5
+            4'd6: seg = 7'b1111101;  // 6
+            4'd7: seg = 7'b0000111;  // 7
+            4'd8: seg = 7'b1111111;  // 8
+            4'd9: seg = 7'b1101111;  // 9
+            default: seg = 7'b0000000;  // blank
+        endcase
+    end
+
+endmodule
+\end{lstlisting>
+\end{solutionbox>
+
+\subsection{Priority Encoder}
+
+\begin{problembox}
+Create an 8-bit priority encoder:
+\begin{itemize}
+    \item Input: 8-bit vector \texttt{in[7:0]}
+    \item Output: 3-bit position \texttt{pos[2:0]} of highest priority 1
+    \item Output: \texttt{valid} = 1 if any bit is set
+    \item Priority: bit 7 (MSB) has highest priority
+\end{itemize}
+\end{problembox>
+
+\begin{explanationbox}
+\textbf{Priority Encoder:}
+
+Finds the position of the highest-priority active input:
+\begin{itemize}
+    \item Opposite of decoder
+    \item Multiple inputs can be active
+    \item Outputs position of highest-priority active input
+    \item Used in interrupt controllers
+\end{itemize}
+
+\textbf{Example:}
+\begin{itemize}
+    \item Input: 8'b00010100
+    \item Output: pos=3'd4 (highest 1 is at bit 4)
+\end{itemize}
+\end{explanationbox>
+
+\begin{solutionbox}
+\begin{lstlisting}[style=verilog]
+module top_module(
+    input [7:0] in,
+    output reg [2:0] pos,
+    output reg valid
+);
+    always @(*) begin
+        valid = |in;  // Any bit set?
+
+        // Priority encoder: check from MSB to LSB
+        casez (in)
+            8'b1???????: pos = 3'd7;
+            8'b01??????: pos = 3'd6;
+            8'b001?????: pos = 3'd5;
+            8'b0001????: pos = 3'd4;
+            8'b00001???: pos = 3'd3;
+            8'b000001??: pos = 3'd2;
+            8'b0000001?: pos = 3'd1;
+            8'b00000001: pos = 3'd0;
+            default:     pos = 3'd0;
+        endcase
+    end
+
+endmodule
+\end{lstlisting>
+\end{solutionbox>
+
+\chapter*{Appendix A: Verilog Quick Reference}
+\addcontentsline{toc}{chapter}{Appendix A: Verilog Quick Reference}
+
+\section*{Data Types}
+
+\begin{lstlisting}[style=verilog]
+// Nets (continuous assignment)
+wire        // Single bit wire
+wire [7:0]  // 8-bit vector wire
+
+// Variables (procedural assignment)
+reg         // Single bit register
+reg [7:0]   // 8-bit register
+
+// SystemVerilog
+logic [7:0] // Can be used anywhere
+\end{lstlisting}
+
+\section*{Operators}
+
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Operator} & \textbf{Description} \\
+\hline
+\texttt{\&, |, \^{}, \~{}} & Bitwise AND, OR, XOR, NOT \\
+\texttt{\&\&, ||, !} & Logical AND, OR, NOT \\
+\texttt{==, !=} & Equality, inequality \\
+\texttt{<, >, <=, >=} & Relational operators \\
+\texttt{<<, >>} & Shift left, shift right \\
+\texttt{+, -, *, /} & Arithmetic operators \\
+\texttt{?:} & Conditional (ternary) \\
+\texttt{\{\}} & Concatenation \\
+\texttt{\{n\{x\}\}} & Replication \\
+\hline
+\end{tabular}
+
+\section*{Always Blocks}
+
+\begin{lstlisting}[style=verilog]
+// Combinational logic
+always @(*) begin
+    // Use blocking assignments =
+end
+
+// Sequential logic (positive edge)
+always @(posedge clk) begin
+    // Use non-blocking assignments <=
+end
+
+// Async reset
+always @(posedge clk or posedge areset) begin
+    if (areset)
+        // reset logic
+    else
+        // normal logic
+end
+\end{lstlisting}
+
+\chapter*{Appendix B: Tips and Best Practices}
+\addcontentsline{toc}{chapter}{Appendix B: Tips and Best Practices}
+
+\section*{Coding Guidelines}
+
+\begin{enumerate}
+    \item \textbf{Use meaningful names:} \texttt{counter} not \texttt{c}
+    \item \textbf{Blocking vs. Non-blocking:}
+    \begin{itemize}
+        \item Combinational: use \texttt{=}
+        \item Sequential: use \texttt{<=}
+    \end{itemize}
+    \item \textbf{Complete sensitivity lists:} Use \texttt{@(*)} for combinational
+    \item \textbf{Avoid latches:} Assign all outputs in all branches
+    \item \textbf{Default cases:} Always include in case statements
+    \item \textbf{Synchronous design:} Minimize asynchronous logic
+    \item \textbf{One clock per module:} Simplifies timing analysis
+    \item \textbf{Named port connections:} More maintainable than positional
+\end{enumerate}
+
+\section*{Common Pitfalls}
+
+\begin{enumerate}
+    \item \textbf{Missing else clause:} Creates unwanted latches
+    \item \textbf{Mixing blocking and non-blocking:} Causes simulation/synthesis mismatch
+    \item \textbf{Incomplete sensitivity list:} Causes simulation errors
+    \item \textbf{Using delays in synthesizable code:} \texttt{\#10} not synthesizable
+    \item \textbf{X and Z in synthesis:} Only for simulation
+\end{enumerate}
+
+\section*{Debugging Tips}
+
+\begin{enumerate}
+    \item \textbf{Simulate before synthesize}
+    \item \textbf{Check for warnings:} They're usually important
+    \item \textbf{Use assertions:} Catch errors early
+    \item \textbf{Waveform analysis:} Visual debugging
+    \item \textbf{Divide and conquer:} Test modules independently
+\end{enumerate}
+
+\chapter*{Index}
+\addcontentsline{toc}{chapter}{Index}
+
+\begin{itemize}
+    \item Always block, 15
+    \item AND gate, 5
+    \item Asynchronous reset, 35
+    \item Blocking assignment, 15
+    \item Combinational logic, 20
+    \item Counter, 36-37
+    \item D flip-flop, 34-36
+    \item Finite State Machine, 38-40
+    \item Full adder, 21-22
+    \item Half adder, 21
+    \item LFSR, 42
+    \item Module instantiation, 18
+    \item Multiplexer, 24-25
+    \item Non-blocking assignment, 34
+    \item OR gate, 6
+    \item Priority encoder, 44
+    \item Reduction operators, 17
+    \item Register, 36
+    \item Sequential logic, 34
+    \item Shift register, 41-42
+    \item Synchronous reset, 35
+    \item Vector, 14-16
+    \item XOR gate, 6
+\end{itemize}
+
+\end{document}
