@@ -1,0 +1,2178 @@
+Found 8 LaTeX files to process
+
+================================================================================
+Processing: Complete_SystemVerilog_Guide.tex
+================================================================================
+Found 79 code blocks
+
+[TEST] Block 1: Complete_SystemVerilog_Guide_block_1
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Hello, SystemVerilog World!
+Time: 0
+
+
+[TEST] Block 3: Complete_SystemVerilog_Guide_block_3
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: int: 42
+byte: -10
+unsigned: 255
+logic: x
+
+
+[TEST] Block 4: Complete_SystemVerilog_Guide_block_4
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Temperature: 98.600000
+Voltage: 3.300000
+Voltage (2 decimals): 3.30
+
+
+[TEST] Block 5: Complete_SystemVerilog_Guide_block_5
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_5.sv:11: error: Method toupper is not a string method.
+extracted_code/Complete_SystemVerilog_Guide_block_5.sv:11: error: Object string_example.name has no method "toupper(...)".
+1 error(s) during elaboration.
+
+
+[TEST] Block 6: Complete_SystemVerilog_Guide_block_6
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_6.sv:17: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_6.sv:17: Syntax in assignment statement l-value.
+extracted_code/Complete_SystemVerilog_Guide_block_6.sv:21: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_6.sv:21
+
+[TEST] Block 7: Complete_SystemVerilog_Guide_block_7
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_7.sv:24: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_7.sv:24: Syntax in assignment statement l-value.
+
+
+[TEST] Block 8: Complete_SystemVerilog_Guide_block_8
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: a < b: 1
+a > b: 0
+a <= b: 1
+a >= b: 0
+x == y: 1
+x != y: 0
+x === y: 1
+x === z: 0
+x !== z: 1
+
+
+[TEST] Block 9: Complete_SystemVerilog_Guide_block_9
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Logical AND: 0
+Logical OR: 1
+Logical NOT: 0
+Bitwise AND: 1000
+Bitwise OR: 1110
+Bitwise XOR: 0110
+Bitwise NOT: 0011
+Bitwise NAND: 0111
+Reduction AND: 0
+Reduction OR: 1
+Reduction XOR: 0
+
+
+[TEST] Block 10: Complete_SystemVerilog_Guide_block_10
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_10.sv:11: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_10.sv:11: Syntax in assignment statement l-value.
+
+
+[TEST] Block 11: Complete_SystemVerilog_Guide_block_11
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_11.sv:6: warning: Static variable initialization requires explicit lifetime in this context.
+extracted_code/Complete_SystemVerilog_Guide_block_11.sv:10: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_11.sv:10: Syntax in assignment sta
+
+[TEST] Block 12: Complete_SystemVerilog_Guide_block_12
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_12.sv:7: warning: Static variable initialization requires explicit lifetime in this context.
+extracted_code/Complete_SystemVerilog_Guide_block_12.sv:11: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_12.sv:11: Syntax in assignment sta
+
+[TEST] Block 13: Complete_SystemVerilog_Guide_block_13
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [0] Counter initialized to 0
+[10] Counter is now 10
+[30] Counter is now 30
+[40] Simulation ending
+
+
+[TEST] Block 14: Complete_SystemVerilog_Guide_block_14
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [5] Counter = 1
+[15] Counter = 2
+[25] Counter = 3
+[35] Counter = 4
+[45] Counter = 5
+extracted_code/Complete_SystemVerilog_Guide_block_14.sv:12: $finish called at 45 (1s)
+
+
+[TEST] Block 15: Complete_SystemVerilog_Guide_block_15
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: extracted_code/Complete_SystemVerilog_Guide_block_15.sv:36: $finish called at 60 (1s)
+
+
+[TEST] Block 16: Complete_SystemVerilog_Guide_block_16
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 17: Complete_SystemVerilog_Guide_block_17
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: After 1 clock:
+  Blocking: a=1, b=1
+  Non-blocking: a=1, b=0
+extracted_code/Complete_SystemVerilog_Guide_block_17.sv:28: $finish called at 20 (1s)
+
+
+[TEST] Block 19: Complete_SystemVerilog_Guide_block_19
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: It's not hot
+Temperature: 75°F - Warm
+
+
+[TEST] Block 20: Complete_SystemVerilog_Guide_block_20
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_20.sv:24: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_20.sv:24: error: Malformed statement
+extracted_code/Complete_SystemVerilog_Guide_block_20.sv:26: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_20.sv:26: Syntax 
+
+[TEST] Block 21: Complete_SystemVerilog_Guide_block_21
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Starts with 1
+Exact: 1000
+
+
+[TEST] Block 22: Complete_SystemVerilog_Guide_block_22
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_22.sv:24: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_22.sv:25: error: Malformed statement
+extracted_code/Complete_SystemVerilog_Guide_block_22.sv:26: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_22.sv:27: error: 
+
+[TEST] Block 23: Complete_SystemVerilog_Guide_block_23
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_23.sv:26: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_23.sv:26: error: Malformed statement
+
+
+[TEST] Block 24: Complete_SystemVerilog_Guide_block_24
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_24.sv:4: warning: Static variable initialization requires explicit lifetime in this context.
+extracted_code/Complete_SystemVerilog_Guide_block_24.sv:18: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_24.sv:18: Syntax in assignment sta
+
+[TEST] Block 25: Complete_SystemVerilog_Guide_block_25
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_25.sv:12: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_25.sv:12: Syntax in assignment statement l-value.
+extracted_code/Complete_SystemVerilog_Guide_block_25.sv:20: warning: Static variable initialization requires explicit lifetime 
+
+[TEST] Block 26: Complete_SystemVerilog_Guide_block_26
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_26.sv:6: sorry: break statements not supported.
+extracted_code/Complete_SystemVerilog_Guide_block_26.sv:14: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_26.sv:14: error: Malformed statement
+extracted_code/Complete_SystemVerilog_Guid
+
+[TEST] Block 31: Complete_SystemVerilog_Guide_block_31
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: a b | AND OR XOR NOT
+----|----------------
+0 0 |  0  0   0   1
+0 1 |  0  1   1   1
+1 0 |  0  1   1   0
+1 1 |  1  1   0   0
+
+
+[TEST] Block 32: Complete_SystemVerilog_Guide_block_32
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: sel a b | out
+--------|----
+ 0  0 0 |  0
+ 0  0 1 |  0
+ 0  1 0 |  1
+ 0  1 1 |  1
+ 1  0 0 |  0
+ 1  0 1 |  1
+ 1  1 0 |  0
+ 1  1 1 |  1
+
+
+[TEST] Block 33: Complete_SystemVerilog_Guide_block_33
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Testing 4:1 MUX with data_in = 1010
+sel | out
+----|----
+ 00 |  0
+ 01 |  1
+ 10 |  0
+ 11 |  1
+
+
+[TEST] Block 34: Complete_SystemVerilog_Guide_block_34
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Decoder 2:4 Truth Table
+en in | out 
+------|-----
+ 1 00 | 0001
+ 1 01 | 0010
+ 1 10 | 0100
+ 1 11 | 1000
+
+With enable=0:
+ 0 11 | 0000
+
+
+[TEST] Block 35: Complete_SystemVerilog_Guide_block_35
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 36: Complete_SystemVerilog_Guide_block_36
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 37: Complete_SystemVerilog_Guide_block_37
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Testing ALU:
+opcode | a    | b    | result | flags
+-------|------|------|--------|------
+  000   |  15  |  10  |   25   | Z=0 C=0 V=0
+  001   |  15  |  10  |    5   | Z=0 C=0 V=0
+  010   |  15  |  10 
+
+[TEST] Block 39: Complete_SystemVerilog_Guide_block_39
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 40: Complete_SystemVerilog_Guide_block_40
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 41: Complete_SystemVerilog_Guide_block_41
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 42: Complete_SystemVerilog_Guide_block_42
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 43: Complete_SystemVerilog_Guide_block_43
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 44: Complete_SystemVerilog_Guide_block_44
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 45: Complete_SystemVerilog_Guide_block_45
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 46: Complete_SystemVerilog_Guide_block_46
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 47: Complete_SystemVerilog_Guide_block_47
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 48: Complete_SystemVerilog_Guide_block_48
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 49: Complete_SystemVerilog_Guide_block_49
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 50: Complete_SystemVerilog_Guide_block_50
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 51: Complete_SystemVerilog_Guide_block_51
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 52: Complete_SystemVerilog_Guide_block_52
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 53: Complete_SystemVerilog_Guide_block_53
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 54: Complete_SystemVerilog_Guide_block_54
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_54.sv:63: error: This assignment requires an explicit cast.
+1 error(s) during elaboration.
+
+
+[TEST] Block 55: Complete_SystemVerilog_Guide_block_55
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 56: Complete_SystemVerilog_Guide_block_56
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_56.sv:7: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_56.sv:1: Errors in port declarations.
+
+
+[TEST] Block 57: Complete_SystemVerilog_Guide_block_57
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[SKIP] Block 59: Not a complete module
+
+[TEST] Block 60: Complete_SystemVerilog_Guide_block_60
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 61: Complete_SystemVerilog_Guide_block_61
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_61.sv:7: error: Unknown module type: and_gate
+extracted_code/Complete_SystemVerilog_Guide_block_61.sv:8: error: Unknown module type: and_gate
+extracted_code/Complete_SystemVerilog_Guide_block_61.sv:9: error: Unknown module type: and_gate
+extracted_co
+
+[TEST] Block 62: Complete_SystemVerilog_Guide_block_62
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 63: Complete_SystemVerilog_Guide_block_63
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 64: Complete_SystemVerilog_Guide_block_64
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_64.sv:12: error: Unknown module type: and_gate
+extracted_code/Complete_SystemVerilog_Guide_block_64.sv:12: error: Unknown module type: and_gate
+extracted_code/Complete_SystemVerilog_Guide_block_64.sv:12: error: Unknown module type: and_gate
+extracted
+
+[TEST] Block 65: Complete_SystemVerilog_Guide_block_65
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 66: Complete_SystemVerilog_Guide_block_66
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Read addr 0: aa, Read addr 1: bb
+Read addr 2: cc, Read addr 0: aa
+extracted_code/Complete_SystemVerilog_Guide_block_66.sv:112: $finish called at 126 (1s)
+
+
+[TEST] Block 67: Complete_SystemVerilog_Guide_block_67
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_67.sv:2: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_67.sv:2: error: Syntax error in instance port expression(s).
+extracted_code/Complete_SystemVerilog_Guide_block_67.sv:3: syntax error
+extracted_code/Complete_SystemVerilog_Guide_b
+
+[TEST] Block 68: Complete_SystemVerilog_Guide_block_68
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_68.sv:8: error: Unknown module type: module_name
+2 error(s) during elaboration.
+*** These modules were missing:
+        module_name referenced 1 times.
+***
+
+
+[TEST] Block 69: Complete_SystemVerilog_Guide_block_69
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: ======================================
+    Full Adder Testbench
+======================================
+Time	 a b cin | sum cout
+--------------------------------------
+10	 0 0  0  |  0   0
+20	 0 0  1  
+
+[TEST] Block 70: Complete_SystemVerilog_Guide_block_70
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✗ Execution FAILED: Execution timeout
+
+[TEST] Block 71: Complete_SystemVerilog_Guide_block_71
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: extracted_code/Complete_SystemVerilog_Guide_block_71.sv:32: $finish called at 285 (1s)
+
+
+[TEST] Block 72: Complete_SystemVerilog_Guide_block_72
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_72.sv:25: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_72.sv:25: error: Malformed statement
+extracted_code/Complete_SystemVerilog_Guide_block_72.sv:31: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_72.sv:31: error: 
+
+[TEST] Block 73: Complete_SystemVerilog_Guide_block_73
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_73.sv:8: error: Unknown module type: adder_4bit
+2 error(s) during elaboration.
+*** These modules were missing:
+        adder_4bit referenced 1 times.
+***
+
+
+[TEST] Block 74: Complete_SystemVerilog_Guide_block_74
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Writing test data...
+Reading and checking...
+[FAIL] Expected aa, got xx
+[FAIL] Expected bb, got xx
+[FAIL] Expected cc, got xx
+extracted_code/Complete_SystemVerilog_Guide_block_74.sv:61: $finish called
+
+[TEST] Block 75: Complete_SystemVerilog_Guide_block_75
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_75.sv:11: sorry: Overriding the default variable lifetime is not yet supported.
+
+
+[TEST] Block 76: Complete_SystemVerilog_Guide_block_76
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: VCD info: dumpfile waveform.vcd opened for output.
+extracted_code/Complete_SystemVerilog_Guide_block_76.sv:21: $finish called at 1100 (1s)
+
+
+[TEST] Block 77: Complete_SystemVerilog_Guide_block_77
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: ========================================
+  Counter 8-bit Testbench
+========================================
+
+VCD info: dumpfile counter.vcd opened for output.
+Test 1: Reset
+[0] count=0 enable=0 load=0
+
+[TEST] Block 78: Complete_SystemVerilog_Guide_block_78
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: byte_data = 40
+
+
+[TEST] Block 79: Complete_SystemVerilog_Guide_block_79
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: memory[3] = 30
+lookup[5] = 0a
+
+
+[TEST] Block 80: Complete_SystemVerilog_Guide_block_80
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 81: Complete_SystemVerilog_Guide_block_81
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_81.sv:16: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_81.sv:16: error: Malformed statement
+extracted_code/Complete_SystemVerilog_Guide_block_81.sv:19: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_81.sv:19: error: 
+
+[TEST] Block 82: Complete_SystemVerilog_Guide_block_82
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_82.sv:35: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_82.sv:35: error: Malformed statement
+extracted_code/Complete_SystemVerilog_Guide_block_82.sv:41: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_82.sv:41: error: 
+
+[TEST] Block 83: Complete_SystemVerilog_Guide_block_83
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/Complete_SystemVerilog_Guide_block_83.sv:23: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_83.sv:23: error: Malformed statement
+extracted_code/Complete_SystemVerilog_Guide_block_83.sv:31: syntax error
+extracted_code/Complete_SystemVerilog_Guide_block_83.sv:31: error: 
+
+[TEST] Block 84: Complete_SystemVerilog_Guide_block_84
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: numbers has 10 elements
+data has 16 elements
+data left bound: 0
+data right bound: 15
+data low: 0
+data high: 15
+
+
+[TEST] Block 85: Complete_SystemVerilog_Guide_block_85
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 86: Complete_SystemVerilog_Guide_block_86
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+
+[TEST] Block 87: Complete_SystemVerilog_Guide_block_87
+  Has testbench: False
+  ✓ Compilation PASSED
+
+================================================================================
+Processing: SystemVerilog_Advanced_Sections_21_30.tex
+================================================================================
+Found 21 code blocks
+
+[TEST] Block 0: SystemVerilog_Advanced_Sections_21_30_block_0
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_0.sv:9: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_0.sv:8: sorry: Constraint declarations not supported.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_0.sv:13: sorry
+
+[TEST] Block 2: SystemVerilog_Advanced_Sections_21_30_block_2
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_2.sv:22: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_2.sv:22: error: Invalid module item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_2.sv:23: syntax error
+extracted_code/SystemVerilog_Advanced_Sect
+
+[TEST] Block 3: SystemVerilog_Advanced_Sections_21_30_block_3
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_3.sv:15: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_3.sv:15: error: Invalid module item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_3.sv:16: syntax error
+extracted_code/SystemVerilog_Advanced_Sect
+
+[TEST] Block 4: SystemVerilog_Advanced_Sections_21_30_block_4
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_4.sv:33: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_4.sv:33: error: Invalid module item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_4.sv:34: syntax error
+extracted_code/SystemVerilog_Advanced_Sect
+
+[TEST] Block 5: SystemVerilog_Advanced_Sections_21_30_block_5
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_5.sv:30: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_5.sv:30: error: Invalid module item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_5.sv:31: syntax error
+extracted_code/SystemVerilog_Advanced_Sect
+
+[TEST] Block 6: SystemVerilog_Advanced_Sections_21_30_block_6
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_6.sv:20: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_6.sv:19: sorry: Constraint declarations not supported.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_6.sv:28: sor
+
+[TEST] Block 7: SystemVerilog_Advanced_Sections_21_30_block_7
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_7.sv:4: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_7.sv:4: error: Errors in variable names after data type.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_7.sv:8: sorry: "inside" expressions not suppo
+
+[TEST] Block 8: SystemVerilog_Advanced_Sections_21_30_block_8
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_8.sv:11: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_8.sv:10: error: Errors in the constraint block item list.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_8.sv:16: sorry: "inside" expressions not su
+
+[TEST] Block 9: SystemVerilog_Advanced_Sections_21_30_block_9
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_9.sv:8: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_9.sv:7: sorry: Constraint declarations not supported.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_9.sv:19: warni
+
+[TEST] Block 10: SystemVerilog_Advanced_Sections_21_30_block_10
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_10.sv:42: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_10.sv:42: error: Malformed statement
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_10.sv:43: syntax error
+extracted_code/SystemVerilog_Advanced_Se
+
+[TEST] Block 11: SystemVerilog_Advanced_Sections_21_30_block_11
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_11.sv:8: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_11.sv:8: error: Invalid class item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_11.sv:9: syntax error
+extracted_code/SystemVerilog_Advanced_Secti
+
+[TEST] Block 12: SystemVerilog_Advanced_Sections_21_30_block_12
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_12.sv:3: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_12.sv:3: error: Invalid class item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_12.sv:19: syntax error
+extracted_code/SystemVerilog_Advanced_Sect
+
+[TEST] Block 13: SystemVerilog_Advanced_Sections_21_30_block_13
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_13.sv:3: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_13.sv:3: error: Invalid class item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_13.sv:4: syntax error
+extracted_code/SystemVerilog_Advanced_Secti
+
+[TEST] Block 14: SystemVerilog_Advanced_Sections_21_30_block_14
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_14.sv:28: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_14.sv:28: error: Invalid class item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_14.sv:29: syntax error
+extracted_code/SystemVerilog_Advanced_Se
+
+[TEST] Block 16: SystemVerilog_Advanced_Sections_21_30_block_16
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_16.sv:10: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_16.sv:10: error: Invalid class item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_16.sv:12: syntax error
+extracted_code/SystemVerilog_Advanced_Se
+
+[TEST] Block 17: SystemVerilog_Advanced_Sections_21_30_block_17
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_17.sv:14: syntax error
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_17.sv:14: error: Invalid class item.
+extracted_code/SystemVerilog_Advanced_Sections_21_30_block_17.sv:15: syntax error
+extracted_code/SystemVerilog_Advanced_Se
+
+[TEST] Block 18: SystemVerilog_Advanced_Sections_21_30_block_18
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_18.sv:2: syntax error
+I give up.
+
+
+[TEST] Block 19: SystemVerilog_Advanced_Sections_21_30_block_19
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Advanced_Sections_21_30_block_19.sv:3: Include file uvm_macros.svh not found
+No top level modules, and no -s option.
+
+
+[SKIP] Block 22: Not a complete module
+
+[SKIP] Block 23: Not a complete module
+
+[SKIP] Block 28: Not a complete module
+
+================================================================================
+Processing: SystemVerilog_Complete_Comprehensive_Guide.tex
+================================================================================
+Found 76 code blocks
+
+[TEST] Block 0: SystemVerilog_Complete_Comprehensive_Guide_block_0
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_0.sv:12: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_0.sv:12: Syntax in assignment statement l-value.
+
+
+[TEST] Block 1: SystemVerilog_Complete_Comprehensive_Guide_block_1
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_1.sv:6: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_1.sv:6: Syntax in assignment statement l-value.
+
+
+[TEST] Block 2: SystemVerilog_Complete_Comprehensive_Guide_block_2
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: === Two-State Types ===
+flag = 0
+signed_byte = -5
+small_int = -1000
+standard_int = -42
+big_int = 0x123456789abcdef
+
+=== Four-State Types ===
+signal = x (X state)
+signal = z (Z state)
+data_bus = 0xxxxx
+
+[TEST] Block 3: SystemVerilog_Complete_Comprehensive_Guide_block_3
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Int 100 -> Real 100.00
+Real 100.00 -> Int 100
+Vector 0xab -> Int 171
+Truncate 0x1234 -> 0x34
+Extend 0x42 -> 0x0042
+
+
+[TEST] Block 4: SystemVerilog_Complete_Comprehensive_Guide_block_4
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 10 / 3 = 3
+10 % 3 = 1
+10 ** 3 = 1000
+
+
+[TEST] Block 5: SystemVerilog_Complete_Comprehensive_Guide_block_5
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: a & b = 10000000
+a | b = 11111110
+a ^ b = 01111110
+Parity of a = 0
+
+
+[TEST] Block 6: SystemVerilog_Complete_Comprehensive_Guide_block_6
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: a=10, b=20
+a == b: 0
+a < b: 1
+(a < b) ? 1 : 0 = 1
+
+
+[TEST] Block 7: SystemVerilog_Complete_Comprehensive_Guide_block_7
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 8: SystemVerilog_Complete_Comprehensive_Guide_block_8
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 9: SystemVerilog_Complete_Comprehensive_Guide_block_9
+  Has testbench: False
+  ✓ Compilation PASSED
+
+[TEST] Block 10: SystemVerilog_Complete_Comprehensive_Guide_block_10
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_10.sv:9: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_10.sv:9: error: Malformed statement
+
+
+[TEST] Block 11: SystemVerilog_Complete_Comprehensive_Guide_block_11
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: While: 0
+While: 1
+While: 2
+While: 3
+While: 4
+Do-While: 0
+Do-While: 1
+Do-While: 2
+Do-While: 3
+Do-While: 4
+
+
+[TEST] Block 12: SystemVerilog_Complete_Comprehensive_Guide_block_12
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 5 + 3 = 8
+
+
+[TEST] Block 13: SystemVerilog_Complete_Comprehensive_Guide_block_13
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [0] Value: 42
+[10] Value: 100
+
+
+[TEST] Block 14: SystemVerilog_Complete_Comprehensive_Guide_block_14
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_14.sv:3: sorry: Unpacked structs not supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_14.sv:25: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_14.sv:25: error: Malformed statement
+
+
+[TEST] Block 15: SystemVerilog_Complete_Comprehensive_Guide_block_15
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_15.sv:3: error: Member as_short of packed struct/union must be packed.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_15.sv:3: error: Member as_short of packed union is 1 bits, expecting 32 bits.
+extracted_code/SystemVe
+
+[TEST] Block 16: SystemVerilog_Complete_Comprehensive_Guide_block_16
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: AXI Write Transaction:
+  Address: 0x10000004
+  Data:    0xdeadbeef
+  Strobe:  0b1111
+  Valid:   1
+  As packed value: 0x1fdeadbeef10000004
+
+Partial Write (lower 2 bytes only):
+  Address: 0x20000008
+  D
+
+[TEST] Block 17: SystemVerilog_Complete_Comprehensive_Guide_block_17
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_17.sv:18: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_17.sv:18: error: Malformed statement
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_17.sv:25: syntax error
+extracted_code/SystemVeri
+
+[TEST] Block 18: SystemVerilog_Complete_Comprehensive_Guide_block_18
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: State: IDLE
+Light: GREEN
+Result: SUCCESS (0)
+
+
+[TEST] Block 19: SystemVerilog_Complete_Comprehensive_Guide_block_19
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_19.sv:16: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_19.sv:16: Syntax in assignment statement l-value.
+
+
+[TEST] Block 20: SystemVerilog_Complete_Comprehensive_Guide_block_20
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Vending Machine Simulation
+---------------------------
+Time 30: State = COIN_25, Dispense = 0
+Time 50: State = COIN_50, Dispense = 0
+Time 70: State = COIN_75, Dispense = 0
+Time 90: State = IDLE, Dispe
+
+[TEST] Block 21: SystemVerilog_Complete_Comprehensive_Guide_block_21
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_21.sv:61: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_21.sv:61: Syntax in assignment statement l-value.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_21.sv:66: syntax error
+extracted_co
+
+[TEST] Block 22: SystemVerilog_Complete_Comprehensive_Guide_block_22
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_22.sv:26: error: Array matrix['sd0] needs 2 indices, but got only 1.
+1 error(s) during elaboration.
+
+
+[TEST] Block 23: SystemVerilog_Complete_Comprehensive_Guide_block_23
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_23.sv:6: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_23.sv:1: error: Syntax error in variable list.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_23.sv:9: syntax error
+extracted_code/Sy
+
+[TEST] Block 24: SystemVerilog_Complete_Comprehensive_Guide_block_24
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Memory Block Test
+=================
+
+Reading initialized values:
+  mem[0x00] = 0xdeadbeef
+  mem[0x01] = 0xcafebabe
+  mem[0x02] = 0x12345678
+  mem[0x03] = 0xabcdef00
+
+Writing new values:
+Write: mem[0x1
+
+[TEST] Block 25: SystemVerilog_Complete_Comprehensive_Guide_block_25
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_25.sv:64: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_25.sv:64: Syntax in assignment statement l-value.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_25.sv:75: warning: Static variable 
+
+[TEST] Block 26: SystemVerilog_Complete_Comprehensive_Guide_block_26
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: PC: 0x00001000
+Instruction: 0xa5f0
+Memory[0]: 0xff
+
+
+[TEST] Block 27: SystemVerilog_Complete_Comprehensive_Guide_block_27
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_27.sv:3: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_27.sv:3: error: Syntax error in typedef clause.
+
+
+[TEST] Block 28: SystemVerilog_Complete_Comprehensive_Guide_block_28
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_28.sv:3: sorry: Unpacked structs not supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_28.sv:12: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_28.sv:12: error: Syntax error in type
+
+[TEST] Block 29: SystemVerilog_Complete_Comprehensive_Guide_block_29
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: ERROR: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_29.sv:15: $display does not support argument type (116).
+ERROR: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_2
+
+[TEST] Block 30: SystemVerilog_Complete_Comprehensive_Guide_block_30
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_30.sv:14: error: Method sum is not a dynamic array method.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_30.sv:14: error: Object dynamic_array_methods.numbers has no method "sum(...)".
+extracted_code/SystemVerilog_Comp
+
+[TEST] Block 31: SystemVerilog_Complete_Comprehensive_Guide_block_31
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_31.sv:6: sorry: Unpacked structs not supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_31.sv:19: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_31.sv:19: error: Errors in foreach lo
+
+[TEST] Block 32: SystemVerilog_Complete_Comprehensive_Guide_block_32
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_32.sv:2: sorry: Unpacked structs not supported.
+
+
+[TEST] Block 33: SystemVerilog_Complete_Comprehensive_Guide_block_33
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_33.sv:16: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_33.sv:16: Syntax in assignment statement l-value.
+
+
+[TEST] Block 34: SystemVerilog_Complete_Comprehensive_Guide_block_34
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_34.sv:19: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_34.sv:19: error: Malformed statement
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_34.sv:25: syntax error
+extracted_code/SystemVeri
+
+[TEST] Block 35: SystemVerilog_Complete_Comprehensive_Guide_block_35
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_35.sv:17: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_35.sv:17: Syntax in assignment statement l-value.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_35.sv:45: syntax error
+extracted_co
+
+[TEST] Block 36: SystemVerilog_Complete_Comprehensive_Guide_block_36
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_36.sv:3: sorry: Unpacked structs not supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_36.sv:13: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_36.sv:13: error: Errors in variable n
+
+[TEST] Block 37: SystemVerilog_Complete_Comprehensive_Guide_block_37
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_37.sv:36: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_37.sv:36: Syntax in assignment statement l-value.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_37.sv:37: syntax error
+extracted_co
+
+[TEST] Block 38: SystemVerilog_Complete_Comprehensive_Guide_block_38
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_38.sv:2: error: Type names are not valid expressions here.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_38.sv:2: internal error: I do not know how to elaborate this expression. 
+extracted_code/SystemVerilog_Complete_C
+
+[TEST] Block 39: SystemVerilog_Complete_Comprehensive_Guide_block_39
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_39.sv:85: warning: Static variable initialization requires explicit lifetime in this context.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_39.sv:8: error: Type names are not valid expressions here.
+extracted_code/Syst
+
+[TEST] Block 40: SystemVerilog_Complete_Comprehensive_Guide_block_40
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_40.sv:9: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_40.sv:9: Errors in port declarations.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_40.sv:16: syntax error
+extracted_code/SystemVeri
+
+[SKIP] Block 41: Not a complete module
+
+[TEST] Block 42: SystemVerilog_Complete_Comprehensive_Guide_block_42
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_42.sv:44: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_42.sv:44: Errors in port declarations.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_42.sv:67: syntax error
+extracted_code/SystemVe
+
+[TEST] Block 43: SystemVerilog_Complete_Comprehensive_Guide_block_43
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_43.sv:14: sorry: modport task/function ports are not yet supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_43.sv:62: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_43.sv:62: Errors 
+
+[TEST] Block 44: SystemVerilog_Complete_Comprehensive_Guide_block_44
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_44.sv:7: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_44.sv:7: error: Invalid class item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_44.sv:9: syntax error
+extracted_code/SystemVerilog
+
+[SKIP] Block 45: Not a complete module
+
+[TEST] Block 46: SystemVerilog_Complete_Comprehensive_Guide_block_46
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 90 degrees = 1.5708 radians
+PI = 3.1415926536
+2^10 = 1024
+
+
+[TEST] Block 47: SystemVerilog_Complete_Comprehensive_Guide_block_47
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_47.sv:57: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_47.sv:56: sorry: Constraint declarations not supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_b
+
+[TEST] Block 48: SystemVerilog_Complete_Comprehensive_Guide_block_48
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Sum: 8
+Max size: 1024
+Sum: 8
+Product: 15
+Max: 1024, Min: 1
+
+
+[TEST] Block 49: SystemVerilog_Complete_Comprehensive_Guide_block_49
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Created Counter1 with initial value 10
+Created Counter2 with initial value 0
+Counter1: incremented to 1
+Counter1: incremented to 1
+Counter 'Counter1' = 1
+Counter2: incremented to 1
+Counter2: increment
+
+[TEST] Block 50: SystemVerilog_Complete_Comprehensive_Guide_block_50
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Account: 12345, Owner: John Doe, Balance: $1000.00
+Deposited $500.00. New balance: $500.00
+Withdrew $200.00. New balance: $200.00
+ERROR: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block
+
+[TEST] Block 51: SystemVerilog_Complete_Comprehensive_Guide_block_51
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_51.sv:47: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_51.sv:47: error: Malformed statement
+
+
+[TEST] Block 52: SystemVerilog_Complete_Comprehensive_Guide_block_52
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_52.sv:17: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_52.sv:18: Syntax in assignment statement l-value.
+
+
+[TEST] Block 53: SystemVerilog_Complete_Comprehensive_Guide_block_53
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Car: Toyota (2023) - $25000.00, 4 doors, Sunroof: Yes
+  Tax: $1750.00
+Truck: Ford (2022) - $45000.00, Capacity: 5.0 tons
+  Tax: $2750.00
+Vehicle: Toyota (2023) - $25000.00
+Vehicle: Ford (2022) - $4500
+
+[TEST] Block 54: SystemVerilog_Complete_Comprehensive_Guide_block_54
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_54.sv:11: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_54.sv:11: error: Invalid class item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_54.sv:12: syntax error
+extracted_code/SystemVeri
+
+[TEST] Block 55: SystemVerilog_Complete_Comprehensive_Guide_block_55
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_55.sv:9: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_55.sv:8: sorry: Constraint declarations not supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_blo
+
+[TEST] Block 57: SystemVerilog_Complete_Comprehensive_Guide_block_57
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_57.sv:22: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_57.sv:22: error: Invalid module item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_57.sv:23: syntax error
+extracted_code/SystemVer
+
+[TEST] Block 58: SystemVerilog_Complete_Comprehensive_Guide_block_58
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_58.sv:15: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_58.sv:15: error: Invalid module item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_58.sv:16: syntax error
+extracted_code/SystemVer
+
+[TEST] Block 59: SystemVerilog_Complete_Comprehensive_Guide_block_59
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_59.sv:33: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_59.sv:33: error: Invalid module item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_59.sv:34: syntax error
+extracted_code/SystemVer
+
+[TEST] Block 60: SystemVerilog_Complete_Comprehensive_Guide_block_60
+  Has testbench: False
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_60.sv:30: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_60.sv:30: error: Invalid module item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_60.sv:31: syntax error
+extracted_code/SystemVer
+
+[TEST] Block 61: SystemVerilog_Complete_Comprehensive_Guide_block_61
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_61.sv:20: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_61.sv:19: sorry: Constraint declarations not supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_b
+
+[TEST] Block 62: SystemVerilog_Complete_Comprehensive_Guide_block_62
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_62.sv:4: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_62.sv:4: error: Errors in variable names after data type.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_62.sv:8: sorry: "inside" exp
+
+[TEST] Block 63: SystemVerilog_Complete_Comprehensive_Guide_block_63
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_63.sv:11: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_63.sv:10: error: Errors in the constraint block item list.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_63.sv:16: sorry: "inside" 
+
+[TEST] Block 64: SystemVerilog_Complete_Comprehensive_Guide_block_64
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_64.sv:8: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_64.sv:7: sorry: Constraint declarations not supported.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_blo
+
+[TEST] Block 65: SystemVerilog_Complete_Comprehensive_Guide_block_65
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_65.sv:42: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_65.sv:42: error: Malformed statement
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_65.sv:43: syntax error
+extracted_code/SystemVeri
+
+[TEST] Block 66: SystemVerilog_Complete_Comprehensive_Guide_block_66
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_66.sv:8: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_66.sv:8: error: Invalid class item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_66.sv:9: syntax error
+extracted_code/SystemVerilog
+
+[TEST] Block 67: SystemVerilog_Complete_Comprehensive_Guide_block_67
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_67.sv:3: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_67.sv:3: error: Invalid class item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_67.sv:19: syntax error
+extracted_code/SystemVerilo
+
+[TEST] Block 68: SystemVerilog_Complete_Comprehensive_Guide_block_68
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_68.sv:3: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_68.sv:3: error: Invalid class item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_68.sv:4: syntax error
+extracted_code/SystemVerilog
+
+[TEST] Block 69: SystemVerilog_Complete_Comprehensive_Guide_block_69
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_69.sv:28: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_69.sv:28: error: Invalid class item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_69.sv:29: syntax error
+extracted_code/SystemVeri
+
+[TEST] Block 71: SystemVerilog_Complete_Comprehensive_Guide_block_71
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_71.sv:10: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_71.sv:10: error: Invalid class item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_71.sv:12: syntax error
+extracted_code/SystemVeri
+
+[TEST] Block 72: SystemVerilog_Complete_Comprehensive_Guide_block_72
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_72.sv:14: syntax error
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_72.sv:14: error: Invalid class item.
+extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_72.sv:15: syntax error
+extracted_code/SystemVeri
+
+[TEST] Block 73: SystemVerilog_Complete_Comprehensive_Guide_block_73
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_73.sv:2: syntax error
+I give up.
+
+
+[TEST] Block 74: SystemVerilog_Complete_Comprehensive_Guide_block_74
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Complete_Comprehensive_Guide_block_74.sv:3: Include file uvm_macros.svh not found
+No top level modules, and no -s option.
+
+
+[SKIP] Block 77: Not a complete module
+
+[SKIP] Block 78: Not a complete module
+
+[SKIP] Block 83: Not a complete module
+
+================================================================================
+Processing: SystemVerilog_Full_Content_Fixed.tex
+================================================================================
+Found 29 code blocks
+
+[TEST] Block 1: SystemVerilog_Full_Content_Fixed_block_1
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_1.sv:5: error: No function named `add' found in this context (test_add).
+extracted_code/SystemVerilog_Full_Content_Fixed_block_1.sv:9: error: No function named `add' found in this context (test_add).
+extracted_code/SystemVerilog_Full_Content_Fixe
+
+[TEST] Block 2: SystemVerilog_Full_Content_Fixed_block_2
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Is 4 even? 1
+Is 7 even? 0
+Lower byte of 16'hABCD: cd
+100C = 212.000000 F
+Score 85 = B
+
+
+[TEST] Block 3: SystemVerilog_Full_Content_Fixed_block_3
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: ==================================
+  SIMULATION START
+==================================
+10110010
+==================================
+  SIMULATION END
+==================================
+
+
+[TEST] Block 4: SystemVerilog_Full_Content_Fixed_block_4
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 0! = 1
+1! = 1
+2! = 2
+3! = 6
+4! = 24
+5! = 120
+6! = 720
+7! = 5040
+8! = 40320
+9! = 362880
+10! = 3628800
+
+
+[TEST] Block 5: SystemVerilog_Full_Content_Fixed_block_5
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [0] Simulation started
+[10] After 10 time units
+
+
+[TEST] Block 6: SystemVerilog_Full_Content_Fixed_block_6
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 5 + 3 = 8, 5 * 3 = 15
+
+
+[TEST] Block 7: SystemVerilog_Full_Content_Fixed_block_7
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [0] Start
+[0] Waiting 10 time units...
+[10] First message
+[10] Waiting 20 time units...
+[30] Second message
+[30] Done
+
+
+[TEST] Block 8: SystemVerilog_Full_Content_Fixed_block_8
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [5] Task 2 completed
+[10] Task 1 completed
+[15] Task 3 completed
+[15] All tasks done
+
+
+[TEST] Block 9: SystemVerilog_Full_Content_Fixed_block_9
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 3^2 = 9
+2^8 = 2304
+5^3 = 288000
+
+
+[TEST] Block 10: SystemVerilog_Full_Content_Fixed_block_10
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_10.sv:4: error: Function $unit.divide_with_remainder port remainder is not an input port.
+extracted_code/SystemVerilog_Full_Content_Fixed_block_10.sv:4:      : Function arguments must be input ports.
+1 error(s) during elaboration.
+
+
+[TEST] Block 11: SystemVerilog_Full_Content_Fixed_block_11
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_11.sv:2: warning: Static variable initialization requires explicit lifetime in this context.
+extracted_code/SystemVerilog_Full_Content_Fixed_block_11.sv:7: sorry: Reference ports not supported yet.
+extracted_code/SystemVerilog_Full_Content_Fixed_
+
+[TEST] Block 12: SystemVerilog_Full_Content_Fixed_block_12
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: === Static Function ===
+Count: 1
+Count: 2
+Count: 3
+Count: 4
+Count: 5
+
+=== Automatic Function ===
+Count: 1
+Count: 1
+Count: 1
+Count: 1
+Count: 1
+
+
+[TEST] Block 13: SystemVerilog_Full_Content_Fixed_block_13
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Deposited $500.00, Balance: $500.00
+Withdrew $200.00, Balance: $200.00
+Error: Insufficient funds
+Final balance: $200.00
+
+
+[TEST] Block 14: SystemVerilog_Full_Content_Fixed_block_14
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_14.sv:2: sorry: Unpacked structs not supported.
+extracted_code/SystemVerilog_Full_Content_Fixed_block_14.sv:7: sorry: Unpacked structs not supported.
+extracted_code/SystemVerilog_Full_Content_Fixed_block_14.sv:21: syntax error
+I give up.
+
+
+[TEST] Block 16: SystemVerilog_Full_Content_Fixed_block_16
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [65] Start bit detected
+[5265] Start bit detected
+[8385] Start bit detected
+[11515] Start bit detected
+[13595] Start bit detected
+[15675] Start bit detected
+[19835] Start bit detected
+[22965] Start bi
+
+[SKIP] Block 17: Not a complete module
+
+[TEST] Block 18: SystemVerilog_Full_Content_Fixed_block_18
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_18.sv:23: sorry: Reference ports not supported yet.
+extracted_code/SystemVerilog_Full_Content_Fixed_block_18.sv:23: error: Function $unit.EthernetPacket.pack port stream is not an input port.
+extracted_code/SystemVerilog_Full_Content_Fixed_block_
+
+[TEST] Block 19: SystemVerilog_Full_Content_Fixed_block_19
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_19.sv:4: syntax error
+extracted_code/SystemVerilog_Full_Content_Fixed_block_19.sv:4: error: Invalid class item.
+
+
+[TEST] Block 20: SystemVerilog_Full_Content_Fixed_block_20
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_20.sv:34: syntax error
+extracted_code/SystemVerilog_Full_Content_Fixed_block_20.sv:35: error: Malformed statement
+
+
+[TEST] Block 21: SystemVerilog_Full_Content_Fixed_block_21
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Original:  10110010
+Reversed:  01001101
+
+
+[TEST] Block 24: SystemVerilog_Full_Content_Fixed_block_24
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_24.sv:21: syntax error
+extracted_code/SystemVerilog_Full_Content_Fixed_block_24.sv:21: error: Malformed statement
+
+
+[TEST] Block 25: SystemVerilog_Full_Content_Fixed_block_25
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_25.sv:2: syntax error
+I give up.
+
+
+[TEST] Block 26: SystemVerilog_Full_Content_Fixed_block_26
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_26.sv:8: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Full_Content_Fixed_block_26.sv:6: sorry: Constraint declarations not supported.
+
+
+[TEST] Block 36: SystemVerilog_Full_Content_Fixed_block_36
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 10 - 3 = 7
+100 - 50 = 50
+7 - 12 = -5
+
+
+[TEST] Block 37: SystemVerilog_Full_Content_Fixed_block_37
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 6 * 7 = 42
+12 * 12 = 144
+-5 * 3 = -15
+
+
+[TEST] Block 38: SystemVerilog_Full_Content_Fixed_block_38
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 32.0 F = 0.0 C = 273.15 K
+98.6 F = 37.0 C = 310.15 K
+212.0 F = 100.0 C = 373.15 K
+
+
+[TEST] Block 39: SystemVerilog_Full_Content_Fixed_block_39
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Fibonacci Sequence:
+fib( 0) =     0
+fib( 1) =     1
+fib( 2) =     1
+fib( 3) =     2
+fib( 4) =     3
+fib( 5) =     5
+fib( 6) =     8
+fib( 7) =    13
+fib( 8) =    21
+fib( 9) =    34
+fib(10) =    55
+fib(
+
+[TEST] Block 40: SystemVerilog_Full_Content_Fixed_block_40
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 2^10 = 1024
+3^5 = 243
+5^3 = 125
+
+
+[TEST] Block 41: SystemVerilog_Full_Content_Fixed_block_41
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Full_Content_Fixed_block_41.sv:35: error: The expression 'data[top_idx]' cannot be implicitly cast to the target type.
+extracted_code/SystemVerilog_Full_Content_Fixed_block_41.sv:23: error: The expression 'data[d(top_idx)]' cannot be implicitly cast to the target type.
+e
+
+================================================================================
+Processing: SystemVerilog_Functions_Tasks_Complete.tex
+================================================================================
+Found 2 code blocks
+
+[TEST] Block 1: SystemVerilog_Functions_Tasks_Complete_block_1
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Complete_block_1.sv:5: error: No function named `add' found in this context (test_add).
+extracted_code/SystemVerilog_Functions_Tasks_Complete_block_1.sv:9: error: No function named `add' found in this context (test_add).
+extracted_code/SystemVerilog_Funct
+
+[TEST] Block 2: SystemVerilog_Functions_Tasks_Complete_block_2
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Is 4 even? 1
+Is 7 even? 0
+Lower byte of 16'hABCD: cd
+100C = 212.000000 F
+Score 85 = B
+
+
+================================================================================
+Processing: SystemVerilog_Functions_Tasks_Complete_Guide.tex
+================================================================================
+Found 21 code blocks
+
+[TEST] Block 1: SystemVerilog_Functions_Tasks_Complete_Guide_block_1
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_1.sv:5: error: No function named `add' found in this context (test_add).
+extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_1.sv:9: error: No function named `add' found in this context (test_add).
+extracted_code/SystemV
+
+[TEST] Block 2: SystemVerilog_Functions_Tasks_Complete_Guide_block_2
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Is 4 even? 1
+Is 7 even? 0
+Lower byte of 16'hABCD: cd
+100°C = 212.000000°F
+Score 85 = B
+
+
+[TEST] Block 3: SystemVerilog_Functions_Tasks_Complete_Guide_block_3
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: ==================================
+  SIMULATION START
+==================================
+10110010
+==================================
+  SIMULATION END
+==================================
+
+
+[TEST] Block 4: SystemVerilog_Functions_Tasks_Complete_Guide_block_4
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 0! = 1
+1! = 1
+2! = 2
+3! = 6
+4! = 24
+5! = 120
+6! = 720
+7! = 5040
+8! = 40320
+9! = 362880
+10! = 3628800
+
+
+[TEST] Block 5: SystemVerilog_Functions_Tasks_Complete_Guide_block_5
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [0] Simulation started
+[10] After 10 time units
+
+
+[TEST] Block 6: SystemVerilog_Functions_Tasks_Complete_Guide_block_6
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 5 + 3 = 8, 5 * 3 = 15
+
+
+[TEST] Block 7: SystemVerilog_Functions_Tasks_Complete_Guide_block_7
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [0] Start
+[0] Waiting 10 time units...
+[10] First message
+[10] Waiting 20 time units...
+[30] Second message
+[30] Done
+
+
+[TEST] Block 8: SystemVerilog_Functions_Tasks_Complete_Guide_block_8
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [5] Task 2 completed
+[10] Task 1 completed
+[15] Task 3 completed
+[15] All tasks done
+
+
+[TEST] Block 9: SystemVerilog_Functions_Tasks_Complete_Guide_block_9
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 3^2 = 9
+2^8 = 2304
+5^3 = 288000
+
+
+[TEST] Block 10: SystemVerilog_Functions_Tasks_Complete_Guide_block_10
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_10.sv:4: error: Function $unit.divide_with_remainder port remainder is not an input port.
+extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_10.sv:4:      : Function arguments must be input ports.
+1 error(s) during elab
+
+[TEST] Block 11: SystemVerilog_Functions_Tasks_Complete_Guide_block_11
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_11.sv:2: warning: Static variable initialization requires explicit lifetime in this context.
+extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_11.sv:7: sorry: Reference ports not supported yet.
+extracted_code/SystemVer
+
+[TEST] Block 12: SystemVerilog_Functions_Tasks_Complete_Guide_block_12
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: === Static Function ===
+Count: 1
+Count: 2
+Count: 3
+Count: 4
+Count: 5
+
+=== Automatic Function ===
+Count: 1
+Count: 1
+Count: 1
+Count: 1
+Count: 1
+
+
+[TEST] Block 13: SystemVerilog_Functions_Tasks_Complete_Guide_block_13
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Deposited $500.00, Balance: $500.00
+Withdrew $200.00, Balance: $200.00
+Error: Insufficient funds
+Final balance: $200.00
+
+
+[TEST] Block 14: SystemVerilog_Functions_Tasks_Complete_Guide_block_14
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_14.sv:2: sorry: Unpacked structs not supported.
+extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_14.sv:7: sorry: Unpacked structs not supported.
+extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_14.sv:
+
+[TEST] Block 16: SystemVerilog_Functions_Tasks_Complete_Guide_block_16
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [65] Start bit detected
+[5265] Start bit detected
+[8385] Start bit detected
+[11515] Start bit detected
+[13595] Start bit detected
+[15675] Start bit detected
+[19835] Start bit detected
+[22965] Start bi
+
+[TEST] Block 17: SystemVerilog_Functions_Tasks_Complete_Guide_block_17
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_17.sv:2: syntax error
+extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_17.sv:2: error: Invalid class item.
+extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_17.sv:4: syntax error
+extracted_code/SystemV
+
+[TEST] Block 18: SystemVerilog_Functions_Tasks_Complete_Guide_block_18
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_18.sv:23: sorry: Reference ports not supported yet.
+extracted_code/SystemVerilog_Functions_Tasks_Complete_Guide_block_18.sv:23: error: Function $unit.EthernetPacket.pack port stream is not an input port.
+extracted_code/SystemVerilog_F
+
+[TEST] Block 27: SystemVerilog_Functions_Tasks_Complete_Guide_block_27
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 10 - 3 = 7
+100 - 50 = 50
+7 - 12 = -5
+
+
+[TEST] Block 28: SystemVerilog_Functions_Tasks_Complete_Guide_block_28
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 6 * 7 = 42
+12 * 12 = 144
+-5 * 3 = -15
+
+
+[TEST] Block 29: SystemVerilog_Functions_Tasks_Complete_Guide_block_29
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 32.0 F = 0.0 C = 273.15 K
+98.6 F = 37.0 C = 310.15 K
+212.0 F = 100.0 C = 373.15 K
+
+
+[TEST] Block 30: SystemVerilog_Functions_Tasks_Complete_Guide_block_30
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Fibonacci Sequence:
+fib( 0) =     0
+fib( 1) =     1
+fib( 2) =     1
+fib( 3) =     2
+fib( 4) =     3
+fib( 5) =     5
+fib( 6) =     8
+fib( 7) =    13
+fib( 8) =    21
+fib( 9) =    34
+fib(10) =    55
+fib(
+
+================================================================================
+Processing: SystemVerilog_Functions_Tasks_Simple.tex
+================================================================================
+Found 11 code blocks
+
+[TEST] Block 1: SystemVerilog_Functions_Tasks_Simple_block_1
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Simple_block_1.sv:5: error: No function named `add' found in this context (test_add).
+extracted_code/SystemVerilog_Functions_Tasks_Simple_block_1.sv:9: error: No function named `add' found in this context (test_add).
+extracted_code/SystemVerilog_Functions
+
+[TEST] Block 3: SystemVerilog_Functions_Tasks_Simple_block_3
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 0! = 1
+1! = 1
+2! = 2
+3! = 6
+4! = 24
+5! = 120
+6! = 720
+7! = 5040
+8! = 40320
+9! = 362880
+10! = 3628800
+
+
+[TEST] Block 4: SystemVerilog_Functions_Tasks_Simple_block_4
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [0] Simulation started
+[10] After 10 time units
+
+
+[TEST] Block 5: SystemVerilog_Functions_Tasks_Simple_block_5
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 5 + 3 = 8, 5 * 3 = 15
+
+
+[TEST] Block 6: SystemVerilog_Functions_Tasks_Simple_block_6
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [0] Start
+[0] Waiting 10 time units...
+[10] First message
+[10] Waiting 20 time units...
+[30] Second message
+[30] Done
+
+
+[TEST] Block 7: SystemVerilog_Functions_Tasks_Simple_block_7
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: [5] Task 2 completed
+[10] Task 1 completed
+[15] Task 3 completed
+[15] All tasks done
+
+
+[TEST] Block 8: SystemVerilog_Functions_Tasks_Simple_block_8
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 3^2 = 9
+2^8 = 2304
+
+
+[TEST] Block 10: SystemVerilog_Functions_Tasks_Simple_block_10
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Simple_block_10.sv:2: warning: Static variable initialization requires explicit lifetime in this context.
+extracted_code/SystemVerilog_Functions_Tasks_Simple_block_10.sv:1: sorry: Reference ports not supported yet.
+extracted_code/SystemVerilog_Functions_T
+
+[TEST] Block 12: SystemVerilog_Functions_Tasks_Simple_block_12
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_Tasks_Simple_block_12.sv:24: Sorry: Dynamic array of type `class Packet{dynamic array of netvector_t:bool unsigned[7:0] payload}` is not yet supported.
+extracted_code/SystemVerilog_Functions_Tasks_Simple_block_12.sv:32: Error: Class/null r-value not allowed in 
+
+[TEST] Block 18: SystemVerilog_Functions_Tasks_Simple_block_18
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 10 - 3 = 7
+100 - 50 = 50
+7 - 12 = -5
+
+
+[TEST] Block 19: SystemVerilog_Functions_Tasks_Simple_block_19
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: fib( 0) =     0
+fib( 1) =     1
+fib( 2) =     1
+fib( 3) =     2
+fib( 4) =     3
+fib( 5) =     5
+fib( 6) =     8
+fib( 7) =    13
+fib( 8) =    21
+fib( 9) =    34
+fib(10) =    55
+
+
+================================================================================
+Processing: SystemVerilog_Functions_and_Tasks.tex
+================================================================================
+Found 27 code blocks
+
+[TEST] Block 0: SystemVerilog_Functions_and_Tasks_block_0
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Result: 8
+
+
+[TEST] Block 1: SystemVerilog_Functions_and_Tasks_block_1
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 5! = 120
+
+
+[TEST] Block 2: SystemVerilog_Functions_and_Tasks_block_2
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Message: Hello, SystemVerilog!
+
+
+[TEST] Block 3: SystemVerilog_Functions_and_Tasks_block_3
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: a = 10, b = 20
+
+
+[TEST] Block 4: SystemVerilog_Functions_and_Tasks_block_4
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Product: 42
+
+
+[TEST] Block 5: SystemVerilog_Functions_and_Tasks_block_5
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Time: 0
+Value after 10 ns: 100
+Time: 10
+
+
+[TEST] Block 6: SystemVerilog_Functions_and_Tasks_block_6
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Sum: 20, Difference: 10
+
+
+[TEST] Block 7: SystemVerilog_Functions_and_Tasks_block_7
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: 3^2 = 9
+2^5 = 288
+
+
+[TEST] Block 8: SystemVerilog_Functions_and_Tasks_block_8
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_8.sv:2: error: Function $unit.divide port remainder is not an input port.
+extracted_code/SystemVerilog_Functions_and_Tasks_block_8.sv:2:      : Function arguments must be input ports.
+1 error(s) during elaboration.
+
+
+[TEST] Block 9: SystemVerilog_Functions_and_Tasks_block_9
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_9.sv:2: sorry: Reference ports not supported yet.
+extracted_code/SystemVerilog_Functions_and_Tasks_block_9.sv:2: sorry: Reference ports not supported yet.
+extracted_code/SystemVerilog_Functions_and_Tasks_block_9.sv:2: error: Function $unit.swap 
+
+[TEST] Block 10: SystemVerilog_Functions_and_Tasks_block_10
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Static: 1
+Static: 2
+Static: 3
+Auto: 1
+Auto: 1
+Auto: 1
+
+
+[TEST] Block 11: SystemVerilog_Functions_and_Tasks_block_11
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Task 2 completed at time 5
+Task 1 completed at time 10
+Task 3 completed at time 15
+
+
+[TEST] Block 12: SystemVerilog_Functions_and_Tasks_block_12
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_12.sv:4: error: Cannot "return" from tasks.
+1 error(s) during elaboration.
+
+
+[TEST] Block 13: SystemVerilog_Functions_and_Tasks_block_13
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: After additions: 5
+After multiply: 2
+
+
+[TEST] Block 14: SystemVerilog_Functions_and_Tasks_block_14
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_14.sv:2: syntax error
+I give up.
+
+
+[TEST] Block 15: SystemVerilog_Functions_and_Tasks_block_15
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_15.sv:49: Sorry: Dynamic array of type `class Shape{}` is not yet supported.
+extracted_code/SystemVerilog_Functions_and_Tasks_block_15.sv:58: Error: Class/null r-value not allowed in this context.
+extracted_code/SystemVerilog_Functions_and_Tasks
+
+[TEST] Block 16: SystemVerilog_Functions_and_Tasks_block_16
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_16.sv:4: syntax error
+extracted_code/SystemVerilog_Functions_and_Tasks_block_16.sv:4: error: Invalid class item.
+
+
+[TEST] Block 17: SystemVerilog_Functions_and_Tasks_block_17
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_17.sv:34: syntax error
+extracted_code/SystemVerilog_Functions_and_Tasks_block_17.sv:35: error: Malformed statement
+
+
+[TEST] Block 18: SystemVerilog_Functions_and_Tasks_block_18
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Original:  10110010
+Reversed:  01001101
+Original:  0000000010110010
+Reversed:  0100110100000000
+
+
+[TEST] Block 19: SystemVerilog_Functions_and_Tasks_block_19
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+
+[TEST] Block 20: SystemVerilog_Functions_and_Tasks_block_20
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_20.sv:3: sorry: External methods are not yet supported.
+extracted_code/SystemVerilog_Functions_and_Tasks_block_20.sv:4: syntax error
+extracted_code/SystemVerilog_Functions_and_Tasks_block_20.sv:4: error: Invalid class item.
+extracted_code/System
+
+[TEST] Block 21: SystemVerilog_Functions_and_Tasks_block_21
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_21.sv:21: syntax error
+extracted_code/SystemVerilog_Functions_and_Tasks_block_21.sv:21: error: Malformed statement
+
+
+[TEST] Block 22: SystemVerilog_Functions_and_Tasks_block_22
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_22.sv:2: syntax error
+I give up.
+
+
+[TEST] Block 23: SystemVerilog_Functions_and_Tasks_block_23
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_23.sv:8: sorry: "inside" expressions not supported yet.
+extracted_code/SystemVerilog_Functions_and_Tasks_block_23.sv:6: sorry: Constraint declarations not supported.
+
+
+[TEST] Block 24: SystemVerilog_Functions_and_Tasks_block_24
+  Has testbench: True
+  ✗ Compilation FAILED
+  Error: extracted_code/SystemVerilog_Functions_and_Tasks_block_24.sv:4: syntax error
+extracted_code/SystemVerilog_Functions_and_Tasks_block_24.sv:4: error: Invalid class item.
+extracted_code/SystemVerilog_Functions_and_Tasks_block_24.sv:5: syntax error
+extracted_code/SystemVerilog_Functions_and_Tasks_block_
+
+[TEST] Block 25: SystemVerilog_Functions_and_Tasks_block_25
+  Has testbench: True
+  ✓ Compilation PASSED
+  ✓ Execution PASSED
+  Output: Timeout: 1000
+Mode: fast
+Enable: 1
+
+
+[SKIP] Block 26: Not a complete module
+
+
+================================================================================
+FINAL SUMMARY
+================================================================================
+Total code blocks processed: 266
+Successfully compiled: 131
+Failed compilation: 124
+Success rate: 49.2%
+
+Detailed report saved to: verification_report.md
+JSON results saved to: verification_report.json
