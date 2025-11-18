@@ -12,7 +12,8 @@ This document provides detailed explanations of communication protocol implement
 2. [I2C (Inter-Integrated Circuit)](#i2c-inter-integrated-circuit)
 3. [Synchronous FIFO](#synchronous-fifo)
 4. [APB (AMBA Advanced Peripheral Bus)](#apb-amba-advanced-peripheral-bus)
-5. [UART (Universal Asynchronous Receiver/Transmitter)](#uart-notes)
+5. [AXI Lite (AMBA AXI4-Lite)](#axi-lite-amba-axi4-lite)
+6. [UART (Universal Asynchronous Receiver/Transmitter)](#uart-universal-asynchronous-receivertransmitter)
 
 ---
 
@@ -700,33 +701,450 @@ Test 5: Back-to-back transactions
 
 ---
 
-## UART Notes
+## AXI Lite (AMBA AXI4-Lite)
 
-### Current Status
+### Overview
 
-The UART implementation (uart_tx.v and uart_rx.v) has been created but requires additional debugging:
+AXI Lite is a simplified subset of the AXI4 protocol, designed for simple, low-throughput memory-mapped communication. It's part of ARM's AMBA specification and widely used in SoC designs.
+
+**Key Characteristics**:
+- **No burst support**: All transactions are single data transfers
+- **Single outstanding transaction**: No pipelining or outstanding requests
+- **5 independent channels**: Write Address (AW), Write Data (W), Write Response (B), Read Address (AR), Read Data (R)
+- **Ready/Valid handshaking**: On all channels
+
+### Key Concepts
+
+#### Five Channel Architecture
+
+```
+Master                                Slave
+  |--- Write Address (AW) ----------->|
+  |--- Write Data (W) --------------->|
+  |<-- Write Response (B) ------------|
+  |--- Read Address (AR) ------------>|
+  |<-- Read Data (R) -----------------|
+```
+
+Each channel is independent with its own VALID/READY handshake.
+
+#### Handshaking Protocol
+
+**Rule**: A transfer occurs when both VALID and READY are HIGH on the same clock edge.
+
+```
+        ___     ___     ___     ___
+CLK  __|   |___|   |___|   |___|   |___
+VALID___/‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\____________
+READY________/‾‾‾‾‾‾‾‾‾‾‾\___________
+             ^-- Transfer occurs here
+```
+
+**Important**:
+- VALID must not wait for READY (prevent deadlock)
+- READY can wait for VALID
+- Once VALID is asserted, it must stay HIGH until transfer completes
+
+#### Write Transaction Sequence
+
+1. **Write Address Phase**: Master drives AWADDR, AWVALID
+   - Slave responds with AWREADY when ready to accept address
+
+2. **Write Data Phase**: Master drives WDATA, WSTRB, WVALID
+   - Slave responds with WREADY when ready to accept data
+   - WSTRB (write strobes) enables byte-level writes
+
+3. **Write Response Phase**: Slave drives BRESP, BVALID
+   - Master responds with BREADY when ready for response
+   - BRESP indicates transaction status (OKAY, SLVERR, etc.)
+
+#### Read Transaction Sequence
+
+1. **Read Address Phase**: Master drives ARADDR, ARVALID
+   - Slave responds with ARREADY
+
+2. **Read Data Phase**: Slave drives RDATA, RRESP, RVALID
+   - Master responds with RREADY
+   - RRESP indicates status
+
+### Implementation Details
 
 **Files**:
-- `rtl/uart/uart_tx.v` - UART Transmitter
-- `rtl/uart/uart_rx.v` - UART Receiver
-- `testbench/uart_tb.v` - UART Testbench
+- `rtl/axi/axi_lite_master.v` - AXI Lite Master
+- `rtl/axi/axi_lite_slave_simple.v` - AXI Lite Slave
 
-**Known Issues**:
-1. Baud rate timing mismatch between TX and RX
-2. RX not properly sampling data bits at mid-bit timing
-3. Test results show 0x00 received instead of transmitted data
+#### Master State Machine
 
-**Concepts Implemented**:
-- Baud rate generator using clock division
-- State machine for START, DATA, PARITY, STOP bits
-- 3-stage synchronizer for RX input (metastability prevention)
-- Configurable parity (none, odd, even)
-- LSB-first transmission
+```verilog
+localparam IDLE        = 3'd0;
+localparam WRITE_ADDR  = 3'd1;
+localparam WRITE_DATA  = 3'd2;
+localparam WRITE_RESP  = 3'd3;
+localparam READ_ADDR   = 3'd4;
+localparam READ_DATA   = 3'd5;
+localparam DONE        = 3'd6;
+```
 
-**Further Work Needed**:
-- Debug RX mid-bit sampling alignment
-- Verify baud rate calculations for non-integer divisions
-- Add comprehensive timing validation
+The master uses a 7-state FSM to manage transactions sequentially.
+
+#### Write Transaction Logic
+
+```verilog
+IDLE: begin
+    if (req) begin
+        AWADDR <= addr;
+        WDATA  <= wdata;
+        WSTRB  <= wstrb;
+        if (wr)
+            next_state = WRITE_ADDR;
+        else
+            next_state = READ_ADDR;
+    end
+end
+
+WRITE_ADDR: begin
+    AWVALID <= 1;
+    if (AWVALID && AWREADY)
+        next_state = WRITE_DATA;
+end
+
+WRITE_DATA: begin
+    WVALID <= 1;
+    if (WVALID && WREADY)
+        next_state = WRITE_RESP;
+end
+
+WRITE_RESP: begin
+    AWVALID <= 0;  // Deassert previous signals
+    WVALID  <= 0;
+    BREADY  <= 1;  // Ready for response
+    if (BVALID) begin
+        resp_ok <= (BRESP == 2'b00);  // Check OKAY response
+        next_state = DONE;
+    end
+end
+```
+
+**Key Points**:
+- Deassert AWVALID and WVALID in WRITE_RESP to avoid holding them high
+- BREADY stays high until BVALID is received
+- Check BRESP for error conditions
+
+#### Slave Implementation
+
+The simplified slave always responds immediately (AWREADY=1, WREADY=1, ARREADY=1):
+
+```verilog
+assign AWREADY = 1'b1;
+assign WREADY = 1'b1;
+assign ARREADY = 1'b1;
+```
+
+**Write Logic**:
+```verilog
+if (AWVALID && AWREADY) begin
+    wr_addr_reg <= AWADDR;  // Capture address
+    wr_addr_valid <= 1'b1;
+end
+
+if (WVALID && WREADY && wr_addr_valid) begin
+    // Perform write with byte strobes
+    if (WSTRB[0]) mem[wr_addr_reg[9:2]][7:0] <= WDATA[7:0];
+    if (WSTRB[1]) mem[wr_addr_reg[9:2]][15:8] <= WDATA[15:8];
+    // ...
+end
+```
+
+**Response Generation**:
+```verilog
+if (WVALID && WREADY && !BVALID) begin
+    BVALID <= 1;
+    BRESP <= (wr_addr_reg[9:2] < MEM_DEPTH) ? OKAY : SLVERR;
+end else if (BVALID && BREADY) begin
+    BVALID <= 0;  // Complete handshake
+end
+```
+
+### Common Pitfalls
+
+1. **Deadlock from VALID waiting for READY**
+   - **Symptom**: Transaction hangs, no progress
+   - **Cause**: Master asserts VALID only after seeing READY
+   - **Fix**: VALID must be independent of READY
+   ```verilog
+   // WRONG:
+   if (AWREADY)
+       AWVALID <= 1;  // Deadlock!
+
+   // CORRECT:
+   AWVALID <= 1;  // Assert regardless of READY
+   ```
+
+2. **Not deasserting VALID after handshake**
+   - **Symptom**: Multiple unintended transfers
+   - **Fix**: Deassert VALID immediately after transfer or when moving to next state
+
+3. **Address/Data Channel Ordering**
+   - AXI Lite allows address and data to arrive in any order
+   - Slave must handle both orderings correctly
+   - This implementation uses address capture register
+
+4. **Ignoring BRESP/RRESP**
+   - **Best Practice**: Always check response codes
+   - 2'b00 = OKAY
+   - 2'b10 = SLVERR (slave error)
+   - 2'b11 = DECERR (decode error)
+
+5. **Byte Strobe Misuse**
+   - WSTRB must remain constant during WVALID=1
+   - Each bit of WSTRB corresponds to a byte lane
+   - WSTRB=4'b0001 writes only byte [7:0]
+
+### Verification Results
+
+**Test File**: `testbench/axi_lite_tb.v`
+
+```
+Test 1: Write 0xCAFEBABE to address 0x10
+  Result: PASS - Write successful
+
+Test 2: Read from address 0x10
+  Result: PASS - Read data matches (0xcafebabe)
+
+Test 3: Write to 8 addresses
+  Results: All PASS - 8 writes successful
+
+Test 4: Read from 8 addresses
+  Results: All PASS - Data matches
+
+Test 5: Byte write with WSTRB
+  Write with WSTRB=4'b0001 (byte 0 only)
+  Result: PASS - Byte strobe write successful (0x000000FF)
+
+ALL TESTS PASSED!
+```
+
+---
+
+## UART (Universal Asynchronous Receiver/Transmitter)
+
+### Overview
+
+UART is an **asynchronous** serial communication protocol that transmits data without a shared clock. It's one of the simplest and most widely used protocols for serial communication.
+
+**Key Characteristics**:
+- **Asynchronous**: No clock signal, relies on agreed baud rate
+- **Point-to-point**: Typically two wires (TX, RX)
+- **Configurable**: Baud rate, data bits, parity, stop bits
+- **LSB-first**: Least significant bit transmitted first
+
+### Key Concepts
+
+#### UART Frame Format
+
+```
+IDLE  START  D0  D1  D2  D3  D4  D5  D6  D7  PARITY  STOP  IDLE
+‾‾‾‾\_____/‾‾‾\___/‾‾‾\___/‾‾‾\___/‾‾‾\___/‾‾‾‾‾‾\______/‾‾‾‾‾
+ 1     0    LSB                    MSB    ?       1
+```
+
+- **IDLE**: Line stays HIGH when not transmitting
+- **START bit**: Always 0 (low) - signals beginning of frame
+- **DATA bits**: 5-9 bits (typically 8), LSB first
+- **PARITY bit**: Optional error checking (even, odd, or none)
+- **STOP bit(s)**: 1 or 2 bits, always 1 (high)
+
+#### Baud Rate
+
+**Baud rate** = bits per second (bps)
+
+Common rates: 9600, 19200, 38400, 57600, **115200**, 230400, 460800
+
+**Clock Division**:
+```verilog
+CLKS_PER_BIT = System_Clock_Frequency / Baud_Rate
+
+Example: 1 MHz clock, 10 kbps baud
+CLKS_PER_BIT = 1,000,000 / 10,000 = 100 clocks per bit
+```
+
+### Implementation Details
+
+**Files**:
+- `rtl/uart/uart_working.v` - Working UART TX and RX modules
+
+#### TX State Machine
+
+```verilog
+localparam IDLE  = 0;
+localparam START = 1;
+localparam DATA  = 2;
+localparam STOP  = 3;
+```
+
+**State Progression**:
+1. **IDLE**: Wait for `start` signal, output TX=1
+2. **START**: Transmit start bit (TX=0) for CLKS_PER_BIT cycles
+3. **DATA**: Transmit 8 data bits, LSB first, each for CLKS_PER_BIT cycles
+4. **STOP**: Transmit stop bit (TX=1) for CLKS_PER_BIT cycles
+5. Return to IDLE
+
+**TX Implementation**:
+```verilog
+IDLE: begin
+    tx <= 1'b1;
+    busy <= 1'b0;
+    if (start) begin
+        data_reg <= data_in;  // Latch input data
+        state <= START;
+        busy <= 1'b1;
+    end
+end
+
+START: begin
+    tx <= 1'b0;  // Start bit
+    if (clk_count < CLKS_PER_BIT - 1) begin
+        clk_count <= clk_count + 1;
+    end else begin
+        clk_count <= 0;
+        state <= DATA;
+    end
+end
+
+DATA: begin
+    tx <= data_reg[bit_idx];  // Send current bit
+    if (clk_count < CLKS_PER_BIT - 1) begin
+        clk_count <= clk_count + 1;
+    end else begin
+        clk_count <= 0;
+        if (bit_idx == 7) begin
+            state <= STOP;
+            bit_idx <= 0;
+        end else begin
+            bit_idx <= bit_idx + 1;
+        end
+    end
+end
+```
+
+#### RX Sampling Strategy
+
+**Critical Concept**: Sample at the **middle** of each bit period for maximum noise immunity.
+
+```
+Bit Period
+|<---------------------->|
+START bit  Data bit 0
+_________               ________
+         \_____________/
+         ^      ^
+         |      |
+    Detect  Sample (middle)
+```
+
+**RX Implementation**:
+```verilog
+IDLE: begin
+    if (rx == 0) begin  // Falling edge = start bit
+        state <= START;
+        clk_count <= 0;
+    end
+end
+
+START: begin
+    // Wait to middle of start bit
+    if (clk_count == (CLKS_PER_BIT / 2)) begin
+        if (rx == 0) begin  // Verify still low
+            clk_count <= 0;
+            state <= DATA;
+        end else begin
+            state <= IDLE;  // False start
+        end
+    end else begin
+        clk_count <= clk_count + 1;
+    end
+end
+
+DATA: begin
+    if (clk_count < CLKS_PER_BIT - 1) begin
+        clk_count <= clk_count + 1;
+    end else begin
+        // Sample at end of bit period (middle of next bit)
+        clk_count <= 0;
+        data_reg[bit_idx] <= rx;
+        if (bit_idx == 7) begin
+            state <= STOP;
+        end else begin
+            bit_idx <= bit_idx + 1;
+        end
+    end
+end
+
+STOP: begin
+    if (clk_count < CLKS_PER_BIT - 1) begin
+        clk_count <= clk_count + 1;
+    end else begin
+        data_out <= data_reg;  // Output received data
+        valid <= 1;  // Pulse valid signal
+        state <= IDLE;
+    end
+end
+```
+
+### Common Pitfalls
+
+1. **Baud Rate Mismatch**
+   - **Symptom**: Corrupted data, all zeros or garbage
+   - **Cause**: TX and RX using different baud rates
+   - **Fix**: Ensure CLKS_PER_BIT calculation matches on both sides
+
+2. **Non-Integer Clock Division**
+   - **Problem**: 50 MHz / 115200 = 434.03 (not integer)
+   - **Effect**: Cumulative timing error over 10 bits
+   - **Solution**:
+     - Use integer-divisible combinations
+     - Or implement fractional baud rate generator
+   - **Example**: 100 MHz / 115200 = 868.05 ≈ 868 (0.006% error, acceptable)
+
+3. **Sampling at Bit Edges**
+   - **Wrong**: Sample immediately when bit changes
+   - **Right**: Sample at mid-bit (CLKS_PER_BIT/2 after transition)
+   - **Reason**: Allows for timing skew and noise
+
+4. **Not Handling False Starts**
+   - **Issue**: Noise can cause RX line to glitch low
+   - **Fix**: Verify start bit is still low at mid-bit before proceeding
+
+5. **Forgetting Busy Signal**
+   - **Problem**: Starting new transmission while previous is ongoing
+   - **Fix**: Check `busy` or `tx_ready` before asserting `start`
+
+6. **Testbench Timing Issues**
+   - **Mistake**: Using `@(posedge clk)` and immediately checking state
+   - **Issue**: Delta-cycle delays - state may not have updated yet
+   - **Fix**: Use `#delay` or additional clock cycle for observation
+
+### Verification Results
+
+**Test File**: `testbench/uart_working_tb.v`
+
+```
+Test 1: Sending 0xAA (10101010)
+  Result: PASS - Received 0xAA
+
+Test 2: Sending 0x55 (01010101)
+  Result: PASS - Received 0x55
+
+Test 3: Sending 0xFF (all ones)
+  Result: PASS - Received 0xFF
+
+Test 4: Sending 0x00 (all zeros)
+  Result: PASS - Received 0x00
+
+ALL TESTS PASSED!
+```
+
+**Timing**: 10 bits/byte * 100 clocks/bit * 1μs/clock = 1 ms per byte at 10 kbps
 
 ---
 
@@ -900,7 +1318,8 @@ end
 | I2C      | ✅ Verified | START/address/data/STOP sequence | Multi-master, open-drain |
 | FIFO     | ✅ Verified | Fill/empty/simultaneous R/W | Buffering, flow control |
 | APB      | ✅ Verified | Read/write/back-to-back transfers | Simple peripheral bus |
-| UART     | ⚠️ Needs debug | TX/RX timing issues | Asynchronous, standard baud rates |
+| AXI Lite | ✅ Verified | 5 tests including byte strobe writes | 5-channel handshaking |
+| UART     | ✅ Verified | TX/RX tests (0xAA, 0x55, 0xFF, 0x00) | Asynchronous, standard baud rates |
 
 ---
 
@@ -909,8 +1328,10 @@ end
 1. **SPI**: Motorola SPI Block Guide
 2. **I2C**: NXP I2C-bus specification (UM10204)
 3. **APB**: ARM AMBA APB Protocol Specification v2.0
-4. **Verilog**: IEEE 1364-2005 Standard
-5. **SystemVerilog**: IEEE 1800-2017 Standard
+4. **AXI Lite**: ARM AMBA AXI4-Lite Protocol Specification
+5. **UART**: Industry standard asynchronous serial communication
+6. **Verilog**: IEEE 1364-2005 Standard
+7. **SystemVerilog**: IEEE 1800-2017 Standard
 
 ---
 
