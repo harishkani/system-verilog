@@ -2,6 +2,13 @@
 
 This comprehensive guide covers the most important communication protocols used in digital design: SPI, UART, I2C, AMBA protocols, and FIFO implementations. Each section includes detailed explanations, timing diagrams, and complete SystemVerilog implementations.
 
+## Documentation Structure
+
+📖 **This Document**: Complete protocol specifications and ready-to-use SystemVerilog code
+📖 **[Detailed Code Explanations](Communication_Protocols_Detailed_Explanations.md)**: Line-by-line explanations of how the code works, design decisions, and timing analysis
+
+👉 **New to these protocols?** Start with this guide, then read the detailed explanations to understand the implementation.
+
 ## Table of Contents
 1. [SPI (Serial Peripheral Interface)](#spi-serial-peripheral-interface)
 2. [UART (Universal Asynchronous Receiver/Transmitter)](#uart-universal-asynchronous-receiver-transmitter)
